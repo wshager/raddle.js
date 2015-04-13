@@ -1,0 +1,5 @@
+define(abs,(number?),number)
+define(ceiling,(number?),number)
+define(floor,(number?),number)
+define(round,(number?),number)
+define(round-half-to-even,(number?),number)

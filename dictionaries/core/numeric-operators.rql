@@ -1,0 +1,8 @@
+define(add,(number,number),number),
+define(subtract,(number,number),number),
+define(multiply,(number,number),number),
+define(divide,(number,number),number),
+define(integer-divide,(number,number),number),
+define(mod,(number,number),number),
+define(unary-plus,(number),number),
+define(unary-minus,(number),number)

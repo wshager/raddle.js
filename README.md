@@ -1,4 +1,4 @@
 # erql
 Extensible RQL
 
-See /rqld.git for definition files.
+See https://github.com/wshager/rqld.git for definition files.

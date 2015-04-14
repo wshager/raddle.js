@@ -1,3 +1,0 @@
-define(equal,(number,number),boolean),
-define(less-than,(number,number),boolean),
-define(greater-than,(number,number),boolean)

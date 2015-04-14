@@ -1,2 +1,0 @@
-define(codepoints-to-string,(number*),string),
-define(string-to-codepoints,(string?),number*)

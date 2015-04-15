@@ -168,16 +168,6 @@ exports.parseGently = function(){
 	return terms;
 }
 
-exports.commonOperatorMap = {
-	"and" : "&",
-	"or" : "|",
-	"eq" : "=",
-	"ne" : "!=",
-	"le" : "<=",
-	"ge" : ">=",
-	"lt" : "<",
-	"gt" : ">"
-}
 function stringToValue(string, parameters){
 	var converter = exports.converters['default'];
 	if(string.charAt(0) === "$"){
@@ -195,6 +185,8 @@ function stringToValue(string, parameters){
 	return converter(string);
 };
 
+// FIXME this should be taken care of by typing
+// however, type inference could be necessary
 var autoConverted = exports.autoConverted = {
 	"true": true,
 	"false": false,

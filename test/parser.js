@@ -6,26 +6,11 @@ define(function (require) {
 		JSON = require('intern/dojo/json'),
 		supportsDateString = !isNaN(new Date('2009')),
 		queryPairs = {
-			arrays: {
-				a: { name: 'and', args: [ 'a' ]},
-				'(a)': { name: 'and', args: [[ 'a' ]]},
-				'a,b,c': { name: 'and', args: [ 'a', 'b', 'c' ]},
-				'(a,b,c)': { name: 'and', args: [[ 'a', 'b', 'c']]},
-				'a(b)': { name: 'and', args: [{ name: 'a', args: [ 'b' ]}]},
-				'a(b,c)': { name: 'and', args: [{ name: 'a', args: [ 'b', 'c' ]}]},
-				'a((b),c)': { name: 'and', args: [{ name: 'a', args: [ [ 'b' ], 'c' ]}]},
-				'a((b,c),d)': { name: 'and', args: [{ name: 'a', args: [ [ 'b', 'c' ], 'd' ]}]},
-				'a(b/c,d)': { name: 'and', args: [{ name: 'a', args: [ [ 'b', 'c' ], 'd' ]}]},
-				'a(b)&c(d(e))': { name: 'and', args:[
-					{ name: 'a', args: [ 'b' ]},
-					{ name: 'c', args: [ { name: 'd', args: [ 'e' ]} ]}
-				]}
+			define: {
+				'define(test,(number,number),number)': { name: 'and', args: [{ name: 'define', args: ['test', [ 'number', 'number' ], 'number' ]}]}
 			},
-			'complex coercion': {
-				'(a=b|c=d)&(e=f|g=1)': { name: 'and', args: [
-					{ name: 'or', args: [{ name: 'eq', args: [ 'a', 'b' ]}, { name: 'eq', args: [ 'c', 'd' ]}]},
-					{ name: 'or', args: [{ name: 'eq', args: [ 'e', 'f' ]}, { name: 'eq', args: [ 'g', 1 ]}]}
-				]}
+			use: {
+				'use(http://test.org/test/bla.rql,/local/foo.rql)': { name: 'and', args: [{ name: 'use', args: ['http://test.org/test/bla.rql', '/local/foo.rql' ]}]}
 			}
 		},
 		testParsing = (function () {
@@ -95,50 +80,6 @@ define(function (require) {
 	test({
 		name: 'rql/test/parsing',
 
-		testBehavior: function () {
-			//assert.error(parseQuery(), "parseQuery requires a string");
-			assert.ok(parseQuery('') instanceof Query, 'should inherit from Query');
-			assert.ok(parseQuery('a=b') instanceof Query, 'should inherit from Query');
-			//assert.error(parseQuery('?a=b'), 'cannot begin with a ?');
-		},
-
-		testParsing: testParsing,
-
-		testBindParameters: function () {
-			// TODO
-			var parsed;
-			parsed = parseQuery('in(id,$1)', [['a','b','c']]);
-			assert.strictEqual(JSON.stringify(parsed), JSON.stringify({
-				name: 'and',
-				args: [{ name: 'in', args: [ 'id', [ 'a', 'b', 'c' ]]}],
-				cache: {}
-			}));
-			parsed = parseQuery('eq(id,$1)', [ 'a' ]);
-			assert.deepEqual(JSON.stringify(parsed), JSON.stringify({
-				name: 'and',
-				args: [{ name: 'eq', args: ['id', 'a']}],
-				cache: {id: 'a'}
-			}));
-		},
-
-		testStringification: function () {
-			// TODO
-			var parsed;
-			parsed = parseQuery('eq(id1,RE:%5Eabc%5C%2F)');
-			// Hmmm. deepEqual gives null for regexps?
-			assert.ok(parsed.args[0].args[1].toString() === /^abc\//.toString());
-			//assert.deepEqual(parsed, {name: 'and', args: [{name: 'eq', args: ['id1', /^abc\//]}]});
-			assert.ok(new Query().eq('_1',/GGG(EE|FF)/i) + '' === 'eq(_1,re:GGG%28EE%7CFF%29)');
-			parsed = parseQuery('eq(_1,re:GGG%28EE%7CFF%29)');
-			console.log(parsed.args[0].args[1].toString() === /GGG(EE|FF)/i.toString());
-			//assert.ok(Query().eq('_1',/GGG(EE|FF)/)+'' === 'eq(_1,RE:GGG%28EE%7CFF%29)');
-			// string to array and back
-			var str = 'somefunc(and(1),(a,b),(10,(10,1)),(a,b.c))';
-			assert.equal(parseQuery(str) + '', str);
-			// quirky arguments
-			var name = ['a/b','c.d'];
-			assert.equal(parseQuery(new Query().eq(name,1) + '') + '', 'eq((a%2Fb,c.d),1)');
-			assert.deepEqual(parseQuery(new Query().eq(name,1) + '').args[0].args[0], name);
-		}
+		testParsing: testParsing
 	});
 });

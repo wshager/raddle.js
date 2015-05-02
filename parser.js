@@ -21,7 +21,7 @@ exports.lastSeen = ['sort', 'select', 'values', 'limit'];
 exports.jsonQueryCompatible = true;
 // allow slashes, process later
 // TODO convert back to inline for performance
-var chars = (/\+\*\$\-:\w%\._\//).source;
+var chars = (/\+\*\$\-:\w%\._\/?/).source;
 exports.normalizeRegExp = new RegExp("(\(["+chars+",]+\)|["+chars+"]*|)([<>!]?=(?:[\w]*=)?|>|<)(\(["+chars+",]+\)|["+chars+"]*|)","g");
 exports.leftoverRegExp = new RegExp((/(\))|([&\|,])?/).source+"([/"+chars+"/]*)"+(/(\(?)/).source,"g");
 
@@ -177,7 +177,7 @@ exports.parseGently = function(){
 
 // this can get replaced by the chainable query if query.js is loaded
 exports.Query = function(){
-	this.name = "and";
+	this.name = "";
 	this.args = [];
 };
 return exports;

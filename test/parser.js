@@ -1,16 +1,21 @@
 define(function (require) {
 	var test = require('intern!object'),
 		assert = require('intern/chai!assert'),
-		Query = require('../query').Query,
+		//Query = require('../query').Query,
 		parseQuery = require('../parser').parseQuery,
-		JSON = require('intern/dojo/json'),
+		//JSON = require('intern/dojo/json'),
 		supportsDateString = !isNaN(new Date('2009')),
 		queryPairs = {
 			define: {
-				'define(test,(number,number),number)': { name: 'and', args: [{ name: 'define', args: ['test', [ 'number', 'number' ], 'number' ]}]}
+				'define(test,(number,number),number)': { name: 'define', args: ['test', [ 'number', 'number' ], 'number' ]},
+				'define(group-by,(any*,map),(function),fold-right(map-merge(?,(map-get(?),ifnull(append(list-new()),append)))))':
+					{name:'define', args:['group-by',['any*','map'],['function'],{name:'fold-right',args:[{"name":"map-merge","args":["?",[{"name":"map-get","args":["?"]},{"name":"ifnull","args":[{"name":"append","args":[{"name":"list-new","args":[]}]},"append"]}]]}]}]},
 			},
 			use: {
-				'use(http://test.org/test/bla.rql,/local/foo.rql)': { name: 'and', args: [{ name: 'use', args: ['http://test.org/test/bla.rql', '/local/foo.rql' ]}]}
+				'use(http://test.org/test/bla.rql,/local/foo.rql)': { name: 'use', args: ['http://test.org/test/bla.rql', '/local/foo.rql' ]}
+			},
+			and:{
+				'and(eq(a,b))': { name: 'and', args: [{ name: 'eq', args: ['a', 'b' ]}]}
 			}
 		},
 		testParsing = (function () {
@@ -58,7 +63,6 @@ define(function (require) {
 					test[ key ] = f(key, pairs);
 				}
 			}
-
 			return tests;
 		})();
 

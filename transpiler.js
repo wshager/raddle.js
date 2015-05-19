@@ -79,7 +79,7 @@ define(["exports", "./parser", "./util/each", "./util/contains"], function(expor
 		var self = this;
 		var def;
 		if(value instanceof Array){
-			return new Function(,value.map(function(_){
+			return new Function("__s","__t",value.map(function(_){
 				return self.compile(_).toString();
 			}).join(""));
 		}

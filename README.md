@@ -6,7 +6,7 @@ See https://github.com/wshager/raddled.git for definition files.
 
 ## What's this?
 
-Raddle is a rad new language for manipulating structured documents on the web. It is fully-featured, functional, point-less, URL-encodable, type-safe and free as beer.
+Raddle is a rad new language for manipulating structured documents on the web. It is [#user-content-fully-featured](fully-featured), [#user-content-functional](functional), [#user-content-point-less](point-less), [#user-content-URL-encodable](URL-encodable), [#user-content-type-safe](type-safe) and free as beer.
 
 ### Fully-featured
 

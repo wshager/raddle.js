@@ -33,4 +33,4 @@ With Raddle's type declarations, types are kept in check.
 
 RQL is a great tool for querying JSON, but with Raddle you can extend that greatness! It is capable of handling more types than arrays of objects, and you can add new functionality, either inline or from external modules.
 
-Furthermore, Raddle encourages implementation in other languages, as the definitions are clear and concise from the start.
+Furthermore, Raddle encourages implementation in other languages, as its core definitions are clear and concise from the start.

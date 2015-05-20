@@ -14,7 +14,7 @@ The Raddle core implements the entire W3C XPATH 3.0 specification and then some.
 
 ### Functional
 
-Raddle has all the good things from functional programming, including respect for immutability, higher-order functions, abstraction, recursion and referential transparency.
+Raddle has all the good things from functional programming, including respect for [immutability](http://en.wikipedia.org/wiki/Referential_transparency_%28computer_science%29), [higher-order functions](http://en.wikipedia.org/wiki/Higher-order_function), [abstraction](http://en.wikipedia.org/wiki/Lambda_calculus), [recursion](http://en.wikipedia.org/wiki/Recursion_%28computer_science%29) and [referential transparency](http://en.wikipedia.org/wiki/Referential_transparency_%28computer_science%29).
 
 ### Point-less
 

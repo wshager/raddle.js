@@ -10,11 +10,9 @@ define(function (require) {
 		testTranspiling: function () {
 			var transpiler = new Transpiler();
 			transpiler.use({name:"use",args:["core/aggregate-functions","core/string-regex-functions"]},{callback:function(){
-				var def = transpiler.process("define(depth,(string,number),(),(tokenize(/),count()))");
+				var def = transpiler.process("define(depth,(string,number),(string),(tokenize(/),count()))");
 				var fn = def.body;
-				var stack = ["/a/v/b"];
-				fn(stack,transpiler.typeCheck)
-				console.warn(stack)
+				console.warn(fn("/a/v/b"),fn.toString())
 			}});
 		}
 	});

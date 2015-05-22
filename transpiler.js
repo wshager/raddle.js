@@ -42,10 +42,10 @@ define(["exports", "./parser", "./util/each", "./util/contains"], function(expor
 			return this.define(value,params);
 		} else if(value.name=="" && value.args) {
 			return value.args.map(function(arg){
-				return this.process(arg,params);
+				return this.process(arg,params,value);
 			},this);
 		} else {
-			return this.compile(value);
+			return this.compile(value,value.name);
 		}
 	};
 	
@@ -73,15 +73,26 @@ define(["exports", "./parser", "./util/each", "./util/contains"], function(expor
 		return value;
 	};
 	
-	Transpiler.prototype.compile = function(value){
+	Transpiler.prototype.compile = function(value,name,funs,args){
 		// TODO compose to single,stackless function
 		// compose
 		var self = this;
 		var def;
 		if(value instanceof Array){
-			return new Function("__s","__t",value.map(function(_){
-				return self.compile(_).toString();
-			}).join(""));
+			var arity = args.length;
+			var fn = "";
+			var map = function(a){
+				var f = self.compile(value.shift());
+				a.unshift(f[0]);
+				a.push(f[1]);
+				if(value.length) {
+					return map(a);
+				} else {
+					return a;
+				}
+			}
+			var a = map(["x"]);
+			return new Function("return function "+name+"(x){ return "+a.join("")+";}")();
 		}
 		def = this.dict[value.name];
 		if(!def) throw new Error("Definition for "+value.name+" not in dictionary");
@@ -101,7 +112,7 @@ define(["exports", "./parser", "./util/each", "./util/contains"], function(expor
 		} else if(def.args) {
 			throw new Error("No arguments supplied");
 		}
-		return "__t(__s,'"+__i+"');\n__s.push(("+__f.toString()+").call(null,__s.pop()"+stringify(args)+"));\n__t(__s,'"+__o+"');\n";
+		return ["("+__f.toString()+").call(this,",stringify(args)+")"];
 	};
 	
 	Transpiler.prototype.define = function(value,params){
@@ -122,7 +133,7 @@ define(["exports", "./parser", "./util/each", "./util/contains"], function(expor
 			args = value.args[2];
 			if(l==4){
 				// compile definition
-				body = this.compile(value.args[3]);
+				body = this.compile(value.args[3],name,funs,args);
 			} else {
 				// known definition
 				if(params.use) body = this.lib[params.use][name];

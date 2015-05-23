@@ -9,10 +9,11 @@ define(function (require) {
 		name: 'rql/test/transpiling',
 		testTranspiling: function () {
 			var transpiler = new Transpiler();
-			transpiler.use({name:"use",args:["core/aggregate-functions","core/string-regex-functions"]},{callback:function(){
-				var def = transpiler.process("define(depth,(string,number),(string),(tokenize(/),count()))");
+			transpiler.use({name:"use",args:["core/numeric-arithmetic-operators"]},{callback:function(){
+				//var def = transpiler.process("define(depth,(string,number),(),(tokenize(/),count()))");
+				var def = transpiler.process("define(add2,(any*,number),(number),add(2,?))");
 				var fn = def.body;
-				console.warn(fn("/a/v/b"),fn.toString())
+				console.warn(fn.toString())
 			}});
 		}
 	});

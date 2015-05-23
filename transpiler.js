@@ -15,7 +15,7 @@ define(["exports", "./parser", "./util/each", "./util/contains"], function(expor
 		// TODO filter and separate core definitions
 		var core = value.args;
 		var reqs = core.map(function(_){
-			return "intern/dojo/text!/rqld/"+_+".rql";
+			return "intern/dojo/text!/rqld/"+_+".rad";
 		});
 		var self = this;
 		require(core,function(){
@@ -45,7 +45,7 @@ define(["exports", "./parser", "./util/each", "./util/contains"], function(expor
 				return this.process(arg,params,value);
 			},this);
 		} else {
-			return this.compile(value,value.name);
+			return this.compile(value);
 		}
 	};
 	
@@ -73,33 +73,81 @@ define(["exports", "./parser", "./util/each", "./util/contains"], function(expor
 		return value;
 	};
 	
-	Transpiler.prototype.compile = function(value,name,funs,args){
-		// TODO compose to single,stackless function
-		// compose
-		var self = this;
-		var def;
-		if(value instanceof Array){
-			var arity = args.length;
-			var fn = "";
-			var map = function(a){
-				var f = self.compile(value.shift());
-				a.unshift(f[0]);
-				a.push(f[1]);
-				if(value.length) {
-					return map(a);
-				} else {
-					return a;
-				}
-			}
-			var a = map(["x"]);
-			return new Function("return function "+name+"(x){ return "+a.join("")+";}")();
+	Transpiler.prototype.type = function(t){
+		// 0: null
+		// 1: number
+		// 2: string
+		// 3: boolean
+		// 4: map
+		// 5: any
+		// 6: number*
+		// 7: string*
+		// 8: boolean*
+		// 9: map*
+		// 10: any*
+		var ts = ["number","string","boolean","map","any"];
+		if(t.match(/\*/)){
+			t = t.replace(/\*/,"");
+			return ts.indexOf(t)+6;
 		}
-		def = this.dict[value.name];
+		return ts.indexOf(t)+1;
+	};
+	
+	Transpiler.prototype.matchTypes = function(i,o){
+		var ti = this.type(i);
+		var to = this.type(o);
+		console.warn(i,ti,"->",o,to);
+		if(ti==to) return true;
+		if(ti>0&&ti<5 && to==5) return true;
+		if(to>0&&to<5 && ti==5) return true;
+		if(ti>5&&ti<10 && to==10) return true;
+		if(to>5&&to<10 && ti==10) return true;
+		return false;
+	};
+	
+	Transpiler.prototype.compile = function(value,parent){
+		// TODO compile literals like ?
+		var self = this;
+		if(parent){
+			var name = parent.name;
+			var args = parent.args;
+			var sigs = parent.sigs;
+			var a = [];
+			var arity = args.length;
+			for(var i=0;i<=arity;i++){
+				a.push("arg"+i);
+			}
+			// this means the function was called from "define"
+			if(value instanceof Array){
+				// compose the functions in the array
+				var map = function(a,i,o){
+					var v = value.shift();
+					var f = self.compile(v);
+					var def = self.dict[v.name];
+					if(!self.matchTypes(i,def.sigs[0])){
+						throw new Error("Type signatures do not match: "+i+"->"+def.sigs[0]);
+					}
+					a.unshift(f[0]);
+					a.push(f[1]);
+					if(value.length) {
+						return map(a,def.sigs[1],o);
+					} else {
+						if(!self.matchTypes(o,def.sigs[1])){
+							throw new Error("Type signatures do not match: "+o+"->"+def.sigs[1]);
+						}
+						return a;
+					}
+				}
+				var f = map([a.join(",")],sigs[0],sigs[1]);
+				return new Function("return function "+name+"("+a.join(",")+"){ return "+f.join("")+";}")();
+			} else {
+				var f = self.compile(value);
+				var def = self.dict[value.name];
+				console.warn(f,def)
+			}
+		}
+		var def = this.dict[value.name];
 		if(!def) throw new Error("Definition for "+value.name+" not in dictionary");
-		var __f = def.body;
-		var __i = def.funs[0];
-		var __o = def.funs[1];
-		var __t = this.typeCheck;
 		var args = value.args;
 		// static type checks
 		if(args){
@@ -112,38 +160,42 @@ define(["exports", "./parser", "./util/each", "./util/contains"], function(expor
 		} else if(def.args) {
 			throw new Error("No arguments supplied");
 		}
-		return ["("+__f.toString()+").call(this,",stringify(args)+")"];
+		return ["("+def.body.toString()+").call(this,",stringify(args)+")"];
 	};
 	
 	Transpiler.prototype.define = function(value,params){
 		var l = value.args.length;
 		var name = value.args[0];
-		var funs = [], args = [];
+		var sigs = [], args = [];
 		var body,def;
 		if(l==2){
 			// lookup
 			def = this.dict[value.args[1]];
 			if(!def) throw new Error("Unknown reference in definition "+name);
-			funs = def.funs;
+			sigs = def.sigs;
 			args = def.args;
 			body = def.body;
 		} else if(l==3 || l==4){
 			// core
-			funs = value.args[1];
+			sigs = value.args[1];
 			args = value.args[2];
 			if(l==4){
-				// compile definition
-				body = this.compile(value.args[3],name,funs,args);
+				body = value.args[3];
 			} else {
 				// known definition
 				if(params.use) body = this.lib[params.use][name];
 			}
 		}
 		def = {
-			funs:funs,
+			name:name,
+			sigs:sigs,
 			args:args,
 			body:body
 		};
+		if(l==4) {
+			// compile definition
+			def.body = this.compile(body,def);
+		}
 		this.dict[name] = def;
 		return def;
 	};

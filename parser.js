@@ -48,6 +48,7 @@ function parse(/*String|Object*/query, parameters){
 	if(query.charAt(0) == "?"){
 		throw new URIError("Query must not start with ?");
 	}
+	query = query.replace(/\s/g,"");
 	if(exports.jsonQueryCompatible){
 		query = query.replace(/%3C=/g,"=le=").replace(/%3E=/g,"=ge=").replace(/%3C/g,"=lt=").replace(/%3E/g,"=gt=");
 	}

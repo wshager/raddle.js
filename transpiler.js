@@ -1,5 +1,5 @@
-({define:typeof define!="undefined"?define:function(deps, factory){module.exports = factory(exports, require("./parser"), require("./util/each"), require("./util/contains"));}}).
-define(["exports", "./parser", "./util/each", "./util/contains"], function(exports, parser, each, contains){
+({define:typeof define!="undefined"?define:function(deps, factory){module.exports = factory(exports, require("./parser"));}}).
+define(["exports", "./parser"], function(exports, parser, Deferred){
 	
 	function Transpiler(execute){
 		this.dict = {};
@@ -11,11 +11,11 @@ define(["exports", "./parser", "./util/each", "./util/contains"], function(expor
 		return str.length>2 ? ","+str.substring(1,str.length-1) : "";
 	}
 	
-	Transpiler.prototype.use = function(value,params){
+	Transpiler.prototype.use = function(value,params,callback){
 		// TODO filter and separate core definitions
 		var core = value.args;
 		var reqs = core.map(function(_){
-			return "intern/dojo/text!/rqld/"+_+".rad";
+			return "intern/dojo/text!/raddled/"+_+".rad";
 		});
 		var self = this;
 		require(core,function(){
@@ -27,23 +27,55 @@ define(["exports", "./parser", "./util/each", "./util/contains"], function(expor
 				var deps = Array.prototype.slice.call(arguments);
 				deps.forEach(function(dep,i){
 					var parsed = parser.parse(dep);
-					if(parsed.args.length) self.process(parsed,{use:core[i]});
+					if(parsed.args.length) self.process(parsed,{use:core[i]},callback);
 				});
-				if(params.callback) params.callback();
+				if(callback) callback();
 			});
 		});
 	};
 	
-	Transpiler.prototype.process = function(value,params){
+	Transpiler.prototype.transpile = function(value,params){
+		var ret = this.process(value,params).filter(function(_){
+			return !!_;
+		}).pop();
+		if(params.callback) {
+			
+		}
+		return ret;
+	};
+	
+	Transpiler.prototype.process = function(value,params,callback){
+		var args = Array.prototype.slice.call(arguments);
+		var value = args.shift();
+		var params = args.length>1 && typeof args[0]!="function" ? args.shift() : {};
+		var callback = args.shift();
 		if(typeof value == "string") value = parser.parse(value);
 		if(value.name=="use"){
-			this.use(value,params);
+			this.use(value,params,callback);
 		} else if(value.name=="define"){
-			return this.define(value,params);
+			this.define(value,params);
 		} else if(value.name=="" && value.args) {
-			return value.args.map(function(arg){
-				return this.process(arg,params,value);
-			},this);
+			var self=this,use,define=[],args=[];
+			value.args.forEach(function(arg){
+				if(arg.name=="use") {
+					use = arg;
+				} else if(arg.name=="define"){
+					define.push(arg);
+				} else {
+					args.push(arg);
+				}
+			});
+			var cb = callback ? callback : function(){};
+			callback = function(){
+				define.forEach(function(arg){
+					self.define(arg,params);
+				});
+				var ret = args.map(function(arg){
+					return self.process(arg,params,callback);
+				}).pop();
+				cb(null,ret);
+			};
+			use ? this.use(use,params,callback) : callback();
 		} else {
 			return this.compile(value);
 		}
@@ -108,59 +140,61 @@ define(["exports", "./parser", "./util/each", "./util/contains"], function(expor
 	Transpiler.prototype.compile = function(value,parent){
 		// TODO compile literals like ?
 		var self = this;
+		var name,sigs=new Array(2),args=[];
 		if(parent){
+			// called from define, so compile to a definition body
 			var name = parent.name;
 			var args = parent.args;
 			var sigs = parent.sigs;
-			var a = [];
-			var arity = args.length;
-			for(var i=0;i<=arity;i++){
-				a.push("arg"+i);
+		}
+		var a = [];
+		var arity = args.length;
+		for(var i=1;i<=arity;i++){
+			a.push("arg"+i);
+		}
+		var fa = a.slice(0);
+		fa.unshift("arg0");
+		var fargs = fa.join(",");
+		// always compose
+		if(!(value instanceof Array)) value = [value];
+		// compose the functions in the array
+		var map = function(acc,i,o){
+			var v = value.shift();
+			var def = self.dict[v.name];
+			if(!def) throw new Error("Definition for "+v.name+" not in dictionary");
+			if(i && !self.matchTypes(i,def.sigs[0])){
+				throw new Error("Type signatures do not match: "+i+"->"+def.sigs[0]);
 			}
-			// this means the function was called from "define"
-			if(value instanceof Array){
-				// compose the functions in the array
-				var map = function(a,i,o){
-					var v = value.shift();
-					var f = self.compile(v);
-					var def = self.dict[v.name];
-					if(!self.matchTypes(i,def.sigs[0])){
-						throw new Error("Type signatures do not match: "+i+"->"+def.sigs[0]);
-					}
-					a.unshift(f[0]);
-					a.push(f[1]);
-					if(value.length) {
-						return map(a,def.sigs[1],o);
-					} else {
-						if(!self.matchTypes(o,def.sigs[1])){
-							throw new Error("Type signatures do not match: "+o+"->"+def.sigs[1]);
-						}
-						return a;
-					}
+			acc.unshift("("+def.body.toString()+").call(this,");
+			// TODO static arg type checks
+			var args;
+			if(v.args){
+				if(!def.args || v.args.length!=def.args.length){
+					throw new Error("Argument length incorrect");
 				}
-				var f = map([a.join(",")],sigs[0],sigs[1]);
-				return new Function("return function "+name+"("+a.join(",")+"){ return "+f.join("")+";}")();
+				// replace ? args in order
+				args = v.args.map(function(_,i){
+					return _=="?" ? a.shift() : JSON.stringify(self.coerce(_,def.args[i],true));
+				},this);
+			} else if(def.args) {
+				throw new Error("No arguments supplied");
+			}
+			acc.push(","+args.join(",")+")");
+			if(value.length) {
+				return map(acc,def.sigs[1],o);
 			} else {
-				var f = self.compile(value);
-				var def = self.dict[value.name];
-				console.warn(f,def)
+				if(o && !self.matchTypes(o,def.sigs[1])){
+					throw new Error("Type signatures do not match: "+o+"->"+def.sigs[1]);
+				}
+				return acc;
 			}
 		}
-		var def = this.dict[value.name];
-		if(!def) throw new Error("Definition for "+value.name+" not in dictionary");
-		var args = value.args;
-		// static type checks
-		if(args){
-			if(!def.args || args.length!=def.args.length){
-				throw new Error("Argument length incorrect");
-			}
-			args = args.map(function(arg,i){
-				return this.coerce(arg,def.args[i]);
-			},this);
-		} else if(def.args) {
-			throw new Error("No arguments supplied");
-		}
-		return ["("+def.body.toString()+").call(this,",stringify(args)+")"];
+		var f = map([a],sigs[0],sigs[1]);
+		// put default input arg in a
+		a.unshift("arg0");
+		var index = f.indexOf(a);
+		f[index] = a.join(",");
+		return new Function("return function "+name+"("+fargs+"){ return "+f.join("")+";}")();
 	};
 	
 	Transpiler.prototype.define = function(value,params){

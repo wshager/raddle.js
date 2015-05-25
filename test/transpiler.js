@@ -1,20 +1,26 @@
 define(function (require) {
-	var test = require('intern!object'),
+	var registerSuite = require('intern!object'),
 		assert = require('intern/chai!assert'),
 		//Query = require('../query').Query,
 		parseQuery = require('../parser').parseQuery,
 		Transpiler = require('../transpiler').Transpiler,
 		JSON = require('intern/dojo/json');
-	test({
+	registerSuite({
 		name: 'rql/test/transpiling',
-		testTranspiling: function () {
+		"use(core/numeric-arithmetic-operators),define(add2,(number,number),(number,number),(add(?),add(?))),add2(2,3)": function () {
+			var dfd = this.async(1000);
 			var transpiler = new Transpiler();
-			transpiler.use({name:"use",args:["core/numeric-arithmetic-operators"]},{callback:function(){
-				//var def = transpiler.process("define(depth,(string,number),(),(tokenize(/),count()))");
-				var def = transpiler.process("define(add2,(any*,number),(number),add(2,?))");
-				var fn = def.body;
-				console.warn(fn.toString())
-			}});
+			var ready = dfd.callback(function (error, fn) {
+		          if (error) {
+		            throw error;
+		          }
+		          assert.equal(fn(1),6,'Addition operator should add numbers together');
+			});
+			//var def = transpiler.process("define(depth,(string,number),(),(tokenize(/),count()))");
+			transpiler.process("use(core/numeric-arithmetic-operators),define(add2,(number,number),(number,number),(add(?),add(?))),add2(2,3)",function(err,fn){
+				ready(err,fn);
+			});
+			return dfd;
 		}
 	});
 });

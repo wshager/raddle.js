@@ -82,7 +82,7 @@ define(function (require) {
 	}
 
 	test({
-		name: 'rql/test/parsing',
+		name: 'raddle/test/parsing',
 
 		testParsing: testParsing
 	});

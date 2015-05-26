@@ -119,19 +119,30 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 		// 10: map*
 		// 11: function*
 		// 12: any*
-		var ts = ["number","string","boolean","map","function","any"];
-		if(t.match(/\*/)){
-			t = t.replace(/\*/,"");
-			return ts.indexOf(t)+7;
+		var ts = ["null","number","string","boolean","map","function","any"];
+		var rt = new Array(2);
+		rt[1] = -1;
+		var re = /(\*)|(\+)|(\-)/;
+		var gr = t.match(re);
+		if(gr) {
+			var i=0,l=gr.length;
+			for(;i<l;i++){
+				if(gr[i+1]) break;
+			}
+			rt[1] = i;
 		}
-		return ts.indexOf(t)+1;
+		t = t.replace(re,"");
+		rt[0] = ts.indexOf(t);
+		console.warn(rt)
+		return rt;
 	};
 	
 	Transpiler.prototype.matchTypes = function(i,o){
 		var ti = this.type(i);
 		var to = this.type(o);
 		console.warn(i,ti,"->",o,to);
-		if(ti==to) return true;
+		// string->string* 2,-1->2,0
+		if(ti[0]==to[0] && to[1]>=ti[1]) return true;
 		if(ti>0&&ti<6 && to==6) return true;
 		if(to>0&&to<6 && ti==6) return true;
 		if(ti>6&&ti<12 && to==12) return true;

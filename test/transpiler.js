@@ -13,14 +13,15 @@ define(function (require) {
 			var dfd = this.async(5000);
 			var transpiler = new Transpiler();
 			var ready = dfd.callback(cb);
-			transpiler.process(key,function(err,fn){
-				ready(err,fn);
+			transpiler.process(key,function(error,fn){
+				if(error) throw error;
+				console.log(fn.toString());
+				ready(error,fn);
 			});
 			return dfd;
 		};
 	}
 	add("use(core/string-regex-functions,core/aggregate-functions),define(depth,(string,number),(),(tokenize(/),count())),depth()",function(error,fn){
-		if(error) throw error;
 		var path = "";
 		for(var i=0;i<10000;i++){
 			path += "/" + Math.random().toString(36).substring(7);
@@ -28,15 +29,9 @@ define(function (require) {
 		assert.equal(fn(path),10001);
 	});
 	add("use(core/numeric-arithmetic-operators),define(add2,(number,number),(number,number),(add(?),add(?))),add2(2,3)",function (error, fn) {
-		if (error) {
-			throw error;
-		}
 		assert.equal(fn(1),6,'Addition operator should add numbers together');
 	});
-	add("use(core/numeric-arithmetic-operators,core/higher-order-functions),define(sum,(any*,any*),(),fold-left(add,0)),sum()",function (error, fn) {
-		if (error) {
-			throw error;
-		}
+	add("use(core/numeric-arithmetic-operators,core/higher-order-functions),define(sum,(any*,any*),(),fold-left(add#1,0)),sum()",function (error, fn) {
 		var arr = [];
 		for(var i=0;i<10000;i++){
 			arr.push(i);

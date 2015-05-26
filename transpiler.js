@@ -65,7 +65,7 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 					args.push(arg);
 				}
 			});
-			var cb = callback ? callback : function(){};
+			var cb = !params.use && !!callback ? callback : function(){};
 			callback = function(){
 				define.forEach(function(arg){
 					self.define(arg,params);
@@ -99,8 +99,8 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 			if(!(value instanceof Array)) value = new Array();
 		} else if (type === 'object') {
 			if(!(value instanceof Object)) value = new Object();
-		} else if (typeof type === 'function' && !(value instanceof type)) {
-			value = new type(value);
+		} else if (type === 'function') {
+			value = this.dict[value].body.toString();
 		}
 		return value;
 	};
@@ -111,16 +111,18 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 		// 2: string
 		// 3: boolean
 		// 4: map
-		// 5: any
-		// 6: number*
-		// 7: string*
-		// 8: boolean*
-		// 9: map*
-		// 10: any*
-		var ts = ["number","string","boolean","map","any"];
+		// 5: function
+		// 6: any
+		// 7: number*
+		// 8: string*
+		// 9: boolean*
+		// 10: map*
+		// 11: function*
+		// 12: any*
+		var ts = ["number","string","boolean","map","function","any"];
 		if(t.match(/\*/)){
 			t = t.replace(/\*/,"");
-			return ts.indexOf(t)+6;
+			return ts.indexOf(t)+7;
 		}
 		return ts.indexOf(t)+1;
 	};
@@ -130,10 +132,10 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 		var to = this.type(o);
 		console.warn(i,ti,"->",o,to);
 		if(ti==to) return true;
-		if(ti>0&&ti<5 && to==5) return true;
-		if(to>0&&to<5 && ti==5) return true;
-		if(ti>5&&ti<10 && to==10) return true;
-		if(to>5&&to<10 && ti==10) return true;
+		if(ti>0&&ti<6 && to==6) return true;
+		if(to>0&&to<6 && ti==6) return true;
+		if(ti>6&&ti<12 && to==12) return true;
+		if(to>6&&to<12 && ti==12) return true;
 		return false;
 	};
 	
@@ -174,12 +176,18 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 				}
 				// replace ? args in order
 				args = v.args.map(function(_,i){
-					return _=="?" ? a.shift() : JSON.stringify(self.coerce(_,def.args[i],true));
+					if(_=="?") {
+						return a.shift();
+					} else {
+						var t = def.args[i];
+						var r = self.coerce(_,t,true)
+						return t=="function" ? r : JSON.stringify(r);
+					}
 				},this);
 			} else if(def.args) {
 				throw new Error("No arguments supplied");
 			}
-			acc.push(","+args.join(",")+")");
+			acc.push((args.length ? "," : "")+args.join(",")+")");
 			if(value.length) {
 				return map(acc,def.sigs[1],o);
 			} else {

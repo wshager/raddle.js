@@ -4,9 +4,9 @@ Extensible Document Manipulation Language for the Web
 See https://github.com/wshager/raddled.git for definition files.
 
 
-## What's this?
+## What is it?
 
-Raddle is a rad new language for manipulating structured documents on the web. It is [fully-featured](#user-content-fully-featured), [functional](#user-content-functional), [point-less](#user-content-point-less), [URL-encodable](#user-content-URL-encodable), [type-safe](#user-content-type-safe) and free as beer.
+Raddle is a rad new language for manipulating structured documents on the web. It is [fully-featured](#fully-featured), [functional](#functional), [point-less](#point-less), [URL-encodable](#url-encodable), [type-safe](#type-safe) and completely [free](#free) (as in speech).
 
 ### Fully-featured
 
@@ -28,15 +28,20 @@ Raddle is inspired by RQL, and has the same notation. If you're already familiar
 
 With Raddle's type declarations, types are kept in check.
 
+### Free
 
-## Why's this?
+Raddle is licensed under the AFL or BSD license.
 
-RQL is a great tool for querying JSON, but with Raddle you can extend that greatness! It is capable of handling more types than arrays of objects, and you can add new functionality, either inline or from external modules.
+
+## Genesis
+
+Raddle was inspired by RQL. RQL is a great tool for querying JSON, but with Raddle you can extend that greatness! It is capable of handling more types than arrays of objects, and you can add new functionality, either inline or from external modules.
 
 Furthermore, Raddle encourages implementation in other languages, as its core definitions are clear and concise from the start.
 
-## What's to do?
+## TODO
 
-* Implementating Raddle's core functions in Javascript, XQuery, Java, PHP, Scala, Ruby, Perl, Python, C++, et cetera!
-* Making Raddle compatible with Dojo's [dstore](https://github.com/sitepen/dstore).
+* Implement Raddle's parser and transpiler in Javascript, XQuery, Java, PHP, Scala, Ruby, Perl, Python, C++, et cetera.
+* Implement Raddle's core functions in Javascript, XQuery, Java, PHP, Scala, Ruby, Perl, Python, C++, et cetera.
+* Make Raddle compatible with Dojo's [dstore](https://github.com/sitepen/dstore).
 * Use Raddle to manipulate the browser's DOM.

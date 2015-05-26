@@ -21,20 +21,27 @@ define(function (require) {
 	}
 	add("use(core/string-regex-functions,core/aggregate-functions),define(depth,(string,number),(),(tokenize(/),count())),depth()",function(error,fn){
 		if(error) throw error;
-		assert.equal(fn("/a/b/c"),4);
+		var path = "";
+		for(var i=0;i<10000;i++){
+			path += "/" + Math.random().toString(36).substring(7);
+		}
+		assert.equal(fn(path),10001);
 	});
 	add("use(core/numeric-arithmetic-operators),define(add2,(number,number),(number,number),(add(?),add(?))),add2(2,3)",function (error, fn) {
 		if (error) {
 			throw error;
 		}
 		assert.equal(fn(1),6,'Addition operator should add numbers together');
-		console.log( ' ended');
 	});
 	add("use(core/numeric-arithmetic-operators,core/higher-order-functions),define(sum,(any*,any*),(),fold-left(add,0)),sum()",function (error, fn) {
 		if (error) {
 			throw error;
 		}
-		assert.equal(fn([1,2,3]),6);
+		var arr = [];
+		for(var i=0;i<10000;i++){
+			arr.push(i);
+		}
+		assert.equal(fn(arr),49995000);
 	});
 	registerSuite(test);
 });

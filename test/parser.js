@@ -1,10 +1,7 @@
 define(function (require) {
 	var test = require('intern!object'),
 		assert = require('intern/chai!assert'),
-		//Query = require('../query').Query,
 		parseQuery = require('../parser').parseQuery,
-		//JSON = require('intern/dojo/json'),
-		supportsDateString = !isNaN(new Date('2009')),
 		queryPairs = {
 			define: {
 				'define(test,(number,number),number)': { name: 'define', args: ['test', [ 'number', 'number' ], 'number' ]},

@@ -1,10 +1,8 @@
 define(function (require) {
 	var registerSuite = require('intern!object'),
 		assert = require('intern/chai!assert'),
-		//Query = require('../query').Query,
 		parseQuery = require('../parser').parseQuery,
-		Transpiler = require('../transpiler').Transpiler,
-		JSON = require('intern/dojo/json');
+		Transpiler = require('../transpiler').Transpiler;
 	var test = {
 		name: 'raddle/test/transpiling'
 	};

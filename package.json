@@ -1,16 +1,16 @@
 {
-  "name": "rql",
-  "version": "0.3.3",
-  "author": "Kris Zyp",
+  "name": "raddle",
+  "version": "0.0.1",
+  "author": "Wouter Hager",
   "contributors": [
-    "Vladimir Dronnikov <dronnikov@gmail.com>"
   ],
   "keywords": [
     "resource",
     "query",
-    "uri"
+    "uri",
+    "transform"
   ],
-  "description": "Query language for the web, NoSQL",
+  "description": "Extensible document manipulation language for the web",
   "licenses": [
     {
       "type": "AFLv2.1",
@@ -26,29 +26,26 @@
   },
   "repository": {
     "type": "git",
-    "url": "http://github.com/kriszyp/rql"
+    "url": "http://github.com/wshager/raddle"
   },
   "maintainers": [
     {
-      "name": "Kris Zyp",
-      "email": "kriszyp@gmail.com"
+      "name": "Wouter Hager",
+      "email": "wshager@gmail.com"
     }
   ],
   "mappings": {
-    "patr": "http://github.com/kriszyp/patr/zipball/v0.2.1",
-    "promised-io": "http://github.com/kriszyp/promised-io/zipball/v0.2.1"
   },
   "dependencies": {
-    "promised-io": ">=0.3.0"
   },
   "devDependencies": {
-    "intern-geezer": "^2.1.1"
+    "intern": "^2.2.2",
+    "intern-geezer": "^2.2.2"
   },
   "scripts": {
     "test": "intern-client config=test/intern",
     "test.sauce": "intern-runner config=test/intern",
     "test.proxy": "intern-runner config=test/intern --proxyOnly"
   },
-  "icon": "http://packages.dojofoundation.org/images/persvr.png",
   "dojoBuild": "package.js"
 }

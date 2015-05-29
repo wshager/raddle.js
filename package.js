@@ -1,12 +1,11 @@
 var miniExcludes = {
-		"rql/README.md": 1,
-		"rql/package": 1
+		"raddle/README.md": 1,
+		"raddle/package": 1
 	},
 	amdExcludes = {
 	},
 	isJsRe = /\.js$/,
-	isTestRe = /\/test\//,
-	isSpecificationRe = /\/specification\//;
+	isTestRe = /\/test\//;
 
 var profile = {
 	resourceTags: {

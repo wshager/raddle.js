@@ -19,7 +19,7 @@ define(function (require) {
 			return dfd;
 		};
 	}
-	add("use(core/string-regex-functions,core/aggregate-functions),define(depth,(string,number),(),(tokenize(/),count())),depth()",function(error,fn){
+	/*add("use(core/string-regex-functions,core/aggregate-functions),define(depth,(string,number),(),(tokenize(/),count())),depth()",function(error,fn){
 		var path = "";
 		for(var i=0;i<10000;i++){
 			path += "/" + Math.random().toString(36).substring(7);
@@ -35,6 +35,11 @@ define(function (require) {
 			arr.push(i);
 		}
 		assert.equal(fn(arr),49995000);
+	});*/
+	add("use(core/numeric-arithmetic-operators,core/numeric-comparison-operators,core/higher-order-functions),unfold((add(1)),(greater-than(10)))",function (error, fn) {
+		var arr = fn(1);
+		console.warn(arr)
+		assert.deepEqual(arr,[1,2,3,4,5,6,7,8,9,10]);
 	});
 	registerSuite(test);
 });

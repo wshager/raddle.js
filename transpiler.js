@@ -211,6 +211,11 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 				args = v.args.map(function(_,i){
 					if(_=="?") {
 						return a.shift();
+					} else if(_ instanceof Array){
+						// compile to function
+						var f = self.compile(_);
+						console.log(f,f.toString())
+						return f.toString();
 					} else {
 						var t = def.args[i];
 						var r = self.convert(_);

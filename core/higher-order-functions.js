@@ -15,9 +15,8 @@ define(["exports"], function(exports){
 		if(!r) r = [];
 		if(cond(init)) {
 			return r;
-		} else {
-			t = fn(init);
 		}
+		t = fn(init);
 		r.push(init);
 		return unfold(t, fn, cond, r);
 	}
@@ -34,6 +33,18 @@ define(["exports"], function(exports){
 			r[t[2]] = x;
 			return groupBy(t[0], fn, r);
 		}
+	}
+	
+	function unfold2(init, fn, cond, next, r) {
+		var t,n;
+		if(!r) r = {};
+		if(cond(init)) {
+			return r;
+		}
+		t = fn(init);
+		n = next(init);
+		r.push(n);
+		return unfold(t, fn, cond, r);
 	}
 
 	/*

@@ -4,6 +4,7 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 	function Transpiler(execute){
 		this.dict = {};
 		this.lib = {};
+		this.count = 0;
 	}
 	
 	Transpiler.prototype.use = function(value,params,callback){
@@ -157,7 +158,7 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 	Transpiler.prototype.matchTypes = function(i,o){
 		var ti = this.type(i);
 		var to = this.type(o);
-		console.warn(i,ti,"->",o,to);
+		//console.warn(i,ti,"->",o,to);
 		// cardinality checks:
 		// string->string* -1->0 => allow
 		// string*->string 0->-1 => deny
@@ -169,7 +170,7 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 		return (ti[0]==to[0] || to[0]==6 || ti[0]==6) && d>=0 && d<=1;
 	};
 	
-	Transpiler.prototype.compile = function(value,parent){
+	Transpiler.prototype.compile = function(value,parent,pa){
 		// TODO compile literals like ?
 		var self = this;
 		var name,sigs=new Array(2),args=[];
@@ -178,7 +179,11 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 			name = parent.name;
 			args = parent.args;
 			sigs = parent.sigs;
+		} else {
+			name = "anon"+this.count;
+			this.count++;
 		}
+		// if there are unknown args, take them from the definition
 		var a = [];
 		var arity = args.length;
 		for(var i=1;i<=arity;i++){
@@ -210,15 +215,11 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 				// replace ? args in order
 				args = v.args.map(function(_,i){
 					if(_=="?") {
-						if(!a.length){
-							a.push("arg"+arity);
-							arity++;
-						}
-						return a.shift();
+						return a.length ? a.shift() : pa && pa.length ? pa.shift() : "";
 					} else if(_ instanceof Array){
 						// compile to function
-						var f = self.compile(_);
-						console.log(f,f.toString())
+						var f = self.compile(_,null,a);
+						//console.log(f,f.toString())
 						return f.toString();
 					} else {
 						var t = def.args[i];
@@ -230,7 +231,6 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 						if(!self.typeCheck(r,t)){
 							throw new Error("Expected type ",t," for argument value ",r);
 						}
-						console.warn(r,t);
 						if(typeof r == "function"){
 							return r.toString();
 						} else {
@@ -241,6 +241,7 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 			} else if(def.args) {
 				throw new Error("No arguments supplied");
 			}
+			args = args.filter(function(_){ return !!_ });
 			acc.push((args.length ? "," : "")+args.join(",")+")");
 			if(value.length) {
 				return map(acc,def.sigs[1],o);

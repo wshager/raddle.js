@@ -10,7 +10,7 @@ define(["exports"], function(exports){
 	function tail(x){
 		return x.slice(1);
 	}
-	function isEmpty(x) {
+	function empty(x) {
 		return x.length===0;
 	}
 	function append(x,y) {
@@ -27,7 +27,7 @@ define(["exports"], function(exports){
 	exports["count"] = count;
 	exports["head"] = head;
 	exports["tail"] = tail;
-	exports["is-empty"] = isEmpty;
+	exports["empty"] = empty;
 	exports["append"] = append;
 	exports["map-transform"] = mapTransform;
 	

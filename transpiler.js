@@ -175,9 +175,9 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 		var name,sigs=new Array(2),args=[];
 		if(parent){
 			// called from define, so compile to a definition body
-			var name = parent.name;
-			var args = parent.args;
-			var sigs = parent.sigs;
+			name = parent.name;
+			args = parent.args;
+			sigs = parent.sigs;
 		}
 		var a = [];
 		var arity = args.length;
@@ -210,6 +210,10 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 				// replace ? args in order
 				args = v.args.map(function(_,i){
 					if(_=="?") {
+						if(!a.length){
+							a.push("arg"+arity);
+							arity++;
+						}
 						return a.shift();
 					} else if(_ instanceof Array){
 						// compile to function

@@ -19,32 +19,41 @@ define(function (require) {
 			return dfd;
 		};
 	}
-	/*add("use(core/string-regex-functions,core/aggregate-functions),define(depth,(string,number),(),(tokenize(/),count())),depth()",function(error,fn){
-		var path = "";
-		for(var i=0;i<10000;i++){
-			path += "/" + Math.random().toString(36).substring(7);
+	add("use(core/string-regex-functions,core/aggregate-functions),define(depth,(string,number),(),(tokenize(/),count())),depth()",function(error,fn){
+		var val = "";
+		for(var i=0;i<10;i++){
+			val += "/" + Math.random().toString(36).substring(7);
 		}
-		assert.equal(fn(path),10001);
+		var ret = fn(val);
+		console.warn(val,"=>",ret);
+		assert.equal(ret,11);
 	});
 	add("use(core/numeric-arithmetic-operators),define(add2,(number,number),(number,number),(add(?),add(?))),add2(2,3)",function (error, fn) {
-		assert.equal(fn(1),6,'Addition operator should add numbers together');
+		var val = 1;
+		var ret = fn(val);
+		console.warn(val,"=>",ret);
+		assert.equal(ret,6,'Addition operator should add numbers together');
 	});
 	add("use(core/numeric-arithmetic-operators,core/higher-order-functions),define(sum,(any*,any*),(),fold-left(add#1,0)),sum()",function (error, fn) {
-		var arr = [];
-		for(var i=0;i<10000;i++){
-			arr.push(i);
+		var val = [];
+		for(var i=0;i<10;i++){
+			val.push(i);
 		}
-		assert.equal(fn(arr),49995000);
+		var ret = fn(val);
+		console.warn(val,"=>",ret);
+		assert.equal(ret,45);
 	});
 	add("use(core/numeric-arithmetic-operators,core/numeric-comparison-operators,core/higher-order-functions),unfold((add(1)),(greater-than(10)))",function (error, fn) {
-		var arr = fn(1);
-		console.warn(arr)
-		assert.deepEqual(arr,[1,2,3,4,5,6,7,8,9,10]);
-	});*/
-	add("use(core/numeric-arithmetic-operators,core/numeric-comparison-operators,core/higher-order-functions,core/list-functions,core/string-value-functions),define(appender,(any*,any*),(?,?),map-transform(?,(append(?)))),unfold4((tail()),(is-empty()),(head()),(head(),string-length()),appender#2)",function (error, fn) {
-		var o = fn(["sdf","d","we","eq","w"]);
-		console.warn(o)
-		assert.deepEqual(o,{1:["d","w"],2:["we","eq"],3:["sdf"]});
+		var val = 1;
+		var ret = fn(val);
+		console.warn(val,"=>",ret);
+		assert.deepEqual(ret,[1,2,3,4,5,6,7,8,9,10]);
+	});
+	add("use(core/numeric-arithmetic-operators,core/numeric-comparison-operators,core/higher-order-functions,core/list-functions,core/string-value-functions),define(appender,(any*,any*),(?,?),map-transform(?,(append(?)))),unfold4((tail()),(empty()),(head()),(head(),string-length()),appender#2)",function (error, fn) {
+		var val = ["sdf","d","we","eq","w"];
+		var ret = fn(val);
+		console.warn(val,"=>",ret);
+		assert.deepEqual(ret,{1:["d","w"],2:["we","eq"],3:["sdf"]});
 	});
 	registerSuite(test);
 });

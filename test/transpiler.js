@@ -35,11 +35,16 @@ define(function (require) {
 			arr.push(i);
 		}
 		assert.equal(fn(arr),49995000);
-	});*/
+	});
 	add("use(core/numeric-arithmetic-operators,core/numeric-comparison-operators,core/higher-order-functions),unfold((add(1)),(greater-than(10)))",function (error, fn) {
 		var arr = fn(1);
 		console.warn(arr)
 		assert.deepEqual(arr,[1,2,3,4,5,6,7,8,9,10]);
+	});*/
+	add("use(core/numeric-arithmetic-operators,core/numeric-comparison-operators,core/higher-order-functions,core/list-functions,core/string-value-functions),define(appender,(any*,any*),(?,?),map-transform(?,(append(?)))),unfold4((tail()),(is-empty()),(head()),(head(),string-length()),appender#2)",function (error, fn) {
+		var o = fn(["sdf","d","we","eq","w"]);
+		console.warn(o)
+		assert.deepEqual(o,{1:["d","w"],2:["we","eq"],3:["sdf"]});
 	});
 	registerSuite(test);
 });

@@ -18,18 +18,12 @@ define(["exports"], function(exports){
 		x.push(y);
 		return x;
 	}
-	function mapTransform(x,i,fn) {
-		// value is curried into fn
-		x[i] = fn(x[i]);
-		return x;
-	}
 	
-	exports["count"] = count;
-	exports["head"] = head;
-	exports["tail"] = tail;
-	exports["empty"] = empty;
-	exports["append"] = append;
-	exports["map-transform"] = mapTransform;
+	exports["count#0"] = count;
+	exports["head#0"] = head;
+	exports["tail#0"] = tail;
+	exports["empty#0"] = empty;
+	exports["append#1"] = append;
 	
 	return exports;
 	

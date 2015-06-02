@@ -3,7 +3,7 @@ define(["exports"], function(exports){
 	function stringLength(str){
 		return str.length;
 	};
-	exports["string-length"]= stringLength;
+	exports["string-length#0"]= stringLength;
 	
 	return exports;
 	

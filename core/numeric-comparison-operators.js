@@ -5,7 +5,7 @@ define(["exports"], function(exports){
 		return a>b;
 	}
 	
-	exports["greater-than"] = gt;
+	exports["greater-than#1"] = gt;
 	
 	return exports;
 	

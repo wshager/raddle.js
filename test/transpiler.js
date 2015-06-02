@@ -19,7 +19,7 @@ define(function (require) {
 			return dfd;
 		};
 	}
-	/*add("use(core/string-regex-functions,core/aggregate-functions),define(depth,(string,number),(),(tokenize(/),count())),depth()",function(error,fn){
+	add("use(core/string-regex-functions,core/aggregate-functions),define(depth,(string,number),(),(tokenize(/),count())),depth()",function(error,fn){
 		var val = "";
 		for(var i=0;i<10;i++){
 			val += "/" + Math.random().toString(36).substring(7);
@@ -48,7 +48,7 @@ define(function (require) {
 		var ret = fn(val);
 		console.warn(val,"=>",ret);
 		assert.deepEqual(ret,[1,2,3,4,5,6,7,8,9,10]);
-	});*/
+	});
 	add("use(core/numeric-arithmetic-operators,core/numeric-comparison-operators,core/higher-order-functions,core/list-functions,core/map-functions,core/string-value-functions),define(appender,(map,map),((any*),(any*)),map-transform(?,(append(?)))),unfold((tail()),(empty()),(head()),appender#2,(head(),string-length()))",function (error, fn) {
 		var val = ["sdf","d","we","eq","w"];
 		var ret = fn(val);

@@ -78,12 +78,12 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 	};
 	
 	function typeOf(o) {
-		return o === undefined ? "undefined" : (o === null ? "null" : Object.prototype.toString.call(o).split(" ").pop().split("]").shift().toLowerCase());
+		return o === undefined ? "undefined" : o === null ? "null" : o.constructor.name.toLowerCase();
 	}
 	
 	Transpiler.prototype.typeCheck = function(value,type){
 		// TODO check occurrence and function arity+types
-		var t = type instanceof Array ? "function" : type.replace(/\?|\+|\*|-/,"");
+		var t = typeOf(type) == "array" ? "function" : type.replace(/\?|\+|\*|-/,"");
 		return typeOf(value)==t || t=="any";
 	};
 	
@@ -170,7 +170,7 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 		return (ti[0]==to[0] || to[0]==6 || ti[0]==6) && d>=0 && d<=1;
 	};
 	
-	Transpiler.prototype.compile = function(value,parent,pa){
+	Transpiler.prototype.compile = function(value,parent,pa,exec){
 		// TODO compile literals like ?
 		var self = this;
 		var name,sigs=new Array(2),args=[];
@@ -193,14 +193,15 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 		fa.unshift("arg0");
 		var fargs = fa.join(",");
 		// always compose
-		if(!(value instanceof Array)) value = [value];
+		if(typeOf(value)!="array") value = [value];
 		// compose the functions in the array
 		var map = function(acc,i,o){
 			var v = value.shift();
 			var arity = v.args.length;
-			var def = self.dict[v.name+"#"+arity];
+			var aname = v.name+"#"+arity;
+			var def = self.dict[aname];
 			if(!def) {
-				throw new Error("Definition for "+v.name+" not in dictionary");
+				throw new Error("Definition for "+aname+" not in dictionary");
 			}
 			if(i && !self.matchTypes(i,def.sigs[0])){
 				throw new Error("Type signatures do not match: "+i+"->"+def.sigs[0]);
@@ -216,10 +217,16 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 				args = v.args.map(function(_,i){
 					if(_=="?") {
 						return a.length ? a.shift() : pa && pa.length ? pa.shift() : "";
-					} else if(_ instanceof Array){
+					} else if(typeOf(_) == "array"){
 						// compile to function
 						var f = self.compile(_,null,a);
-						//console.log(f,f.toString())
+						return f.toString();
+					} else if(typeOf(_) == "query"){
+						// compile and execute with args
+						// TODO execute with provided args
+						// if input is null and no args, exec with null
+						var f = self.compile(_,null,a,true);
+						console.warn(f.toString())
 						return f.toString();
 					} else {
 						var t = def.args[i];
@@ -263,7 +270,7 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 	Transpiler.prototype.define = function(value,params){
 		var l = value.args.length;
 		var name = value.args[0];
-		var sigs = [], args = [];
+		var sigs = [], args = [], aname;
 		var body,def;
 		if(l==2){
 			// lookup
@@ -274,20 +281,23 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 			sigs = def.sigs;
 			args = def.args;
 			body = def.body;
+			aname = name+"#"+args.length;
 		} else if(l==3 || l==4){
 			// core
 			sigs = value.args[1];
 			args = value.args[2];
+			aname = name+"#"+args.length;
 			if(l==4){
 				body = value.args[3];
 			} else {
 				// known definition
-				if(params.use) body = this.lib[params.use][name];
+				if(params.use) body = this.lib[params.use][aname];
 			}
 		}
-		if(this.dict[name+"#"+args.length]) return this.dict[name+"#"+args.length];
+		if(this.dict[aname]) return this.dict[aname];
 		def = {
 			name:name,
+			aname:aname,
 			sigs:sigs,
 			args:args,
 			body:body
@@ -296,7 +306,7 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 			// compile definition
 			def.body = this.compile(body,def);
 		}
-		this.dict[name+"#"+args.length] = def;
+		this.dict[aname] = def;
 		return def;
 	};
 	exports.Transpiler = Transpiler;

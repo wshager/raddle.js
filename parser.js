@@ -185,12 +185,12 @@ exports.parseGently = function(){
 	return terms;
 }
 
-
-// this can get replaced by the chainable query if query.js is loaded
-exports.Query = function(){
+function Query(){
 	this.name = "";
 	this.args = [];
 };
+// this can get replaced by the chainable query if query.js is loaded
+exports.Query = Query;
 
 exports.Query.prototype.toJSON = function(){
 	delete this.parent;

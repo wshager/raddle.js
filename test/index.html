@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+</head>
+<body>
+    <!-- load Dojo -->
+    <script src="../../dojo/dojo.js" data-dojo-config="async:true"></script>
+    <script>
+    	require(["raddle/transpiler","dojo/domReady!"],function(raddle){
+    		function add(key,ready){
+   				var transpiler = new raddle.Transpiler();
+   				transpiler.process(key,function(error,fn){
+   					if(error) throw error;
+   					console.log(fn.toString());
+   					ready(error,fn);
+   				});
+    		}
+    		add("use(core/string-regex-functions,core/aggregate-functions),define(depth,(string,number),(),(tokenize(/),count())),depth()",function(error,fn){
+				var val = "";
+				for(var i=0;i<10;i++){
+					val += "/" + Math.random().toString(36).substring(7);
+				}
+				var ret = fn(val);
+				console.warn(val,"=>",ret);
+			});
+			add("use(core/numeric-arithmetic-operators),define(add2,(number,number),(number,number),(add(?),add(?))),add2(2,3)",function (error, fn) {
+				var val = 1;
+				var ret = fn(val);
+				console.warn(val,"=>",ret);
+			});
+			add("use(core/numeric-arithmetic-operators,core/higher-order-functions),define(sum,(any*,any*),(),fold-left(add#1,0)),sum()",function (error, fn) {
+				var val = [];
+				for(var i=0;i<10;i++){
+					val.push(i);
+				}
+				var ret = fn(val);
+				console.warn(val,"=>",ret);
+			});
+			add("use(core/numeric-arithmetic-operators,core/numeric-comparison-operators,core/higher-order-functions),unfold((add(1)),(greater-than(10)))",function (error, fn) {
+				var val = 1;
+				var ret = fn(val);
+				console.warn(val,"=>",ret);
+			});
+			add("use(core/numeric-arithmetic-operators,core/numeric-comparison-operators,core/higher-order-functions,core/list-functions,core/map-functions,core/string-value-functions),define(appender,(map,map),((any*),(any*)),map-transform(?,(append(?)))),unfold((tail()),(empty()),(head()),appender#2,(head(),string-length()))",function (error, fn) {
+				var val = ["sdf","d","we","eq","w"];
+				var ret = fn(val);
+				console.warn(val,"=>",ret);
+			});
+    	});
+    </script>
+</body>
+</html>

@@ -14,7 +14,7 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 			return "intern/dojo/text!/raddled/"+_+".rad";
 		});
 		var self = this;
-		require(core,function(){
+		require(core.map(function(_){ return _ }),function(){
 			var libs = Array.prototype.slice.call(arguments);
 			libs.forEach(function(lib,i){
 				self.lib[core[i]] = lib;
@@ -170,6 +170,73 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 		return (ti[0]==to[0] || to[0]==6 || ti[0]==6) && d>=0 && d<=1;
 	};
 	
+	Transpiler.prototype.wrap = function(value,acc,i,o,a){
+		var v = value.shift();
+		var arity = v.args.length;
+		var aname = v.name+"#"+arity;
+		var def = this.dict[aname];
+		if(!def) {
+			throw new Error("Definition for "+aname+" not in dictionary");
+		}
+		if(i && !this.matchTypes(i,def.sigs[0])){
+			throw new Error("Type signatures do not match: "+i+"->"+def.sigs[0]);
+		}
+		acc.unshift("("+def.body.toString()+").call(this,");
+		// TODO static arg type checks
+		if(v.args){
+			if(!def.args || v.args.length!=def.args.length){
+				throw new Error("Argument length incorrect");
+			}
+		} else if(def.args) {
+			throw new Error("No arguments supplied");
+		}
+		// replace ? args in order
+		var args = v.args.map(function(_,i){
+			if(_=="?") {
+				if(a.length){
+					return a.shift();
+				} else {
+					throw new Error("No arguments found to replace ?");
+				}
+			} else if(typeOf(_) == "array"){
+				// compile to function
+				var f = this.compile(_,null,a);
+				return f.toString();
+			} else if(typeOf(_) == "query"){
+				// compile and execute with args
+				// TODO execute with provided args
+				// if input is null and no args, exec with null
+				var f = this.compile(_,null,a,true);
+				console.warn(f.toString())
+				return f.toString();
+			} else {
+				var t = def.args[i];
+				var r = this.convert(_);
+				if(typeof r=="string" && r.match(/^.+#[0-9]+$/)){
+					r = this.dict[r].body;
+				}
+				// check type here
+				if(!this.typeCheck(r,t)){
+					throw new Error("Expected type ",t," for argument value ",r);
+				}
+				if(typeof r == "function"){
+					return r.toString();
+				} else {
+					return JSON.stringify(r);
+				}
+			}
+		},this);
+		acc.push((args.length ? "," : "")+args.join(",")+")");
+		if(value.length) {
+			return this.wrap(value,acc,def.sigs[1],o,a);
+		} else {
+			if(o && !this.matchTypes(o,def.sigs[1])){
+				throw new Error("Type signatures do not match: "+o+"->"+def.sigs[1]);
+			}
+			return acc;
+		}
+	};
+	
 	Transpiler.prototype.compile = function(value,parent,pa,exec){
 		// TODO compile literals like ?
 		var self = this;
@@ -195,71 +262,7 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 		// always compose
 		if(typeOf(value)!="array") value = [value];
 		// compose the functions in the array
-		var map = function(acc,i,o){
-			var v = value.shift();
-			var arity = v.args.length;
-			var aname = v.name+"#"+arity;
-			var def = self.dict[aname];
-			if(!def) {
-				throw new Error("Definition for "+aname+" not in dictionary");
-			}
-			if(i && !self.matchTypes(i,def.sigs[0])){
-				throw new Error("Type signatures do not match: "+i+"->"+def.sigs[0]);
-			}
-			acc.unshift("("+def.body.toString()+").call(this,");
-			// TODO static arg type checks
-			var args;
-			if(v.args){
-				if(!def.args || v.args.length!=def.args.length){
-					throw new Error("Argument length incorrect");
-				}
-				// replace ? args in order
-				args = v.args.map(function(_,i){
-					if(_=="?") {
-						return a.length ? a.shift() : pa && pa.length ? pa.shift() : "";
-					} else if(typeOf(_) == "array"){
-						// compile to function
-						var f = self.compile(_,null,a);
-						return f.toString();
-					} else if(typeOf(_) == "query"){
-						// compile and execute with args
-						// TODO execute with provided args
-						// if input is null and no args, exec with null
-						var f = self.compile(_,null,a,true);
-						console.warn(f.toString())
-						return f.toString();
-					} else {
-						var t = def.args[i];
-						var r = self.convert(_);
-						if(typeof r=="string" && r.match(/^.+#[0-9]+$/)){
-							r = self.dict[r].body;
-						}
-						// check type here
-						if(!self.typeCheck(r,t)){
-							throw new Error("Expected type ",t," for argument value ",r);
-						}
-						if(typeof r == "function"){
-							return r.toString();
-						} else {
-							return JSON.stringify(r);
-						}
-					}
-				},this);
-			} else if(def.args) {
-				throw new Error("No arguments supplied");
-			}
-			args = args.filter(function(_){ return !!_ });
-			acc.push((args.length ? "," : "")+args.join(",")+")");
-			if(value.length) {
-				return map(acc,def.sigs[1],o);
-			} else {
-				if(o && !self.matchTypes(o,def.sigs[1])){
-					throw new Error("Type signatures do not match: "+o+"->"+def.sigs[1]);
-				}
-				return acc;
-			}
-		}
-		var f = map([a],sigs[0],sigs[1]);
+		var f = this.wrap(value,[a],sigs[0],sigs[1],parent ? a : pa);
 		// put default input arg in a
 		a.unshift("arg0");
 		var index = f.indexOf(a);

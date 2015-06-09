@@ -6,10 +6,10 @@ define(function (require) {
 	var test = {
 		name: 'raddle/test/transpiling'
 	};
+	var transpiler = new Transpiler();
 	function add(key,cb){
 		test[key] = function(){
 			var dfd = this.async(5000);
-			var transpiler = new Transpiler();
 			var ready = dfd.callback(cb);
 			transpiler.process(key,function(error,fn){
 				if(error) throw error;

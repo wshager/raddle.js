@@ -4,6 +4,7 @@ define(["exports", "./parser"], function(exports, parser){
 	function Transpiler(execute){
 		this.dict = {};
 		this.lib = {};
+		this.cache = [];
 		this.count = 0;
 	}
 	
@@ -41,6 +42,7 @@ define(["exports", "./parser"], function(exports, parser){
 	};
 	
 	Transpiler.prototype.process = function(value,params,callback){
+		this.cache = [];
 		var args = Array.prototype.slice.call(arguments);
 		var value = args.shift();
 		var params = args.length>1 && typeof args[0]!="function" ? args.shift() : {};
@@ -185,6 +187,7 @@ define(["exports", "./parser"], function(exports, parser){
 		}
 		//acc.unshift("this['"+def.module+"']['"+aname+"'].call(this,");
 		acc.unshift("("+this.lib[def.module][aname].toString()+")(");
+		//acc.unshift("f"+def.hash+"(");
 		// TODO static arg type checks
 		if(v.args){
 			if(!def.args || v.args.length!=def.args.length){
@@ -268,7 +271,18 @@ define(["exports", "./parser"], function(exports, parser){
 		a.unshift("arg0");
 		var index = f.length/2;
 		f.splice(index,0,a.join(","));
-		return new Function("return function "+name+"("+fargs+"){ return "+f.join("")+";}")();
+		var fns = "\n";
+		/*if(!parent && !pa) {
+			for(var k in this.cache){
+				var d = this.dict[k]; 
+				if(d.hash && this.lib[d.module][d.aname]){
+					fns += "var f"+d.hash+"="+this.lib[d.module][d.aname].toString()+";\n";
+				}
+			}
+		}*/
+		var fn =  "function "+name+"("+fargs+"){ "+fns+"return "+f.join("")+";}";
+		console.warn(fn)
+		return new Function("return "+fn)();
 	};
 	
 	Transpiler.prototype.define = function(value,params){
@@ -306,8 +320,11 @@ define(["exports", "./parser"], function(exports, parser){
 			sigs:sigs,
 			args:args,
 			body:body,
-			module:module
+			module:module,
+			hash:Math.random().toString(36).substring(7)
 		};
+		// TODO accumulate def hashes per run
+		this.cache.push(aname);
 		if(!this.lib[module]) this.lib[module] = {};
 		if(l==4) {
 			// compile definition

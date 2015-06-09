@@ -1,5 +1,5 @@
 ({define:typeof define!="undefined"?define:function(deps, factory){module.exports = factory(exports, require("./parser"));}}).
-define(["exports", "./parser"], function(exports, parser, Deferred){
+define(["exports", "./parser"], function(exports, parser){
 	
 	function Transpiler(execute){
 		this.dict = {};
@@ -130,7 +130,8 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 //		} else if (type === 'object') {
 //			if(!(value instanceof Object)) value = new Object();
 		} else if (type instanceof Array) {
-			value = this.dict[value].body.toString();
+			var def = this.dict[value];
+			value = this.lib[def.module][value];
 		}
 		return value;
 	};
@@ -170,7 +171,8 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 		return (ti[0]==to[0] || to[0]==6 || ti[0]==6) && d>=0 && d<=1;
 	};
 	
-	Transpiler.prototype.wrap = function(value,acc,i,o,a){
+	Transpiler.prototype.wrap = function(value,i,o,a,acc){
+		acc = acc || [];
 		var v = value.shift();
 		var arity = v.args.length;
 		var aname = v.name+"#"+arity;
@@ -181,7 +183,8 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 		if(i && !this.matchTypes(i,def.sigs[0])){
 			throw new Error("Type signatures do not match: "+i+"->"+def.sigs[0]);
 		}
-		acc.unshift("("+def.body.toString()+").call(this,");
+		//acc.unshift("this['"+def.module+"']['"+aname+"'].call(this,");
+		acc.unshift("("+this.lib[def.module][aname].toString()+")(");
 		// TODO static arg type checks
 		if(v.args){
 			if(!def.args || v.args.length!=def.args.length){
@@ -213,22 +216,20 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 				var t = def.args[i];
 				var r = this.convert(_);
 				if(typeof r=="string" && r.match(/^.+#[0-9]+$/)){
-					r = this.dict[r].body;
+					var d = this.dict[r];
+					//return "this['"+d.module+"']['"+r+"']";
+					return this.lib[d.module][r].toString();
 				}
 				// check type here
 				if(!this.typeCheck(r,t)){
 					throw new Error("Expected type ",t," for argument value ",r);
 				}
-				if(typeof r == "function"){
-					return r.toString();
-				} else {
-					return JSON.stringify(r);
-				}
+				return JSON.stringify(r);
 			}
 		},this);
 		acc.push((args.length ? "," : "")+args.join(",")+")");
 		if(value.length) {
-			return this.wrap(value,acc,def.sigs[1],o,a);
+			return this.wrap(value,def.sigs[1],o,a,acc);
 		} else {
 			if(o && !this.matchTypes(o,def.sigs[1])){
 				throw new Error("Type signatures do not match: "+o+"->"+def.sigs[1]);
@@ -262,18 +263,18 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 		// always compose
 		if(typeOf(value)!="array") value = [value];
 		// compose the functions in the array
-		var f = this.wrap(value,[a],sigs[0],sigs[1],parent ? a : pa);
+		var f = this.wrap(value,sigs[0],sigs[1],parent ? a : pa);
 		// put default input arg in a
 		a.unshift("arg0");
-		var index = f.indexOf(a);
-		f[index] = a.join(",");
+		var index = f.length/2;
+		f.splice(index,0,a.join(","));
 		return new Function("return function "+name+"("+fargs+"){ return "+f.join("")+";}")();
 	};
 	
 	Transpiler.prototype.define = function(value,params){
 		var l = value.args.length;
 		var name = value.args[0];
-		var sigs = [], args = [], aname;
+		var sigs = [], args = [], aname, module = "";
 		var body,def;
 		if(l==2){
 			// lookup
@@ -284,6 +285,7 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 			sigs = def.sigs;
 			args = def.args;
 			body = def.body;
+			module = def.module;
 			aname = name+"#"+args.length;
 		} else if(l==3 || l==4){
 			// core
@@ -292,9 +294,9 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 			aname = name+"#"+args.length;
 			if(l==4){
 				body = value.args[3];
+				module = "user";
 			} else {
-				// known definition
-				if(params.use) body = this.lib[params.use][aname];
+				module = params.use;
 			}
 		}
 		if(this.dict[aname]) return this.dict[aname];
@@ -303,11 +305,13 @@ define(["exports", "./parser"], function(exports, parser, Deferred){
 			aname:aname,
 			sigs:sigs,
 			args:args,
-			body:body
+			body:body,
+			module:module
 		};
+		if(!this.lib[module]) this.lib[module] = {};
 		if(l==4) {
 			// compile definition
-			def.body = this.compile(body,def);
+			this.lib[module][aname] = this.compile(body,def);
 		}
 		this.dict[aname] = def;
 		return def;

@@ -1,7 +1,7 @@
 ({define:typeof define!="undefined"?define:function(deps, factory){module.exports = factory(exports);}}).
 define(["exports"], function(exports){
 	
-	function reduce(array, iteratee, accumulator) {
+	function reduce(array, accumulator, iteratee) {
 		var index = -1,
 			length = array.length;
 		while (++index < length) {

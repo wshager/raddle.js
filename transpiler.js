@@ -1,5 +1,12 @@
+"use strict";
+
 ({define:typeof define!="undefined"?define:function(deps, factory){module.exports = factory(exports, require("./parser"));}}).
 define(["exports", "./parser"], function(exports, parser){
+	
+	function short(d){
+		var n = d.aname;
+		return ((d.module.split("/")[0])+n.charAt(0).toUpperCase()+n.substr(1)).replace(/#|-/g,"");
+	}
 	
 	function Transpiler(execute){
 		this.dict = {};
@@ -32,6 +39,7 @@ define(["exports", "./parser"], function(exports, parser){
 	};
 	
 	Transpiler.prototype.transpile = function(value,params){
+		this.cache = [];
 		var ret = this.process(value,params).filter(function(_){
 			return !!_;
 		}).pop();
@@ -42,7 +50,6 @@ define(["exports", "./parser"], function(exports, parser){
 	};
 	
 	Transpiler.prototype.process = function(value,params,callback){
-		this.cache = [];
 		var args = Array.prototype.slice.call(arguments);
 		var value = args.shift();
 		var params = args.length>1 && typeof args[0]!="function" ? args.shift() : {};
@@ -71,10 +78,13 @@ define(["exports", "./parser"], function(exports, parser){
 				var ret = args.map(function(arg){
 					return self.process(arg,params,callback);
 				}).pop();
+				// always return a function
+				if(!ret) ret = function anon0() {};
 				cb(null,ret);
 			};
 			use ? this.use(use,params,callback) : callback();
 		} else {
+			value.top = true;
 			return this.compile(value);
 		}
 	};
@@ -185,9 +195,8 @@ define(["exports", "./parser"], function(exports, parser){
 		if(i && !this.matchTypes(i,def.sigs[0])){
 			throw new Error("Type signatures do not match: "+i+"->"+def.sigs[0]);
 		}
-		//acc.unshift("this['"+def.module+"']['"+aname+"'].call(this,");
-		acc.unshift("("+this.lib[def.module][aname].toString()+")(");
-		//acc.unshift("f"+def.hash+"(");
+		//acc.unshift("("+this.lib[def.module][aname].toString()+")(");
+		acc.unshift(short(def)+"(");
 		// TODO static arg type checks
 		if(v.args){
 			if(!def.args || v.args.length!=def.args.length){
@@ -196,6 +205,8 @@ define(["exports", "./parser"], function(exports, parser){
 		} else if(def.args) {
 			throw new Error("No arguments supplied");
 		}
+		// accumulate def hashes per run
+		if(this.cache.indexOf(aname)==-1) this.cache.push(aname);
 		// replace ? args in order
 		var args = v.args.map(function(_,i){
 			if(_=="?") {
@@ -244,6 +255,13 @@ define(["exports", "./parser"], function(exports, parser){
 	Transpiler.prototype.compile = function(value,parent,pa,exec){
 		// TODO compile literals like ?
 		var self = this;
+		var top = false;
+		// always compose
+		if(typeOf(value)!="array") {
+			top = value.top;
+			value = [value];
+		}
+		if(top) this.count = 0;
 		var name,sigs=new Array(2),args=[];
 		if(parent){
 			// called from define, so compile to a definition body
@@ -263,8 +281,6 @@ define(["exports", "./parser"], function(exports, parser){
 		var fa = a.slice(0);
 		fa.unshift("arg0");
 		var fargs = fa.join(",");
-		// always compose
-		if(typeOf(value)!="array") value = [value];
 		// compose the functions in the array
 		var f = this.wrap(value,sigs[0],sigs[1],parent ? a : pa);
 		// put default input arg in a
@@ -272,20 +288,19 @@ define(["exports", "./parser"], function(exports, parser){
 		var index = f.length/2;
 		f.splice(index,0,a.join(","));
 		var fns = "\n";
-		/*if(!parent && !pa) {
-			for(var k in this.cache){
-				var d = this.dict[k]; 
-				if(d.hash && this.lib[d.module][d.aname]){
-					fns += "var f"+d.hash+"="+this.lib[d.module][d.aname].toString()+";\n";
+		if(top) {
+			for(var i=0;i<this.cache.length;i++){
+				var d = this.dict[this.cache[i]]; 
+				if(d && this.lib[d.module][d.aname]){
+					fns += "var "+short(d)+"="+this.lib[d.module][d.aname].toString()+";\n";
 				}
 			}
-		}*/
-		var fn =  "function "+name+"("+fargs+"){ "+fns+"return "+f.join("")+";}";
-		console.warn(fn)
-		return new Function("return "+fn)();
+		}
+		return new Function("return function "+name+"("+fargs+"){ "+fns+"return "+f.join("")+";}")();
 	};
 	
 	Transpiler.prototype.define = function(value,params){
+		this.cache = [];
 		var l = value.args.length;
 		var name = value.args[0];
 		var sigs = [], args = [], aname, module = "";
@@ -320,11 +335,8 @@ define(["exports", "./parser"], function(exports, parser){
 			sigs:sigs,
 			args:args,
 			body:body,
-			module:module,
-			hash:Math.random().toString(36).substring(7)
+			module:module
 		};
-		// TODO accumulate def hashes per run
-		this.cache.push(aname);
 		if(!this.lib[module]) this.lib[module] = {};
 		if(l==4) {
 			// compile definition

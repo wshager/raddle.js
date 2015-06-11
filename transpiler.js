@@ -231,8 +231,9 @@ define(["exports", "./parser"], function(exports, parser){
 				var r = this.convert(_);
 				if(typeof r=="string" && r.match(/^.+#[0-9]+$/)){
 					var d = this.dict[r];
-					//return "this['"+d.module+"']['"+r+"']";
-					return this.lib[d.module][r].toString();
+					if(this.cache.indexOf(r)==-1) this.cache.push(r);
+					//return this.lib[d.module][r].toString();
+					return short(d);
 				}
 				// check type here
 				if(!this.typeCheck(r,t)){

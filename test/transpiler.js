@@ -34,7 +34,7 @@ define(function (require) {
 		console.warn(val,"=>",ret);
 		assert.equal(ret,6,'Addition operator should add numbers together');
 	});
-	add("use(core/numeric-arithmetic-operators,core/higher-order-functions),define(sum,(any*,any*),(),fold-left(add#1,0)),sum()",function (error, fn) {
+	add("use(core/numeric-arithmetic-operators,core/higher-order-functions),define(sum,(any*,any*),(),fold-left(0,add#1)),sum()",function (error, fn) {
 		var val = [];
 		for(var i=0;i<10;i++){
 			val.push(i);

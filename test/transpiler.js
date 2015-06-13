@@ -55,5 +55,11 @@ define(function (require) {
 		console.warn(val,"=>",ret);
 		assert.deepEqual(ret,{1:["d","w"],2:["we","eq"],3:["sdf"]});
 	});
+	add("use(dom/dom-functions),",function (error, fn) {
+		var val = ["sdf","d","we","eq","w"];
+		var ret = fn(val);
+		console.warn(val,"=>",ret);
+		assert.deepEqual(ret,{1:["d","w"],2:["we","eq"],3:["sdf"]});
+	});
 	registerSuite(test);
 });

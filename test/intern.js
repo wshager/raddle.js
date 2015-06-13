@@ -40,16 +40,16 @@ define({
 
 	// Configuration options for the module loader; any AMD configuration options supported by the specified AMD loader
 	// can be used here
-	loader: (typeof process === 'undefined' && location.search.indexOf('config=rql') > -1) ?
+	loader: (typeof process === 'undefined' && location.search.indexOf('config=raddle') > -1) ?
 		{
-			// if we are using the full path to rql, we assume we are running
+			// if we are using the full path to raddle, we assume we are running
 			// in a sibling path configuration
 			baseUrl: '../..'
 		} : {},
 
 	// Non-functional test suite(s) to run in each browser
-	suites: [ (typeof process === 'undefined' && location.search.indexOf('config=rql') > -1) ?
-		'rql/test/all' : 'test/all' ],
+	suites: [ (typeof process === 'undefined' && location.search.indexOf('config=raddle') > -1) ?
+		'raddle/test/all' : 'test/all' ],
 
 	// A regular expression matching URLs to files that should not be included in code coverage analysis
 	excludeInstrumentation: /^(?:test|node_modules)\//

@@ -4,8 +4,8 @@
 define(["exports", "./parser"], function(exports, parser){
 	
 	function short(d){
-		var n = d.aname;
-		return ((d.module.split("/")[0])+n.charAt(0).toUpperCase()+n.substr(1)).replace(/#|-/g,"");
+		var n = d.aname.split(":");
+		return (n[0]+n[1].charAt(0).toUpperCase()+n[1].substr(1)).replace(/#|-/g,"");
 	}
 	
 	function Transpiler(execute){
@@ -25,7 +25,11 @@ define(["exports", "./parser"], function(exports, parser){
 		require(core.map(function(_){ return _ }),function(){
 			var libs = Array.prototype.slice.call(arguments);
 			libs.forEach(function(lib,i){
-				self.lib[core[i]] = lib;
+				var nslib = {};
+				for(var k in lib){
+					nslib["core:"+k] = lib[k];
+				} 
+				self.lib[core[i]] = nslib;
 			});
 			require(reqs,function(){
 				var deps = Array.prototype.slice.call(arguments);
@@ -187,7 +191,10 @@ define(["exports", "./parser"], function(exports, parser){
 		acc = acc || [];
 		var v = value.shift();
 		var arity = v.args.length;
-		var aname = v.name+"#"+arity;
+		var parts = v.name.split(":");
+		var name = parts.pop();
+		var ns = parts.length ? parts[0] : "core";
+		var aname = ns+":"+name+"#"+arity;
 		var def = this.dict[aname];
 		if(!def) {
 			throw new Error("Definition for "+aname+" not in dictionary");
@@ -230,8 +237,12 @@ define(["exports", "./parser"], function(exports, parser){
 				var t = def.args[i];
 				var r = this.convert(_);
 				if(typeof r=="string" && r.match(/^.+#[0-9]+$/)){
-					var d = this.dict[r];
-					if(this.cache.indexOf(r)==-1) this.cache.push(r);
+					var parts = r.split(":");
+					var name = parts.pop();
+					var ns = parts.length ? parts[0] : "core";
+					var aname = ns+":"+name;
+					var d = this.dict[aname];
+					if(this.cache.indexOf(aname)==-1) this.cache.push(aname);
 					//return this.lib[d.module][r].toString();
 					return short(d);
 				}
@@ -296,6 +307,7 @@ define(["exports", "./parser"], function(exports, parser){
 					fns += "var "+short(d)+"="+this.lib[d.module][d.aname].toString()+";\n";
 				}
 			}
+			console.warn(fns)
 		}
 		return new Function("return function "+name+"("+fargs+"){ "+fns+"return "+f.join("")+";}")();
 	};
@@ -303,8 +315,11 @@ define(["exports", "./parser"], function(exports, parser){
 	Transpiler.prototype.define = function(value,params){
 		this.cache = [];
 		var l = value.args.length;
-		var name = value.args[0];
-		var sigs = [], args = [], aname, module = "";
+		var parts = value.args[0].split(":");
+		var name = parts.pop();
+		var module = "";
+		var ns = parts.length ? parts[0] : "local";
+		var sigs = [], args = [], aname;
 		var body,def;
 		if(l==2){
 			// lookup
@@ -316,15 +331,18 @@ define(["exports", "./parser"], function(exports, parser){
 			args = def.args;
 			body = def.body;
 			module = def.module;
-			aname = name+"#"+args.length;
+			aname = ns+":"+name+"#"+args.length;
 		} else if(l==3 || l==4){
+			if(l==3 && ns=="local") {
+				ns = "core";
+			}
 			// core
 			sigs = value.args[1];
 			args = value.args[2];
-			aname = name+"#"+args.length;
+			aname = ns+":"+name+"#"+args.length;
 			if(l==4){
 				body = value.args[3];
-				module = "user";
+				module = ns;
 			} else {
 				module = params.use;
 			}
@@ -333,6 +351,7 @@ define(["exports", "./parser"], function(exports, parser){
 		def = {
 			name:name,
 			aname:aname,
+			ns:ns,
 			sigs:sigs,
 			args:args,
 			body:body,

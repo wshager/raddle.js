@@ -68,13 +68,13 @@ define(["exports"], function(exports){
 		return unfold4(unspool(init), unspool, cond, handler, appender, index, appender(r,index(init),handler(init)));
 	}
 	
-	exports["fold-left#2"] = reduce;
-	exports["unfold#2"] = unfold;
-	exports["unfold#3"] = unfold2;
-	exports["unfold#4"] = unfold3;
-	exports["unfold#5"] = unfold4;
+	exports["fold-left#3"] = reduce;
+	exports["unfold#3"] = unfold;
+	exports["unfold#4"] = unfold2;
+	exports["unfold#5"] = unfold3;
 	exports["unfold#6"] = unfold4;
-	exports["group-by#1"] = groupBy;
+	exports["unfold#7"] = unfold4;
+	exports["group-by#2"] = groupBy;
 	
 	return exports;
 	

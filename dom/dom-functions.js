@@ -2,7 +2,7 @@
 define(["exports"], function(exports){
 	
 	function byId(id){
-		return (typeof id == "string") ? document.byId(node) : id;
+		return (typeof id == "string") ? document.getElementById(id) : id;
 	}
 	
 	function place(node, position, refNode){
@@ -56,13 +56,13 @@ define(["exports"], function(exports){
 		return element; // DomNode
 	};
 
-	exports.empty = function empty(/*DOMNode*/ node){
+	function empty(/*DOMNode*/ node){
 		while(node.firstChild) {
 			node.removeChild(node.firstChild);
 		}
 	};
 
-	exports.destroy = function destroy(/*DOMNode*/ node){
+	function destroy(/*DOMNode*/ node){
 		if(node && node.parentNode) node.parentNode.removeChild(node);
 	};
 	

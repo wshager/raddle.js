@@ -5,7 +5,7 @@ define(["exports"], function(exports){
 		return arg0+arg1;
 	};
 	
-	exports["add#1"] = add;
+	exports["add#2"] = add;
 	
 	return exports;
 	

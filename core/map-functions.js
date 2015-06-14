@@ -12,7 +12,7 @@ define(["exports"], function(exports){
 	}
 	
 	exports["map-new#0"] = mapNew;
-	exports["map-transform#2"] = mapTransform;
+	exports["map-transform#3"] = mapTransform;
 	
 	return exports;
 	

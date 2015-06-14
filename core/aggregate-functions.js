@@ -5,7 +5,7 @@ define(["exports"], function(exports){
 		return seq.length;
 	}
 	
-	exports["count#0"] = count;
+	exports["count#1"] = count;
 	
 	return exports;
 	

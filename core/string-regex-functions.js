@@ -4,7 +4,11 @@ define(["exports"], function(exports){
 	function tokenize(str,delim){
 		return str.split(delim);
 	}
-	exports["tokenize#1"] = tokenize;
+	function replace(str,pattern,replacement){
+		return str.replace(pattern,replacement);
+	}
+	exports["tokenize#2"] = tokenize;
+	exports["replace#3"] = replace;
 	return exports;
 	
 });

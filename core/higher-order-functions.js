@@ -5,6 +5,7 @@ define(["exports"], function(exports){
 		var index = -1,
 			length = array.length;
 		while (++index < length) {
+			// parameters: previousValue, currentValue, index, array
 			accumulator = iteratee(accumulator, array[index], index, array);
 		}
 		return accumulator;

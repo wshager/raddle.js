@@ -39,22 +39,34 @@ define(["exports"], function(exports){
 		return node; // DomNode
 	};
 
-	function create(/*DOMNode*/ tag, /*Object*/ kwArgs){
+	function element(/*string*/ tag, /*Object*/ kwArgs){
 		var doc = document;
 		var element = doc.createElement(tag);
-		if(attrs){
-            for (var property in kwArgs) {
-                if (property === 'attributes') {
-                    for (var attribute in kwArgs.attributes) {
-                        element.setAttribute(attribute, kwArgs.attributes[attribute]);
-                    }
-                } else {
-                    element[property] = kwArgs[property];
+        for (var property in kwArgs) {
+        	var value = kwArgs[property];
+            if (property === 'attributes') {
+                for (var attribute in value) {
+                    element.setAttribute(attribute, kwArgs.attributes[attribute]);
                 }
+            } else if(typeof value == "object" && value.constructor.name.toString() == "Attr"){
+            	element.setAttributeNode(value);
+            } else {
+                element[property] = kwArgs[property];
             }
-		}
+        }
 		return element; // DomNode
 	};
+	
+	// See http://stackoverflow.com/questions/7677930
+	// it says createAttribute is deprecated, but could't find elsewhere
+	// I'll keep this for compatibility with xquery 
+	function attribute(/*string*/ name, /*Object*/ value){
+		var doc = document;
+		var attr = doc.createAttribute(name);
+		attr.value = value;
+		return attr; // DomNode
+	};
+
 
 	function empty(/*DOMNode*/ node){
 		while(node.firstChild) {
@@ -62,7 +74,7 @@ define(["exports"], function(exports){
 		}
 	};
 
-	function destroy(/*DOMNode*/ node){
+	function remove(/*DOMNode*/ node){
 		if(node && node.parentNode) node.parentNode.removeChild(node);
 	};
 	
@@ -79,13 +91,17 @@ define(["exports"], function(exports){
 		return node; // DomNode
 	}
 	
-	exports["set-attribute#2"] = setAttr;
-	exports["set-attributes#1"] = setAttrs;
-	exports["by-id#1"] = byId;
-	exports["empty#0"] = empty;
-	exports["destroy#0"] = destroy;
+	
+	exports["element#2"] = create;
+	exports["attribute#2"] = attribute;
 	exports["place#2"] = place;
-	exports["create#1"] = create;
+	exports["by-id#1"] = byId;
+	exports["empty#1"] = empty;
+	exports["remove#1"] = remove;
+	exports["set-attribute#3"] = setAttr;
+	exports["set-attributes#2"] = setAttrs;
+	
+	
 	
 	return exports;
 	

@@ -1,0 +1,17 @@
+[{
+    "name": "core",
+    "prefix": "",
+    "location": "raddle/core"
+},{
+    "name": "op",
+    "prefix": "op",
+    "location": "raddle/op"
+},{
+    "name": "map",
+    "prefix": "map",
+    "location": "raddle/map"
+},{
+    "name": "array",
+    "prefix": "array",
+    "uri": "raddle/array"
+}]

@@ -19,7 +19,13 @@ define(function (require) {
 			return dfd;
 		};
 	}
-	add("use(core/string-regex-functions,core/aggregate-functions),define(depth,(string),number,(tokenize(.,/),count(.))),local:depth(.)",function(error,fn){
+	/*add("use(core/string-value-functions),define(get,(string),string,core:concat(file:///,$1,/xml/refs/,$1,.refs.xml)),local:get(.)",function(error,fn){
+		var val = "t";
+		var ret = fn(val);
+		console.warn(val,"=>",ret);
+		assert.equal(ret,"file:///t/xml/refs/t.refs.xml");
+	});
+	add("use(core/string-regex-functions,core/aggregate-functions),define(depth,(string),number,(tokenize($1,/),count(.))),local:depth(.)",function(error,fn){
 		var val = "";
 		for(var i=0;i<10;i++){
 			val += "/" + Math.random().toString(36).substring(7);
@@ -28,13 +34,13 @@ define(function (require) {
 		console.warn(val,"=>",ret);
 		assert.equal(ret,11);
 	});
-	add("use(core/numeric-arithmetic-operators),define(add2,(number,number,number),number,(add(.,?),add(.,?))),local:add2(.,2,3)",function (error, fn) {
+	add("use(op/numeric-arithmetic-operators),define(add2,(number,number,number),number,(op:add($1,$2),op:add(.,$3))),local:add2(.,2,3)",function (error, fn) {
 		var val = 1;
 		var ret = fn(val);
 		console.warn(val,"=>",ret);
 		assert.equal(ret,6,'Addition operator should add numbers together');
 	});
-	add("use(core/numeric-arithmetic-operators,core/higher-order-functions),define(sum,(any*),number,fold-left(.,0,add#2)),local:sum(.)",function (error, fn) {
+	add("use(op/numeric-arithmetic-operators,core/higher-order-functions),define(sum,(any*),number,fold-left($1,0,op:add#2)),local:sum(.)",function (error, fn) {
 		var val = [];
 		for(var i=0;i<10;i++){
 			val.push(i);
@@ -42,14 +48,14 @@ define(function (require) {
 		var ret = fn(val);
 		console.warn(val,"=>",ret);
 		assert.equal(ret,45);
-	});
-	add("use(core/numeric-arithmetic-operators,core/numeric-comparison-operators,core/higher-order-functions),unfold(.,(add(.,1)),(greater-than(.,10)))",function (error, fn) {
+	});*/
+	add("use(op/numeric-arithmetic-operators,op/numeric-comparison-operators,hof/unfold-functions),hof:unfold(.,(op:add(.,1)),(op:greater-than(.,10)))",function (error, fn) {
 		var val = 1;
 		var ret = fn(val);
 		console.warn(val,"=>",ret);
 		assert.deepEqual(ret,[1,2,3,4,5,6,7,8,9,10]);
 	});
-	add("use(core/numeric-arithmetic-operators,core/numeric-comparison-operators,core/higher-order-functions,core/list-functions,core/map-functions,core/string-value-functions),define(appender,(map,any,(any*)),map,map-transform(.,?,(append(.,?)))),unfold(.,(tail(.)),(empty(.)),(head(.)),local:appender#3,(head(.),string-length(.)),map-new())",function (error, fn) {
+	/*add("use(core/numeric-arithmetic-operators,core/numeric-comparison-operators,core/higher-order-functions,core/list-functions,core/map-functions,core/string-value-functions),define(appender,(map,any,(any*)),map,map-transform(.,?,(append(.,?)))),unfold(.,(tail(.)),(empty(.)),(head(.)),local:appender#3,(head(.),string-length(.)),map-new())",function (error, fn) {
 		var val = ["sdf","d","we","eq","w"];
 		var ret = fn(val);
 		console.warn(val,"=>",ret);
@@ -63,7 +69,7 @@ define(function (require) {
 		var ret = fn(val);
 		console.warn(val,"=>",ret);
 		assert.deepEqual(ret,node);
-	});/*
+	});
 	add("use(dom/dom-functions),core:create(?)",function (error, fn) {
 		var val = "div";
 		var ret = fn(val);

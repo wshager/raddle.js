@@ -3,8 +3,8 @@
 ({define:typeof define!="undefined"?define:function(deps, factory){module.exports = factory(exports, require("./parser"));}}).
 define(["exports", "./parser"], function(exports, parser){
 	
-	function short(qname){
-		var n = qname.split(":");
+	function short(fullname){
+		var n = fullname.split(":");
 		return (n[0]+n[1].charAt(0).toUpperCase()+n[1].substr(1)).replace(/#|-/g,"");
 	}
 	
@@ -27,9 +27,10 @@ define(["exports", "./parser"], function(exports, parser){
 			libs.forEach(function(lib,i){
 				var nslib = {};
 				for(var k in lib){
-					nslib[core[i].split("/")[0]+":"+k] = lib[k];
+					var name = core[i].split("/")[0]+":"+k;
+					console.warn(name);
+					if(!self.lib[name]) self.lib[name] = lib[k];
 				} 
-				self.lib[core[i]] = nslib;
 			});
 			require(reqs,function(){
 				var deps = Array.prototype.slice.call(arguments);
@@ -118,10 +119,10 @@ define(["exports", "./parser"], function(exports, parser){
 		}
 		var number = +string;
 		if(isNaN(number) || number.toString() !== string){
-          /*var isoDate = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?Z$/.exec(x);
-          if (isoDate) {
-            date = new Date(Date.UTC(+isoDate[1], +isoDate[2] - 1, +isoDate[3], +isoDate[4], +isoDate[5], +isoDate[6], +isoDate[7] || 0));
-          }*/
+			/*var isoDate = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?Z$/.exec(x);
+			if (isoDate) {
+			date = new Date(Date.UTC(+isoDate[1], +isoDate[2] - 1, +isoDate[3], +isoDate[4], +isoDate[5], +isoDate[6], +isoDate[7] || 0));
+			}*/
 			string = decodeURIComponent(string);
 			if(exports.jsonQueryCompatible){
 				if(string.charAt(0) == "'" && string.charAt(string.length-1) == "'"){
@@ -131,6 +132,15 @@ define(["exports", "./parser"], function(exports, parser){
 			return string;
 		}
 		return number;
+	};
+	
+	Transpiler.prototype.getFunction = function(fullname){
+		return this.lib[fullname];
+	};
+	
+	Transpiler.prototype.getFunctionDef = function(qname,arity){
+		if(!this.dict[qname]) return;
+		return this.dict[qname][arity+1] ? this.dict[qname][arity+1] : this.dict[qname][0];
 	};
 	
 	Transpiler.prototype.coerce = function(value,type){
@@ -187,124 +197,86 @@ define(["exports", "./parser"], function(exports, parser){
 		return (ti[0]==to[0] || to[0]==7 || ti[0]==7) && d>=0 && d<=1;
 	};
 	
-	Transpiler.prototype.compile = function(value,parent,pa){
-		// TODO compile literals like ?
+	Transpiler.prototype.compile = function(value,parent,compose){
 		var self = this;
-		var top = false;
-		// always compose
-		if(typeOf(value)!="array") {
-			top = value.top;
-			value = [value];
-		}
-		if(top) this.count = 0;
-		var name,type,args=[];
+		var isSeq = typeOf(value)=="array";
+		var top = isSeq ? false : value.top;
+		var fargs = parent ? parent.args.map(function(_,i){
+			return "arg" + (i+1);
+		}).join(",") : "arg0";
+		var fname = "anon"+this.count;
 		if(parent){
-			// called from define, so compile to a definition body
-			name = parent.name;
-			args = parent.args;
-			type = parent.type;
-		} else {
-			name = "anon"+this.count;
+			var parity = parent.more ? "N" : parent.args.length;
+			fname = short(parent.name+"#"+parity);
+		} else if(top) {
 			this.count++;
 		}
-		// if there are unknown args, take them from the definition
-		var a = [];
-		var arity = args.length;
-		for(var i=1;i<arity;i++){
-			a.push("arg"+i);
-		}
-		var fa = a.slice(0);
-		fa.unshift("arg0");
-		// compose the functions in the array
-		var f = value.map(function(v){
-			var acc = [];
-			//var v = value.shift();
-			var arity = v.args.length;
-			var name = v.name;
-			var qname = (name.indexOf(":")>-1 ? name : "core:"+name)+"#"+arity;
-			/*var def = this.dict[qname];
-			if(!def) {
-				throw new Error("Definition for "+qname+" not in dictionary");
-			}*/
-			/*if(i && !this.matchTypes(i,def.sigs[0])){
-				throw new Error("Type signatures do not match: "+i+"->"+def.sigs[0]);
-			}*/
-			acc.push(short(qname));
-			// TODO static arg type checks
-			/*if(v.args){
-				if(!def.args || v.args.length!=def.args.length){
-					throw new Error("Argument length incorrect");
-				}
-			} else if(def.args) {
-				throw new Error("No arguments supplied");
-			}*/
-			// accumulate def hashes per run
-			if(this.cache.indexOf(qname)==-1) this.cache.push(qname);
-			// replace ? args in order
-			args = v.args.map(function(_,i){
-				var type = typeOf(_);
-				if(_==".") {
-					return ".";
-				} else if(_=="?") {
-					if(parent && a.length){
-						return a.shift();
-					} else if(pa.length){
-						return pa.shift();
-					} else {
-						throw new Error("No arguments found to replace ?");
-					}
-				} else if(type == "array" || type == "query"){
-					// compile to function
-					return this.compile(_,null,a).toString();
+		if(isSeq) {
+			var seq = value.map(function(_){
+				if(typeOf(_)=="query"){
+					// compose the functions in the array
+					return "arg0 = "+this.compile(_,null,true).toString()+";\n";
 				} else {
-					//var t = def.args[i];
-					var r = this.convert(_);
-					if(typeof r=="string" && r.match(/^.+#[0-9]+$/)){
-						var qname = (r.indexOf(":")>-1 ? r : "core:"+r);
-						//var d = this.dict[qname];
-						if(this.cache.indexOf(qname)==-1) this.cache.push(qname);
-						//return this.lib[d.module][r].toString();
-						return short(qname);
-					}
-					// check type here
-					//if(!this.typeCheck(r,t)){
-					//	throw new Error("Expected type ",t," for argument value ",r);
-					//}
-					return JSON.stringify(r);
+					return _;
 				}
 			},this);
-			acc.push(args);
-			return acc;
+			var pre = parent ? "var arg0;\n" : "";
+			return new Function("return function "+fname+"("+fargs+"){\n"+pre+seq.join("")+"return arg0;\n}")();
+		}
+		var name = value.name,
+			args = value.args;
+		if(!name.match(/:/)) name = "core:"+name;
+		var def = this.getFunctionDef(name,args.length);
+		var fullname = name+"#"+(def.more ? "N" : def.args.length);
+		if(this.cache.indexOf(fullname)==-1) this.cache.push(fullname);
+		args = args.map(function(_){
+			if(typeOf(_) == "array") {
+				return this.compile(_,null,null).toString();
+			} else if(typeOf(_) == "query") {
+				return this.compile(_,null,null);
+			} else if(_.match(/^(\.\/)|\.$/)) {
+				return _;
+			} else if(_.match(/^\$[0-9]+$/)) {
+				return _.replace(/^\$([0-9]+)$/,"arg$1");
+			} else {
+				var r = this.convert(_);
+				if(typeof r=="string" && r.match(/^.+#[0-9]+$/)){
+					var fullname = (r.indexOf(":")>-1 ? r : "core:"+r);
+					if(this.cache.indexOf(fullname)==-1) this.cache.push(fullname);
+					return short(fullname);
+				}
+				// check type here
+				//if(!this.typeCheck(r,t)){
+				//	throw new Error("Expected type ",t," for argument value ",r);
+				//}
+				return JSON.stringify(r);
+			}
 		},this);
-		var exec = false;
-		var fn = f.reduce(function(pre,cur,i){
-		  var f = cur[0]+"(";
-		  var args = cur[1];
-		  if(args[0]=="."){
-		    args[0] = pre;
-		  } else {
-			  exec = true;
-			  f = pre+","+f;
-		  }
-		  return f+args.join(",")+")";
-		},"arg0");
-		console.warn(fn)
-		var fargs = fa.join(",");
+		var args2 = args.reduce(function(pre,cur,i){
+			if(cur.match(/^(\.\/)|\.$/)) {
+				pre.push("arg0");
+			} else {
+				var s = pre.length-1;
+				var last = pre[s];
+				if(last.match(/^(\.\/)|\.$/) || s<1) {
+					pre.push(cur);
+				} else {
+					pre[s] = last + "," + cur;
+				}
+			}
+			return pre;
+		},[short(fullname) + "("]);
+		args2.push(")");
+		var fn = args2.join("");
+		if(compose) return fn;
 		var fns = "\n";
 		if(top) {
 			for(var i=0;i<this.cache.length;i++){
-				var d = this.dict[this.cache[i]]; 
-				if(d && this.lib[d.module][d.qname]){
-					fns += "var "+short(d.qname)+"="+this.lib[d.module][d.qname].toString()+";\n";
-				}
+				var f = this.getFunction(this.cache[i]);
+				fns += "var "+short(this.cache[i])+"="+f.toString()+";\n";
 			}
 		}
-		var func = new Function("return function "+name+"("+fargs+"){ "+fns+"return "+fn+";}")();
-		if(!exec || top){
-			return func;
-		} else {
-			return func.toString()+"()";
-		}
+		return new Function("return function "+fname+"("+fargs+"){ "+fns+"return "+fn+";}")();
 	};
 	
 	Transpiler.prototype.define = function(value,params){
@@ -326,7 +298,7 @@ define(["exports", "./parser"], function(exports, parser){
 			args = def.args;
 			body = def.body;
 			module = def.module;
-			qname = ns+":"+name+"#"+args.length;
+			qname = ns+":"+name;
 		} else if(l==3 || l==4){
 			if(l==3) {
 				module = params.use;
@@ -340,24 +312,31 @@ define(["exports", "./parser"], function(exports, parser){
 			// core
 			args = value.args[1];
 			type = value.args[2];
-			qname = ns+":"+name+"#"+args.length;
+			qname = ns+":"+name;
 		}
-		if(this.dict[qname]) return this.dict[qname];
+		var len = args.length;
+		// check if more argument of last type is allowed
+		var last = args[len-1];
+		var more = typeOf(last) == "string" ? last.substr(-1) === "-" : false;
+		var arity = more ? -1 : len;
+		var existing = this.getFunctionDef(qname,arity);
+		if(existing) return existing;
 		def = {
-			name:name,
-			qname:qname,
-			ns:ns,
+			name:qname,
 			type:type,
 			args:args,
+			more:more,
 			body:body,
 			module:module
 		};
-		if(!this.lib[module]) this.lib[module] = {};
+		if(!this.dict[qname]){
+			this.dict[qname] = [];
+		}
+		this.dict[qname][arity+1] = def;
 		if(l==4) {
 			// compile definition
-			this.lib[module][qname] = this.compile(body,def);
+			this.lib[qname+"#"+(arity<0 ? "N" : arity)] = this.compile(body,def);
 		}
-		this.dict[qname] = def;
 		return def;
 	};
 	exports.Transpiler = Transpiler;

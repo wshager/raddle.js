@@ -17,30 +17,45 @@ define(["exports", "./parser"], function(exports, parser){
 	
 	Transpiler.prototype.use = function(value,params,callback){
 		// TODO filter and separate core definitions
-		var core = value.args;
-		var reqs = core.map(function(_){
-			return "intern/dojo/text!/raddled/"+_+".rdl";
-		});
+		var modulePath = params.modules || "raddle/modules.json";
+		var textPrefix = params.moduleTextPrefix || "text!";
+		var defaultNamespace = params.defaultNamespace || "core";
+		var use = value.args;
 		var self = this;
-		require(core.map(function(_){ return _ }),function(){
-			var libs = Array.prototype.slice.call(arguments);
-			libs.forEach(function(lib,i){
-				var nslib = {};
-				for(var k in lib){
-					var name = core[i].split("/")[0]+":"+k;
-					console.warn(name);
-					if(!self.lib[name]) self.lib[name] = lib[k];
-				} 
+		//require([textPrefix+modulePath],function(moduleText){
+			/*var modules = JSON.parse(moduleText);
+			var moduleMap = {};
+			for(var i=0,l=modules.length;i<l;i++) {
+				moduleMap[modules[i].prefix ? modules[i].prefix : defaultNamespace] = modules[i];
+			}*/
+			var reqs = use.map(function(_){
+				return textPrefix+"raddled/"+_+".rdl";
 			});
-			require(reqs,function(){
-				var deps = Array.prototype.slice.call(arguments);
-				deps.forEach(function(dep,i){
-					var parsed = parser.parse(dep);
-					if(parsed.args.length) self.process(parsed,{use:core[i]},callback);
+			/*var core = use.map(function(_){
+				// FIXME don't use first part of path as namespace!
+				var parts = _.split("/");
+				var ns = parts.shift();
+				var mod = moduleMap[ns];
+				return mod.location+"/"+parts.join("/");
+			});*/
+			require(use,function(){
+				var libs = Array.prototype.slice.call(arguments);
+				libs.forEach(function(lib,i){
+					for(var k in lib){
+						var name = use[i].split("/")[0]+":"+k;
+						if(!self.lib[name]) self.lib[name] = lib[k];
+					}
 				});
-				if(callback) callback();
+				require(reqs,function(){
+					var deps = Array.prototype.slice.call(arguments);
+					deps.forEach(function(dep,i){
+						var parsed = parser.parse(dep);
+						if(parsed.args.length) self.process(parsed,{use:use[i]},callback);
+					});
+					if(callback) callback();
+				});
 			});
-		});
+		//});
 	};
 	
 	Transpiler.prototype.transpile = function(value,params){

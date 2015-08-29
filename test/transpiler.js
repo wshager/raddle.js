@@ -11,7 +11,10 @@ define(function (require) {
 		test[key] = function(){
 			var dfd = this.async(5000);
 			var ready = dfd.callback(cb);
-			transpiler.process(key,function(error,fn){
+			transpiler.process(key,{
+				moduleTextPrefix:"intern/dojo/text!"
+			},
+			function(error,fn){
 				if(error) throw error;
 				console.log(fn.toString());
 				ready(error,fn);

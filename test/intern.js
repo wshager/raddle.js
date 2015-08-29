@@ -41,12 +41,31 @@ define({
 	// Configuration options for the module loader; any AMD configuration options supported by the specified AMD loader
 	// can be used here
 	loader: (typeof process === 'undefined' && location.search.indexOf('config=raddle') > -1) ?
-		{
-			// if we are using the full path to raddle, we assume we are running
-			// in a sibling path configuration
-			baseUrl: '../..'
-		} : {},
-
+	{
+		// if we are using the full path to raddle, we assume we are running
+		// in a sibling path configuration
+		baseUrl: '../..'
+	} : {
+		packages: [{
+			name: 'dojo',
+			location: '../dojo'
+		},{
+			name: 'raddle',
+			location: '../raddle'
+		},{
+			name: 'raddled',
+			location: '../raddled'
+		},{
+			name: 'fn',
+			location: '../raddle-core/fn'
+		},{
+			name: 'op',
+			location: '../raddle-core/op'
+		},{
+			name: 'hof',
+			location: '../raddle-core/hof'
+		}]
+	},
 	// Non-functional test suite(s) to run in each browser
 	suites: [ (typeof process === 'undefined' && location.search.indexOf('config=raddle') > -1) ?
 		'raddle/test/all' : 'test/all' ],

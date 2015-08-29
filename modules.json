@@ -13,5 +13,13 @@
 },{
     "name": "array",
     "prefix": "array",
-    "uri": "raddle/array"
+    "location": "raddle/array"
+},{
+    "name": "hof",
+    "prefix": "hof",
+    "location": "raddle/hof"
+},{
+    "name": "new",
+    "prefix": "new",
+    "location": "raddle/new"
 }]

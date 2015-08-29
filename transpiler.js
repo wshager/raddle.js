@@ -19,43 +19,31 @@ define(["exports", "./parser"], function(exports, parser){
 		// TODO filter and separate core definitions
 		var modulePath = params.modules || "raddle/modules.json";
 		var textPrefix = params.moduleTextPrefix || "text!";
-		var defaultNamespace = params.defaultNamespace || "core";
+		var defaultNamespace = params.defaultNamespace || "fn";
 		var use = value.args;
 		var self = this;
-		//require([textPrefix+modulePath],function(moduleText){
-			/*var modules = JSON.parse(moduleText);
-			var moduleMap = {};
-			for(var i=0,l=modules.length;i<l;i++) {
-				moduleMap[modules[i].prefix ? modules[i].prefix : defaultNamespace] = modules[i];
-			}*/
+		// TODO: core is bound, use namespace mapping for external modules
+		// OR assume flat collections
+		require(use,function(){
+			var libs = Array.prototype.slice.call(arguments);
+			libs.forEach(function(lib,i){
+				for(var k in lib){
+					var name = use[i].split("/")[0]+":"+k;
+					if(!self.lib[name]) self.lib[name] = lib[k];
+				}
+			});
 			var reqs = use.map(function(_){
 				return textPrefix+"raddled/"+_+".rdl";
 			});
-			/*var core = use.map(function(_){
-				// FIXME don't use first part of path as namespace!
-				var parts = _.split("/");
-				var ns = parts.shift();
-				var mod = moduleMap[ns];
-				return mod.location+"/"+parts.join("/");
-			});*/
-			require(use,function(){
-				var libs = Array.prototype.slice.call(arguments);
-				libs.forEach(function(lib,i){
-					for(var k in lib){
-						var name = use[i].split("/")[0]+":"+k;
-						if(!self.lib[name]) self.lib[name] = lib[k];
-					}
+			require(reqs,function(){
+				var deps = Array.prototype.slice.call(arguments);
+				deps.forEach(function(dep,i){
+					var parsed = parser.parse(dep);
+					if(parsed.args.length) self.process(parsed,{use:use[i]},callback);
 				});
-				require(reqs,function(){
-					var deps = Array.prototype.slice.call(arguments);
-					deps.forEach(function(dep,i){
-						var parsed = parser.parse(dep);
-						if(parsed.args.length) self.process(parsed,{use:use[i]},callback);
-					});
-					if(callback) callback();
-				});
+				if(callback) callback();
 			});
-		//});
+		});
 	};
 	
 	Transpiler.prototype.transpile = function(value,params){

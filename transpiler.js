@@ -93,7 +93,7 @@ define(["exports", "./parser"], function(exports, parser){
 			use ? this.use(use,params,callback) : callback();
 		} else {
 			value.top = true;
-			return this.compile(value);
+			return this.compile(value,null,false,params);
 		}
 	};
 	
@@ -200,7 +200,7 @@ define(["exports", "./parser"], function(exports, parser){
 		return (ti[0]==to[0] || to[0]==7 || ti[0]==7) && d>=0 && d<=1;
 	};
 	
-	Transpiler.prototype.compile = function(value,parent,compose){
+	Transpiler.prototype.compile = function(value,parent,compose,params){
 		var self = this;
 		var isSeq = typeOf(value)=="array";
 		var top = isSeq ? false : value.top;
@@ -218,7 +218,7 @@ define(["exports", "./parser"], function(exports, parser){
 			var seq = value.map(function(_){
 				if(typeOf(_)=="query"){
 					// compose the functions in the array
-					return "arg0 = "+this.compile(_,null,true).toString()+";\n";
+					return "arg0 = "+this.compile(_,null,true,params).toString()+";\n";
 				} else {
 					return _;
 				}
@@ -227,16 +227,17 @@ define(["exports", "./parser"], function(exports, parser){
 			return new Function("return function "+fname+"("+fargs+"){\n"+pre+seq.join("")+"return arg0;\n}")();
 		}
 		var name = value.name,
-			args = value.args;
-		if(!name.match(/:/)) name = "core:"+name;
+			args = value.args,
+			defaultNamespace = params.defaultNamespace || "fn";
+		if(!name.match(/:/)) name = defaultNamespace+":"+name;
 		var def = this.getFunctionDef(name,args.length);
 		var fullname = name+"#"+(def.more ? "N" : def.args.length);
 		if(this.cache.indexOf(fullname)==-1) this.cache.push(fullname);
 		args = args.map(function(_){
 			if(typeOf(_) == "array") {
-				return this.compile(_,null,null).toString();
+				return this.compile(_,null,null,params).toString();
 			} else if(typeOf(_) == "query") {
-				return this.compile(_,null,null);
+				return this.compile(_,null,null,params).toString();
 			} else if(_.match(/^(\.\/)|\.$/)) {
 				return _;
 			} else if(_.match(/^\$[0-9]+$/)) {
@@ -338,7 +339,7 @@ define(["exports", "./parser"], function(exports, parser){
 		this.dict[qname][arity+1] = def;
 		if(l==4) {
 			// compile definition
-			this.lib[qname+"#"+(arity<0 ? "N" : arity)] = this.compile(body,def);
+			this.lib[qname+"#"+(arity<0 ? "N" : arity)] = this.compile(body,def,false,params);
 		}
 		return def;
 	};

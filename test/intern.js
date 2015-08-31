@@ -64,6 +64,12 @@ define({
 		},{
 			name: 'hof',
 			location: '../raddle-core/hof'
+		},{
+			name: 'map',
+			location: '../raddle-core/map'
+		},{
+			name: 'array',
+			location: '../raddle-core/array'
 		}]
 	},
 	// Non-functional test suite(s) to run in each browser

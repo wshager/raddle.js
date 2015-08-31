@@ -51,20 +51,20 @@ define(function (require) {
 		var ret = fn(val);
 		console.warn(val,"=>",ret);
 		assert.equal(ret,45);
-	});*/
+	});
 	add("use(op/numeric-arithmetic-operators,op/numeric-comparison-operators,hof/unfold-functions),hof:unfold(.,(op:add(.,1)),(op:greater-than(.,10)))",function (error, fn) {
 		var val = 1;
 		var ret = fn(val);
 		console.warn(val,"=>",ret);
 		assert.deepEqual(ret,[1,2,3,4,5,6,7,8,9,10]);
 	});
-	/*add("use(core/numeric-arithmetic-operators,core/numeric-comparison-operators,core/higher-order-functions,core/list-functions,core/map-functions,core/string-value-functions),define(appender,(map,any,(any*)),map,map-transform(.,?,(append(.,?)))),unfold(.,(tail(.)),(empty(.)),(head(.)),local:appender#3,(head(.),string-length(.)),map-new())",function (error, fn) {
+	*/add("use(op/numeric-arithmetic-operators,op/numeric-comparison-operators,hof/unfold-functions,array/array-functions,map/map-functions,fn/string-value-functions),define(appender,(map,any,(any*)),map,map:transform($1,$2,(array:append(.,$3)))),hof:unfold(.,array:tail#1,array:empty#1,array:head#1,local:appender#3,(array:head(.),string-length(.)),map:new())",function (error, fn) {
 		var val = ["sdf","d","we","eq","w"];
 		var ret = fn(val);
 		console.warn(val,"=>",ret);
 		assert.deepEqual(ret,{1:["d","w"],2:["we","eq"],3:["sdf"]});
 	});
-	add("use(dom/dom-functions),dom:by-id(test)",function (error, fn) {
+	/*add("use(dom/dom-functions),dom:by-id(test)",function (error, fn) {
 		var node = document.createElement("div");
 		node.id = "test";
 		document.body.appendChild(node);

@@ -2,7 +2,8 @@ define(function (require) {
 	var registerSuite = require('intern!object'),
 		assert = require('intern/chai!assert'),
 		parseQuery = require('../parser').parseQuery,
-		Transpiler = require('../transpiler').Transpiler;
+		Transpiler = require('../transpiler').Transpiler,
+		js_beautify = require('js-beautify/beautify').js_beautify;
 	var test = {
 		name: 'raddle/test/transpiling'
 	};
@@ -16,19 +17,19 @@ define(function (require) {
 			},
 			function(error,fn){
 				if(error) throw error;
-				console.log(fn.toString());
+				console.log(js_beautify(fn.toString()));
 				ready(error,fn);
 			});
 			return dfd;
 		};
 	}
-	/*add("use(core/string-value-functions),define(get,(string),string,core:concat(file:///,$1,/xml/refs/,$1,.refs.xml)),local:get(.)",function(error,fn){
+	/*add("use(fn/string-value-functions),define(get,(string),string,fn:concat(file:///,$1,/xml/refs/,$1,.refs.xml)),local:get(.)",function(error,fn){
 		var val = "t";
 		var ret = fn(val);
 		console.warn(val,"=>",ret);
 		assert.equal(ret,"file:///t/xml/refs/t.refs.xml");
 	});
-	add("use(core/string-regex-functions,core/aggregate-functions),define(depth,(string),number,(tokenize($1,/),count(.))),local:depth(.)",function(error,fn){
+	add("use(fn/string-regex-functions,fn/aggregate-functions),define(depth,(string),number,(tokenize($1,/),count(.))),local:depth(.)",function(error,fn){
 		var val = "";
 		for(var i=0;i<10;i++){
 			val += "/" + Math.random().toString(36).substring(7);
@@ -41,9 +42,9 @@ define(function (require) {
 		var val = 1;
 		var ret = fn(val);
 		console.warn(val,"=>",ret);
-		assert.equal(ret,6,'Addition operator should add numbers together');
+		assert.equal(ret,6);
 	});
-	add("use(op/numeric-arithmetic-operators,core/higher-order-functions),define(sum,(any*),number,fold-left($1,0,op:add#2)),local:sum(.)",function (error, fn) {
+	add("use(op/numeric-arithmetic-operators,fn/higher-order-functions),define(sum,(any*),number,fold-left($1,0,op:add#2)),local:sum(.)",function (error, fn) {
 		var val = [];
 		for(var i=0;i<10;i++){
 			val.push(i);
@@ -58,13 +59,13 @@ define(function (require) {
 		console.warn(val,"=>",ret);
 		assert.deepEqual(ret,[1,2,3,4,5,6,7,8,9,10]);
 	});
-	*/add("use(op/numeric-arithmetic-operators,op/numeric-comparison-operators,hof/unfold-functions,array/array-functions,map/map-functions,fn/string-value-functions),define(appender,(map,any,(any*)),map,map:transform($1,$2,(array:append(.,$3)))),hof:unfold(.,array:tail#1,array:empty#1,array:head#1,local:appender#3,(array:head(.),string-length(.)),map:new())",function (error, fn) {
+	add("use(op/numeric-arithmetic-operators,op/numeric-comparison-operators,hof/unfold-functions,array/array-functions,map/map-functions,fn/string-value-functions),define(appender,(map,any,(any*)),map,map:transform($1,$2,(array:append(.,$3)))),hof:unfold(.,array:tail#1,array:empty#1,array:head#1,local:appender#3,(array:head(.),string-length(.)),map:new())",function (error, fn) {
 		var val = ["sdf","d","we","eq","w"];
 		var ret = fn(val);
 		console.warn(val,"=>",ret);
 		assert.deepEqual(ret,{1:["d","w"],2:["we","eq"],3:["sdf"]});
-	});
-	/*add("use(dom/dom-functions),dom:by-id(test)",function (error, fn) {
+	});*/
+	add("use(dom/dom-functions),dom:by-id(test)",function (error, fn) {
 		var node = document.createElement("div");
 		node.id = "test";
 		document.body.appendChild(node);
@@ -73,11 +74,10 @@ define(function (require) {
 		console.warn(val,"=>",ret);
 		assert.deepEqual(ret,node);
 	});
-	add("use(dom/dom-functions),core:create(?)",function (error, fn) {
+	add("use(dom/dom-functions),dom:element(div,(className:test))",function (error, fn) {
 		var val = "div";
 		var ret = fn(val);
 		console.warn(val,"=>",ret);
 	});
-	*/
 	registerSuite(test);
 });

@@ -138,7 +138,7 @@ define(["exports", "./parser"], function(exports, parser){
 	};
 	
 	Transpiler.prototype.getFunction = function(fullname){
-		return this.lib[fullname];
+		return this.lib[fullname] ? this.lib[fullname] : this.lib[fullname.replace(/#.*$/,"")];
 	};
 	
 	Transpiler.prototype.getFunctionDef = function(qname,arity){
@@ -200,9 +200,52 @@ define(["exports", "./parser"], function(exports, parser){
 		return (ti[0]==to[0] || to[0]==7 || ti[0]==7) && d>=0 && d<=1;
 	};
 	
+	Transpiler.prototype.getSeqType = function(seq){
+		var type = 0;
+		for(var i=0,l=seq.length;i<l;i++){
+			var itemType = typeOf(seq[i])=="query" ? 1 : seq[i].indexOf(":") > -1 ? 2 : 3;
+			if(type<1 || type==itemType){
+					type = itemType;
+			} else {
+				throw new Error("Mixing sequence types is not allowed");
+			}
+		}
+		return type;
+	};
+	
 	Transpiler.prototype.compile = function(value,parent,compose,params){
 		var self = this;
 		var isSeq = typeOf(value)=="array";
+		var ret,seqType;
+		if(isSeq) {
+			seqType = this.getSeqType(value);
+			if(seqType==1) {
+				ret = value.reduce(function(pre,cur,i){
+					if(typeOf(cur)=="query"){
+						// compose the functions in the array
+						var c = self.compile(cur,null,true,params);
+						console.log(c)
+						var p = c.length>1 ? c[1].split(",") : [];
+						if(parent && p.length>0 && p[0]=="arg0") p.shift();
+						var t = (p.length && i>0 ? "," : "") + p.join(",");
+						return c[0]+pre+t+")";
+					}
+				},"");
+			} else {
+				if(seqType==2){
+					ret = {};
+					var vals = value.forEach(function(_){
+						var p = _.split(":");
+						ret[p[0].trim()] = this.convert(p[1].trim());
+					},this);
+				} else {
+					ret = value.map(function(_){
+						return this.convert(_);
+					},this);
+				}
+				return JSON.stringify(ret);
+			}
+		}
 		var top = isSeq ? false : value.top;
 		var fargs = parent ? parent.args.map(function(_,i){
 			return "arg" + (i+1);
@@ -214,17 +257,9 @@ define(["exports", "./parser"], function(exports, parser){
 		} else if(top) {
 			this.count++;
 		}
-		if(isSeq) {
-			var seq = value.map(function(_){
-				if(typeOf(_)=="query"){
-					// compose the functions in the array
-					return "arg0 = "+this.compile(_,null,true,params).toString()+";\n";
-				} else {
-					return _;
-				}
-			},this);
-			var pre = parent ? "var arg0;\n" : "";
-			return new Function("return function "+fname+"("+fargs+"){\n"+pre+seq.join("")+"return arg0;\n}")();
+		if(isSeq && seqType==1){
+			//var pre = parent ? "var arg0;\n" : "";
+			return new Function("return function "+fname+"("+fargs+"){\nreturn "+ret+";\n}")();
 		}
 		var name = value.name,
 			args = value.args,
@@ -233,6 +268,7 @@ define(["exports", "./parser"], function(exports, parser){
 		var def = this.getFunctionDef(name,args.length);
 		var fullname = name+"#"+(def.more ? "N" : def.args.length);
 		if(this.cache.indexOf(fullname)==-1) this.cache.push(fullname);
+		// exec is true if there are no args or the args don't contain variables
 		args = args.map(function(_){
 			if(typeOf(_) == "array") {
 				return this.compile(_,null,null,params).toString();
@@ -270,17 +306,19 @@ define(["exports", "./parser"], function(exports, parser){
 			}
 			return pre;
 		},[short(fullname) + "("]);
+		if(compose) return args2;
 		args2.push(")");
 		var fn = args2.join("");
-		if(compose) return fn;
+		if(!parent && !top) return fn;
 		var fns = "\n";
 		if(top) {
 			for(var i=0;i<this.cache.length;i++){
 				var f = this.getFunction(this.cache[i]);
-				fns += "var "+short(this.cache[i])+"="+f.toString()+";\n";
+				var r = new RegExp(f.name+"\\s?\\(","g");
+				fns += f.toString().replace(r,short(this.cache[i])+"(")+";\n";
 			}
 		}
-		return new Function("return function "+fname+"("+fargs+"){ "+fns+"return "+fn+";}")();
+		return new Function("return function "+fname+"("+fargs+"){ "+fns+"return "+fn+";\n}")();
 	};
 	
 	Transpiler.prototype.define = function(value,params){

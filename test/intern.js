@@ -50,6 +50,9 @@ define({
 			name: 'dojo',
 			location: '../dojo'
 		},{
+			name: 'js-beautify',
+			location: 'node_modules/js-beautify/js/lib'
+		},{
 			name: 'raddle',
 			location: '../raddle'
 		},{
@@ -70,6 +73,9 @@ define({
 		},{
 			name: 'array',
 			location: '../raddle-core/array'
+		},{
+			name: 'dom',
+			location: '../raddle-core/dom'
 		}]
 	},
 	// Non-functional test suite(s) to run in each browser

@@ -10,7 +10,7 @@ Raddle is a rad new language for manipulating structured documents on the web. I
 
 ### Fully-featured
 
-The Raddle core implements the entire W3C XPATH 3.0 specification and then some.
+The Raddle core implements the entire W3C XQUERY 3.1 function specification and then some.
 
 ### Functional
 

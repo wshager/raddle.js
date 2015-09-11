@@ -227,8 +227,8 @@ define(["exports", "./parser"], function(exports, parser){
 						console.log(c)
 						var p = c.length>1 ? c[1].split(",") : [];
 						if(parent && p.length>0 && p[0]=="arg0") p.shift();
-						var t = (p.length && i>0 ? "," : "") + p.join(",");
-						return c[0]+pre+t+")";
+						var t = p.length && i>0 ? "," : "";
+						return c[0] + pre + t + p.join(",") + ")";
 					}
 				},"");
 			} else {

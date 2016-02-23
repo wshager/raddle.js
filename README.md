@@ -1,5 +1,5 @@
 # Raddle
-Extensible Document Manipulation Language for the Web
+Recursive Definition Language for the Web
 
 See https://github.com/wshager/raddled.git for definition files.
 

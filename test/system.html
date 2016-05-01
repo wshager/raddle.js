@@ -1,0 +1,16 @@
+<script src="/systemjs/dist/system.js"></script>
+<script>
+  // set our baseURL reference path
+  System.config({
+    baseURL: '../',
+    defaultJSExtensions: true,
+  	transpiler:'traceur',
+  	map: {
+  		traceur: '../../systemjs/bower_components/traceur/traceur.js'
+  	}
+  });
+// loads /app/main.js
+  System.import('main.js').then(function(x){
+	  x.main()
+  });
+</script>

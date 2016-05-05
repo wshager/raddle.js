@@ -6,11 +6,11 @@
     defaultJSExtensions: true,
   	transpiler:'traceur',
   	map: {
-  		traceur: '../../bower_components/traceur/traceur.js'
+  		traceur: '../../systemjs/bower_components/traceur/traceur.js'
   	}
   });
 // loads /app/main.js
-  System.import('xq-compat.js').then(function(x){
-	  //x.main()
+  System.import('main.js').then(function(x){
+	  x.main();
   });
 </script>

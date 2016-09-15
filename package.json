@@ -2,8 +2,7 @@
   "name": "raddle",
   "version": "0.0.1",
   "author": "Wouter Hager",
-  "contributors": [
-  ],
+  "contributors": [],
   "keywords": [
     "resource",
     "query",
@@ -21,8 +20,14 @@
       "url": "http://trac.dojotoolkit.org/browser/dojo/trunk/LICENSE#L13"
     }
   ],
+  "files": [
+    "lib"
+  ],
   "directories": {
     "lib": "."
+  },
+  "scripts": {
+    "start": "babel-node --presets es2015 ./lib/main.js"
   },
   "repository": {
     "type": "git",
@@ -34,18 +39,16 @@
       "email": "wshager@gmail.com"
     }
   ],
-  "mappings": {
-  },
+  "mappings": {},
   "dependencies": {
+    "babel-core": "^6.10.4",
+    "babel-preset-es2015": "^6.9.0"
   },
   "devDependencies": {
+    "babel-core": "^6.10.4",
+    "babel-preset-es2015": "^6.9.0",
     "intern": "^2.2.2",
     "intern-geezer": "^2.2.2"
-  },
-  "scripts": {
-    "test": "intern-client config=test/intern",
-    "test.sauce": "intern-runner config=test/intern",
-    "test.proxy": "intern-runner config=test/intern --proxyOnly"
   },
   "dojoBuild": "package.js"
 }

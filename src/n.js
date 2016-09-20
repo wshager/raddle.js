@@ -27,29 +27,59 @@ function str2ab(str) {
   return buf;
 }
 
-export function compress($node){
+export function compress($node) {
     var doc = materialize($node);
     var nodes = doc.slice(2),
         names = doc[0],
         values = doc[1];
-	var nil = Buffer.alloc(1);
-    //var offsets = ab2str(FastIntCompression.compress([names.length,values.length]));
-	//return offsets+nulstr+names.join(nulstr)+nulstr+values.join(nulstr)+nulstr+nodes.map(_ => ab2str(FastIntCompression.compress(_))).join(nulstr);
-	var offsets = Buffer.from(FastIntCompression.compress([names.length,values.length]));
-	var out = [offsets,nil];
-	names.forEach(_ => { out = out.concat([Buffer.from(_),nil]); });
-	values.forEach(_ => { out = out.concat([Buffer.from(_),nil]); });
-	nodes.forEach(_ => { out = out.concat([Buffer.from(FastIntCompression.compress(_)),nil]); });
-	return Buffer.concat(out);
+    var nil = Buffer.alloc(1);
+    var out = new Buffer(0),
+        i = 0,
+        l = 0,
+        offsets = [];
+    for (i = 0, l = names.length; i < l; i++) {
+        out = Buffer.concat([out, Buffer.from(names[i]), nil]);
+    }
+    //console.log(out.length,names.length);
+    offsets.push(out.length);
+    for (i = 0, l = values.length; i < l; i++) {
+        out = Buffer.concat([out, Buffer.from(values[i]), nil]);
+    }
+    // repair difference with offset itself in uncompress
+    offsets.push(out.length);
+
+    for (i = 0, l = nodes.length; i < l; i++) {
+        out = Buffer.concat([out, Buffer.from(FastIntCompression.compress(nodes[i])), nil]);
+    }
+    return Buffer.concat([Buffer.from(FastIntCompression.compress(offsets)), nil, out]);
 }
-export function uncompress(str){
-	var parts = str.split(nulstr);
-    var offsets = FastIntCompression.uncompress(str2ab(parts[0]));
-    var names = parts.slice(1,offsets[0]+1);
-    var valueOffset = offsets[0]+offsets[1];
-    var values = parts.slice(offsets[0]+2,valueOffset+1);
-    var nodes = parts.slice(valueOffset+2).map(_ => FastIntCompression.uncompress(str2ab(_)));
-    return [names,values].concat(nodes);
+
+export function uncompress(buf) {
+    // TODO read stream chunked
+    var cur = 0,
+        offsets,
+        nameoffset,
+        valoffset,
+        names = [],
+        values = [],
+        nodes = [];
+    for (var i = 0; i < buf.length; i++) {
+        if (buf[i] === 0) {
+            if (!offsets) {
+                offsets = FastIntCompression.uncompress(buf.slice(cur, i));
+                nameoffset = i+offsets[0]+1;
+                valoffset = i+offsets[1]+1;
+            } else if (i < nameoffset) {
+                names.push(buf.slice(cur, i).toString());
+            } else if (i < valoffset) {
+                values.push(buf.slice(cur, i).toString());
+            } else {
+                nodes.push(FastIntCompression.uncompress(buf.slice(cur, i)));
+            }
+            cur = i+1;
+        }
+    }
+    return dematerialize([names, values].concat(nodes));
 }
 
 const parser = new xmutable.Parser();
@@ -1325,25 +1355,31 @@ export function serialize(node,indent) {
 	}
 }
 
-export function dematerialize($doc){
+export function dematerialize($doc) {
     var doc = atomic($doc);
     var stack = [];
-    var names = doc[0], values = doc[1], nodes = doc.slice(2);
-    var node, name, value, depth, type, oldd = 10e10;
-    for(var i=0;i<nodes.length;i++){
-        depth = nodes[i][0];
-        type = nodes[i][1];
-        if(depth < oldd) {
-            name = type < 3 || type == 7 ? names[nodes[i][2]] : null;
-            value = type > 1 ? values[node[i][type == 2 || type == 7 ? 3 : 2]] : stack.pop();
-            node = new Node(type,name,null,val);
-            stack.push(node);
-        } else if(depth == oldd) {
+    var names = doc[0],
+        values = doc[1],
+        nodes = doc.slice(2);
+    var nn,
+        node,
+        name,
+        value,
+        depth,
+        type;
+    for (var i = 0; i < nodes.length; i++) {
+        nn = nodes[i];
+        depth = nn[0];
+        type = nn[1];
+        if(!stack[depth]) stack[depth] = [];
 
-        } else {
-
-        }
+        name = type < 3 || type == 7 ? names[nn[2]-1] : null;
+        value = type > 1 ? values[nn[type == 2 || type == 7 ? 3 : 2]-1] : stack[depth+1] ? stack[depth+1] : [];
+        if(type == 1) stack[depth+1] = [];
+        node = new Node(type, name, null, value);
+        stack[depth].push(node);
     }
+    return node;
 }
 
 export function materialize($node) {
@@ -1362,7 +1398,7 @@ export function materialize($node) {
     while (cur) {
         type = cur._type;
 
-        console.log("with", cur._name, index, l);
+        //console.log("with", cur._name, index, l);
         // do we have more children?
         if (type == 1 && index < l) {
             depth++;
@@ -1370,34 +1406,34 @@ export function materialize($node) {
             cur = cur.get(index);
             index = 0;
             l = cur.count();
-            console.log("down", cur._name);
+            //console.log("down", cur._name);
         } else {
             // write head
-            console.log("write",type == 1 ? cur._name : cur.first());
+            //console.log("write", type == 1 ? cur._name : cur.first());
             var w = [depth + 1, type];
             if (type < 3) {
                 var name = cur._name;
                 if (!names[name]) {
-                    names[name] = ncount;
                     ncount++;
+                    names[name] = ncount;
                 }
-                w.push(names[name] + 1);
+                w.push(names[name] );
             }
             if (type > 1) {
                 var val = cur.first();
                 if (!values[val]) {
-                    values[val] = vcount;
                     vcount++;
+                    values[val] = vcount;
                 }
-                w.push(values[val] + 1);
+                w.push(values[val]);
             }
             ret.push(w);
             // go back up
             depth--;
-            console.log("up", cur._name, type, cur._parent ? cur._parent._name : "no parent");
+            //console.log("up", cur._name, type, cur._parent ? cur._parent._name : "no parent");
             cur = cur._parent;
             if (cur) {
-                index = cur._index+1;
+                index = cur._index + 1;
                 l = cur.count();
             }
         }
@@ -1405,12 +1441,12 @@ export function materialize($node) {
     var namea = [],
         vala = [];
     for (var k in names) {
-        namea[names[k]] = k;
+        namea[names[k]-1] = k;
     }
     for (k in values) {
-        vala[values[k]] = k;
+        vala[values[k]-1] = k;
     }
-    return [namea, vala, ret];
+    return [namea, vala].concat(ret);
 }
 
 // reserve for l3n

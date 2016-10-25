@@ -4,106 +4,105 @@
 
 n.seq()*/
 
-import * as n from "n.js";
+import * as n from "./n";
 
-import * as array from "array.js";
+import * as array from "xvarray";
 
-import * as fn from "fn.js";
+import * as fn from "xvfn";
 
-export function put($array,$position,$member) /*n.item()*/ {
 
-return array.insertBefore(array.remove($array,$position),$position,$member);
-
+export function put(...$_a) {
+	var $_l = $_a.length,
+        $ = n.frame($_a);
+    if($_l==3){
+        $.init($.array("array"),$.item("position"),$.item("member"));
+        return n.item(array.insertBefore(array.remove($.get("array"),$.get("position")),$.get("position"),$.get("member")));
+    }
+    return n.error("err:XPST0017","Function put called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function last($array) /*n.item()*/ {
+export function foldLeft(...$_a) {
+	var $_l = $_a.length,
+        $ = n.frame($_a);
+    if($_l==3){
+        $.init($.array("array"),$.item("zero"),$.item("function"));
+        return $.test(n.eq(array.size($.get("array")),n.integer(0))) ?
 
-var $s;
+ ($.get("zero")) :
 
-return (($s = n.item(array.size($array)),
-
-(n.ggt($s,0) ? $array($s) : n.seq())));
-
+ (foldLeft(array.tail($.get("array")),n.call($.get("function"),$.get("zero"),array.head($.get("array"))),$.get("function")));
+    }
+    return n.error("err:XPST0017","Function foldLeft called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function initial($array) /*n.item()*/ {
+export function foldLeftAt(...$_a) {
+	var $_l = $_a.length,
+        $ = n.frame($_a);
+    if($_l==3){
+        $.init($.array("array"),$.item("zero"),$.item("function"));
+        return n.item(foldLeftAt($.get("array"),$.get("zero"),$.get("function"),n.integer(1)));
+    }
+    if($_l==4){
+        $.init($.array("array"),$.item("zero"),$.item("function"),$.item("at"));
+        return $.test(n.eq(array.size($.get("array")),n.integer(0))) ?
 
-var $s;
+ ($.get("zero")) :
 
-return (($s = n.item(array.size($array)),
-
-(n.ggt($s,0) ? array.remove($array,$s) : $array)));
-
+ (foldLeftAt(array.tail($.get("array")),n.call($.get("function"),$.get("zero"),array.head($.get("array")),$.get("at")),$.get("function"),n.add($.get("at"),n.integer(1))));
+    }
+    return n.error("err:XPST0017","Function foldLeftAt called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function foldLeft($array,$zero,$function) /*n.item()*/ {
+export function foldRightAt(...$_a) {
+	var $_l = $_a.length,
+        $ = n.frame($_a);
+    if($_l==3){
+        $.init($.array("array"),$.item("zero"),$.item("function"));
+        return n.item(foldRightAt($.get("array"),$.get("zero"),$.get("function"),n.integer(1)));
+    }
+    if($_l==4){
+        $.init($.array("array"),$.item("zero"),$.item("function"),$.item("at"));
+        return $.test(n.eq(array.size($.get("array")),n.integer(0))) ?
 
-return (n.eq(array.size($array),0) ? $zero : foldLeft(array.tail($array),$function($zero,array.head($array)),$function));
+ ($.get("zero")) :
 
+ (n.call($.get("function"),array.head($.get("array")),foldRightAt(array.tail($.get("array")),$.get("zero"),$.get("function"),n.add($.get("at"),n.integer(1)))));
+    }
+    return n.error("err:XPST0017","Function foldRightAt called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-function foldLeftAt_3($array,$zero,$function) /*n.item()*/ {
+export function forEach(...$_a) {
+	var $_l = $_a.length,
+        $ = n.frame($_a);
+    if($_l==2){
+        $.init($.array("array"),$.item("function"));
+        return n.item(forEach($.get("array"),$.get("function"),n.array(n.seq())));
+    }
+    if($_l==3){
+        $.init($.array("array"),$.item("function"),$.item("ret"));
+        return $.test(n.eq(array.size($.get("array")),n.integer(0))) ?
 
-return foldLeftAt($array,$zero,$function,1);
+ ($.get("ret")) :
 
+ (forEach(array.tail($.get("array")),$.get("function"),array.append($.get("ret"),n.call($.get("function"),array.head($.get("array"))))));
+    }
+    return n.error("err:XPST0017","Function forEach called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-function foldLeftAt_4($array,$zero,$function,$at) /*n.item()*/ {
+export function forEachAt(...$_a) {
+	var $_l = $_a.length,
+        $ = n.frame($_a);
+    if($_l==2){
+        $.init($.array("array"),$.item("function"));
+        return n.item(forEachAt($.get("array"),$.get("function"),n.array(n.seq()),n.integer(1)));
+    }
+    if($_l==4){
+        $.init($.array("array"),$.item("function"),$.item("ret"),$.item("at"));
+        return $.test(n.eq(array.size($.get("array")),n.integer(0))) ?
 
-return (n.eq(array.size($array),0) ? $zero : foldLeftAt(array.tail($array),$function($zero,array.head($array),$at),$function,n.add($at,1)));
+ ($.get("ret")) :
 
-}
-
-export function foldLeftAt(... $a) /*n.item()*/ {
-
-var $s;
-
-return (($s = n.integer(array.size($a)),
-
-(n.eq($s,3) ? fn.apply(foldLeftAt_3,$a) : (n.eq($s,4) ? fn.apply(foldLeftAt_4,$a) : n.seq()))));
-
-}
-
-function forEach_2($array,$function) /*n.item()*/ {
-
-return forEach($array,$function,n.array(n.seq()));
-
-}
-
-function forEach_3($array,$function,$ret) /*n.item()*/ {
-
-return (n.eq(array.size($array),0) ? $ret : forEach(array.tail($array),$function,array.append($ret,$function(array.head($array)))));
-
-}
-
-export function forEach(... $a) /*n.item()*/ {
-
-var $s;
-
-return (($s = n.integer(array.size($a)),
-
-(n.eq($s,2) ? fn.apply(forEach_2,$a) : (n.eq($s,3) ? fn.apply(forEach_3,$a) : n.seq()))));
-
-}
-
-function forEachAt_2($array,$function) /*n.item()*/ {
-
-return forEachAt($array,$function,n.array(n.seq()),1);
-
-}
-
-function forEachAt_4($array,$function,$ret,$at) /*n.item()*/ {
-
-return (n.eq(array.size($array),0) ? $ret : forEachAt(array.tail($array),$function,array.append($ret,$function(array.head($array),$at)),n.add($at,1)));
-
-}
-
-export function forEachAt(... $a) /*n.item()*/ {
-
-var $s;
-
-return (($s = n.integer(array.size($a)),
-
-(n.eq($s,2) ? fn.apply(forEachAt_2,$a) : (n.eq($s,4) ? fn.apply(forEachAt_4,$a) : n.seq()))));
-
+ (forEachAt(array.tail($.get("array")),$.get("function"),array.append($.get("ret"),n.call($.get("function"),array.head($.get("array")),$.get("at"))),n.add($.get("at"),n.integer(1))));
+    }
+    return n.error("err:XPST0017","Function forEachAt called with "+l+" arguments doesn't match any of the known signatures.");
 }

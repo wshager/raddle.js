@@ -1,14 +1,14 @@
 import { seq, toSeq, _isSeq, _first, _boolean } from "xvtype";
 
 import {
-    stringJoin, concat, analyzeString, tokenize, substring, stringToCodepoints, codepointsToString, matches, replace, stringLength,
-    subsequence, remove, head, tail, count, reverse, insertBefore, forEach, filter, foldLeft, foldRight, error,
-    item, string, number, boolean, integer, double, float, decimal, data, to, _boolean,
+    concat, forEach, filter, foldLeft, foldRight, error,
+    item, string, number, boolean, integer, double, float, decimal, data, to,
     doc, collection, parse, name, position, last, not, apply, sort, round, booleans
 } from "xvfn";
 
 import { array, _isArray } from "xvarray";
 import { map, entry, _isMap } from "xvmap";
+import { element, attribute, text } from "xvnode";
 
 // mix in bools you shall!
 const fn = booleans;
@@ -23,21 +23,41 @@ class Context {
     func(... a) {
         this._ref = typeof a[0] == "function" && a[0] !== this ? a.shift() : null;
         var l = a.length;
-        this._arity = l-1;
-        if(this._arity !== this._args.length){
+        this._arity = l - 1;
+        if (this._arity !== this._args.length) {
             return error("err:XPST0017");
         }
         var i = 0;
-        for(var k in this._params){
+        for (var k in this._params) {
             var type = this._params[k];
-            this._frame[k] = type(this._args[i]);
+            this._frame[k] = type(this._args[i]);//.cacheResult();
             i++;
         }
-        if(i < this._arity) {
+        if (i < this._arity) {
             // what?
         }
-        this._body = a[l-1];
-        return this._body.call(this,this);
+        this._body = a[l - 1];
+        var ret = this._body.call(this, this);
+        while(typeof ret == "function") {
+            ret = ret();
+        }
+        return ret;
+    }
+    init(...a){
+        var l = a.length;
+        this._arity = l;
+        if (this._arity !== this._args.length) {
+            return error("err:XPST0017");
+        }
+        var i = 0;
+        for (var k in this._params) {
+            var type = this._params[k];
+            this._frame[k] = type(this._args[i]);//.cacheResult();
+            i++;
+        }
+        if (i < this._arity) {
+            // what?
+        }
     }
     let(k,v=null,type=item){
         var i = this._init;
@@ -69,7 +89,12 @@ class Context {
     }
     get(k){
         if(k !== undefined) return this._frame[k];
-        return this._frame[0];
+        var ret = this._frame[0];
+        this._frame[0] = null;
+        return ret;
+    }
+    test($test) {
+        return _boolean($test);
     }
     if($test){
         this._frame[0] = _boolean($test);
@@ -83,22 +108,17 @@ class Context {
         if(this._frame[0]===false) this._frame[0] = fn(this);
         return this;
     }
-    rec(){
+    rec(ref,...a){
         // recursive call with optimization
         // re-insert all params from their initial config
         // call the function again
-        var i = 0;
-        for (var k in this._params) {
-            var type = this._params[k];
-            console.log(k,a[i]);
-            this._frame[k] = type(a[i]);
-            i++;
+        if(typeof ref === "function") {
+            //console.log(ref);
+            return function(){
+                return ref.apply(null,a);
+            };
         }
-        return this._body.call(this, this);
-    }
-    stop(val){
-        return val;
-        // signify recursion is over
+        throw new Error("Function for recursion not provided");
     }
 }
 
@@ -131,7 +151,8 @@ export const pair = entry;
 export {
     //stringJoin, concat, analyzeString, tokenize, substring, stringToCodepoints, codepointsToString, matches, replace, stringLength,
     //subsequence, remove, head, tail, count, reverse, insertBefore, forEach, filter, foldLeft, foldRight,
-    seq, toSeq, _first, _isSeq, filter, forEach, foldLeft, foldRight, item, string, number, boolean, integer, double, float, decimal, data, to, array, map, error, concat
+    seq, toSeq, _first, _isSeq, filter, forEach, foldLeft, foldRight, item, string, number, boolean, integer, double, float, decimal, data, to, array, map, error, concat,
+    element, attribute, text
     //doc, collection, parse, name, position, last, not, apply, sort, round, booleans
 };
 

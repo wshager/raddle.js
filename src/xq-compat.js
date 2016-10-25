@@ -1,13 +1,8 @@
-import * as n from "./n.js";
-
-import fn from "./fn.js";
-
-import * as map from "./map.js";
-
-import * as array from "./array.js";
-
-import * as console from "./console.js";
-
+import * as n from "./n";
+import * as fn from "xvfn";
+for (var k in fn.booleans) fn[k] = fn.booleans[k];
+import * as map from "xvmap";
+import * as array from "xvarray";
 /* xquery version n.string("3.1") */
 
 /*module namespace n.string("xqc")=n.string("http://raddle.org/xquery-compat");
@@ -16,2366 +11,1120 @@ n.seq()*/
 
 export const ncname = n.string("\\p{L}\\p{N}\\-_\\.");
 
-export const qname = n.concat(n.concat(n.concat(n.concat(n.concat(n.string("["), ncname), n.string("]*:?")), n.string("[")), ncname), n.string("]+"));
+export const qname = n.concat(n.concat(n.concat(n.concat(n.concat(n.string("["),ncname),n.string("]*:?")),n.string("[")),ncname),n.string("]+"));
 
 export const operatorRegexp = n.string("=#\\p{N}+#?\\p{N}*=");
 
-export const operators = n.map(n.seq(n.array(n.seq(n.integer(1), n.string(","))), n.array(n.seq(n.decimal(2.01), n.string("some"))), n.array(n.seq(n.decimal(2.02), n.string("every"))), n.array(n.seq(n.decimal(2.03), n.string("switch"))), n.array(n.seq(n.decimal(2.04), n.string("typeswitch"))), n.array(n.seq(n.decimal(2.05), n.string("try"))), n.array(n.seq(n.decimal(2.06), n.string("if"))), n.array(n.seq(n.decimal(2.07), n.string("then"))), n.array(n.seq(n.decimal(2.08), n.string("else"))), n.array(n.seq(n.decimal(2.09), n.string("let"))), n.array(n.seq(n.decimal(2.10), n.string(":="))), n.array(n.seq(n.decimal(2.11), n.string("return"))), n.array(n.seq(n.decimal(2.12), n.string("case"))), n.array(n.seq(n.decimal(2.13), n.string("default"))), n.array(n.seq(n.decimal(2.14), n.string("xquery"))), n.array(n.seq(n.decimal(2.15), n.string("version"))), n.array(n.seq(n.decimal(2.16), n.string("module"))), n.array(n.seq(n.decimal(2.17), n.string("declare"))), n.array(n.seq(n.decimal(2.18), n.string("variable"))), n.array(n.seq(n.decimal(2.19), n.string("import"))), n.array(n.seq(n.integer(3), n.string("or"))), n.array(n.seq(n.integer(4), n.string("and"))), n.array(n.seq(n.decimal(5.01), n.string("eq"))), n.array(n.seq(n.decimal(5.02), n.string("ne"))), n.array(n.seq(n.decimal(5.03), n.string("lt"))), n.array(n.seq(n.decimal(5.04), n.string("le"))), n.array(n.seq(n.decimal(5.05), n.string("gt"))), n.array(n.seq(n.decimal(5.06), n.string("ge"))), n.array(n.seq(n.decimal(5.07), n.string("="))), n.array(n.seq(n.decimal(5.08), n.string("!="))), n.array(n.seq(n.decimal(5.09), n.string("<="))), n.array(n.seq(n.decimal(5.10), n.string(">="))), n.array(n.seq(n.decimal(5.11), n.string("<<"))), n.array(n.seq(n.decimal(5.12), n.string(">>"))), n.array(n.seq(n.decimal(5.13), n.string("<"))), n.array(n.seq(n.decimal(5.14), n.string(">"))), n.array(n.seq(n.decimal(5.15), n.string("is"))), n.array(n.seq(n.integer(6), n.string("||"))), n.array(n.seq(n.integer(7), n.string("to"))), n.array(n.seq(n.decimal(8.01), n.string("+"))), n.array(n.seq(n.decimal(8.02), n.string("-"))), n.array(n.seq(n.decimal(9.01), n.string("*"))), n.array(n.seq(n.decimal(9.02), n.string("idiv"))), n.array(n.seq(n.decimal(9.03), n.string("div"))), n.array(n.seq(n.decimal(9.04), n.string("mod"))), n.array(n.seq(n.decimal(10.01), n.string("union"))), n.array(n.seq(n.decimal(10.02), n.string("|"))), n.array(n.seq(n.decimal(11.01), n.string("intersect"))), n.array(n.seq(n.decimal(11.02), n.string("except"))), n.array(n.seq(n.integer(12), n.string("instance of"))), n.array(n.seq(n.integer(13), n.string("treat as"))), n.array(n.seq(n.integer(14), n.string("castable as"))), n.array(n.seq(n.integer(15), n.string("cast as"))), n.array(n.seq(n.integer(16), n.string("=>"))), n.array(n.seq(n.decimal(17.01), n.string("+"))), n.array(n.seq(n.decimal(17.02), n.string("-"))), n.array(n.seq(n.integer(18), n.string("!"))), n.array(n.seq(n.decimal(19.01), n.string("/"))), n.array(n.seq(n.decimal(19.02), n.string("//"))), n.array(n.seq(n.decimal(19.03), n.string("/*"))), n.array(n.seq(n.decimal(20.01), n.string("["))), n.array(n.seq(n.decimal(20.02), n.string("]"))), n.array(n.seq(n.decimal(20.03), n.string("?"))), n.array(n.seq(n.decimal(20.04), n.string("["))), n.array(n.seq(n.decimal(20.06), n.string("{"))), n.array(n.seq(n.decimal(20.07), n.string("}"))), n.array(n.seq(n.decimal(20.08), n.string("@"))), n.array(n.seq(n.decimal(21.01), n.string("array"))), n.array(n.seq(n.decimal(21.02), n.string("attribute"))), n.array(n.seq(n.decimal(21.03), n.string("comment"))), n.array(n.seq(n.decimal(21.04), n.string("document"))), n.array(n.seq(n.decimal(21.05), n.string("element"))), n.array(n.seq(n.decimal(21.06), n.string("function"))), n.array(n.seq(n.decimal(21.07), n.string("map"))), n.array(n.seq(n.decimal(21.08), n.string("namespace"))), n.array(n.seq(n.decimal(21.09), n.string("processing-instruction"))), n.array(n.seq(n.decimal(21.10), n.string("text"))), n.array(n.seq(n.decimal(22.01), n.string("array"))), n.array(n.seq(n.decimal(22.02), n.string("attribute"))), n.array(n.seq(n.decimal(22.03), n.string("comment"))), n.array(n.seq(n.decimal(22.04), n.string("document-node"))), n.array(n.seq(n.decimal(22.05), n.string("element"))), n.array(n.seq(n.decimal(22.06), n.string("empty-sequence"))), n.array(n.seq(n.decimal(22.07), n.string("function"))), n.array(n.seq(n.decimal(22.08), n.string("item"))), n.array(n.seq(n.decimal(22.09), n.string("map"))), n.array(n.seq(n.decimal(22.10), n.string("namespace-node"))), n.array(n.seq(n.decimal(22.11), n.string("node"))), n.array(n.seq(n.decimal(22.12), n.string("processing-instruction"))), n.array(n.seq(n.decimal(22.13), n.string("schema-attribute"))), n.array(n.seq(n.decimal(22.14), n.string("schema-element"))), n.array(n.seq(n.decimal(22.15), n.string("text"))), n.array(n.seq(n.integer(24), n.string("as"))), n.array(n.seq(n.decimal(25.01), n.string("(:"))), n.array(n.seq(n.decimal(25.02), n.string(":)"))), n.array(n.seq(n.integer(26), n.string(":")))));
+export const operators = n.map(n.seq(n.pair(n.integer(1),n.string(",")),n.pair(n.decimal(2.01),n.string("some")),n.pair(n.decimal(2.02),n.string("every")),n.pair(n.decimal(2.03),n.string("switch")),n.pair(n.decimal(2.04),n.string("typeswitch")),n.pair(n.decimal(2.05),n.string("try")),n.pair(n.decimal(2.06),n.string("if")),n.pair(n.decimal(2.07),n.string("then")),n.pair(n.decimal(2.08),n.string("else")),n.pair(n.decimal(2.09),n.string("let")),n.pair(n.decimal(2.10),n.string(":=")),n.pair(n.decimal(2.11),n.string("return")),n.pair(n.decimal(2.12),n.string("case")),n.pair(n.decimal(2.13),n.string("default")),n.pair(n.decimal(2.14),n.string("xquery")),n.pair(n.decimal(2.15),n.string("version")),n.pair(n.decimal(2.16),n.string("module")),n.pair(n.decimal(2.17),n.string("declare")),n.pair(n.decimal(2.18),n.string("variable")),n.pair(n.decimal(2.19),n.string("import")),n.pair(n.integer(3),n.string("or")),n.pair(n.integer(4),n.string("and")),n.pair(n.decimal(5.01),n.string("eq")),n.pair(n.decimal(5.02),n.string("ne")),n.pair(n.decimal(5.03),n.string("lt")),n.pair(n.decimal(5.04),n.string("le")),n.pair(n.decimal(5.05),n.string("gt")),n.pair(n.decimal(5.06),n.string("ge")),n.pair(n.decimal(5.07),n.string("=")),n.pair(n.decimal(5.08),n.string("!=")),n.pair(n.decimal(5.09),n.string("<=")),n.pair(n.decimal(5.10),n.string(">=")),n.pair(n.decimal(5.11),n.string("<<")),n.pair(n.decimal(5.12),n.string(">>")),n.pair(n.decimal(5.13),n.string("<")),n.pair(n.decimal(5.14),n.string(">")),n.pair(n.decimal(5.15),n.string("is")),n.pair(n.integer(6),n.string("||")),n.pair(n.integer(7),n.string("to")),n.pair(n.decimal(8.01),n.string("+")),n.pair(n.decimal(8.02),n.string("-")),n.pair(n.decimal(9.01),n.string("*")),n.pair(n.decimal(9.02),n.string("idiv")),n.pair(n.decimal(9.03),n.string("div")),n.pair(n.decimal(9.04),n.string("mod")),n.pair(n.decimal(10.01),n.string("union")),n.pair(n.decimal(10.02),n.string("|")),n.pair(n.decimal(11.01),n.string("intersect")),n.pair(n.decimal(11.02),n.string("except")),n.pair(n.integer(12),n.string("instance of")),n.pair(n.integer(13),n.string("treat as")),n.pair(n.integer(14),n.string("castable as")),n.pair(n.integer(15),n.string("cast as")),n.pair(n.integer(16),n.string("=>")),n.pair(n.decimal(17.01),n.string("+")),n.pair(n.decimal(17.02),n.string("-")),n.pair(n.integer(18),n.string("!")),n.pair(n.decimal(19.01),n.string("/")),n.pair(n.decimal(19.02),n.string("//")),n.pair(n.decimal(19.03),n.string("/*")),n.pair(n.decimal(20.01),n.string("[")),n.pair(n.decimal(20.02),n.string("]")),n.pair(n.decimal(20.03),n.string("?")),n.pair(n.decimal(20.04),n.string("[")),n.pair(n.decimal(20.06),n.string("{")),n.pair(n.decimal(20.07),n.string("}")),n.pair(n.decimal(20.08),n.string("@")),n.pair(n.decimal(21.01),n.string("array")),n.pair(n.decimal(21.02),n.string("attribute")),n.pair(n.decimal(21.03),n.string("comment")),n.pair(n.decimal(21.04),n.string("document")),n.pair(n.decimal(21.05),n.string("element")),n.pair(n.decimal(21.06),n.string("function")),n.pair(n.decimal(21.07),n.string("map")),n.pair(n.decimal(21.08),n.string("namespace")),n.pair(n.decimal(21.09),n.string("processing-instruction")),n.pair(n.decimal(21.10),n.string("text")),n.pair(n.decimal(22.01),n.string("array")),n.pair(n.decimal(22.02),n.string("attribute")),n.pair(n.decimal(22.03),n.string("comment")),n.pair(n.decimal(22.04),n.string("document-node")),n.pair(n.decimal(22.05),n.string("element")),n.pair(n.decimal(22.06),n.string("empty-sequence")),n.pair(n.decimal(22.07),n.string("function")),n.pair(n.decimal(22.08),n.string("item")),n.pair(n.decimal(22.09),n.string("map")),n.pair(n.decimal(22.10),n.string("namespace-node")),n.pair(n.decimal(22.11),n.string("node")),n.pair(n.decimal(22.12),n.string("processing-instruction")),n.pair(n.decimal(22.13),n.string("schema-attribute")),n.pair(n.decimal(22.14),n.string("schema-element")),n.pair(n.decimal(22.15),n.string("text")),n.pair(n.integer(24),n.string("as")),n.pair(n.decimal(25.01),n.string("(:")),n.pair(n.decimal(25.02),n.string(":)")),n.pair(n.integer(26),n.string(":"))));
 
-export const operatorsI = fn.foldLeft(map.keys(operators), n.map(n.seq()), function() {
-
-    return n.initialize(arguments, [
-        ["pre", null, "item"],
-        ["cur", null, "item"]
-    ], function($) {
-
-        return n.stop($, n.item(map.put(n.fetch($, "pre"), n.call(operators, n.fetch($, "cur")), n.fetch($, "cur"))));
-    });
-
+export const operatorsI = fn.foldLeft(map.keys(operators),n.map(n.seq()),function(...a){
+    var l = a.length,
+        $ = n.frame(a);
+    if(l==2){
+        $.init($.item("pre"),$.item("cur"));
+        return n.item(map.put($.get("pre"),n.call(operators,$.get("cur")),$.get("cur")));
+    }
+    return n.error("err:XPST0017","Anonymous function called with "+l+" arguments doesn't match any of the known signatures.");
 });
 
-export const types = n.seq(n.string("untypedAtomic"), n.string("dateTime"), n.string("dateTimeStamp"), n.string("date"), n.string("time"), n.string("duration"), n.string("yearMonthDuration"), n.string("dayTimeDuration"), n.string("float"), n.string("double"), n.string("decimal"), n.string("integer"), n.string("nonPositiveInteger"), n.string("negativeInteger"), n.string("long"), n.string("int"), n.string("short"), n.string("byte"), n.string("nonNegativeInteger"), n.string("unsignedLong"), n.string("unsignedInt"), n.string("unsignedShort"), n.string("unsignedByte"), n.string("positiveInteger"), n.string("gYearMonth"), n.string("gYear"), n.string("gMonthDay"), n.string("gDay"), n.string("gMonth"), n.string("string"), n.string("normalizedString"), n.string("token"), n.string("language"), n.string("NMTOKEN"), n.string("Name"), n.string("NCName"), n.string("ID"), n.string("IDREF"), n.string("ENTITY"), n.string("boolean"), n.string("base64Binary"), n.string("hexBinary"), n.string("anyURI"), n.string("QName"), n.string("NOTATION"));
+export const types = n.seq(n.string("untypedAtomic"),n.string("dateTime"),n.string("dateTimeStamp"),n.string("date"),n.string("time"),n.string("duration"),n.string("yearMonthDuration"),n.string("dayTimeDuration"),n.string("float"),n.string("double"),n.string("decimal"),n.string("integer"),n.string("nonPositiveInteger"),n.string("negativeInteger"),n.string("long"),n.string("int"),n.string("short"),n.string("byte"),n.string("nonNegativeInteger"),n.string("unsignedLong"),n.string("unsignedInt"),n.string("unsignedShort"),n.string("unsignedByte"),n.string("positiveInteger"),n.string("gYearMonth"),n.string("gYear"),n.string("gMonthDay"),n.string("gDay"),n.string("gMonth"),n.string("string"),n.string("normalizedString"),n.string("token"),n.string("language"),n.string("NMTOKEN"),n.string("Name"),n.string("NCName"),n.string("ID"),n.string("IDREF"),n.string("ENTITY"),n.string("boolean"),n.string("base64Binary"),n.string("hexBinary"),n.string("anyURI"),n.string("QName"),n.string("NOTATION"));
 
-export const operatorMap = n.map(n.seq(n.array(n.seq(n.decimal(2.06), n.string("iff"))), n.array(n.seq(n.decimal(2.09), n.string("item"))), n.array(n.seq(n.decimal(5.01), n.string("eq"))), n.array(n.seq(n.decimal(5.02), n.string("ne"))), n.array(n.seq(n.decimal(5.03), n.string("lt"))), n.array(n.seq(n.decimal(5.04), n.string("le"))), n.array(n.seq(n.decimal(5.05), n.string("gt"))), n.array(n.seq(n.decimal(5.06), n.string("ge"))), n.array(n.seq(n.decimal(5.07), n.string("geq"))), n.array(n.seq(n.decimal(5.08), n.string("gne"))), n.array(n.seq(n.decimal(5.09), n.string("gle"))), n.array(n.seq(n.decimal(5.10), n.string("gge"))), n.array(n.seq(n.decimal(5.11), n.string("precedes"))), n.array(n.seq(n.decimal(5.12), n.string("follows"))), n.array(n.seq(n.decimal(5.13), n.string("glt"))), n.array(n.seq(n.decimal(5.14), n.string("ggt"))), n.array(n.seq(n.integer(6), n.string("concat"))), n.array(n.seq(n.decimal(8.01), n.string("add"))), n.array(n.seq(n.decimal(8.02), n.string("subtract"))), n.array(n.seq(n.decimal(9.01), n.string("multiply"))), n.array(n.seq(n.decimal(10.02), n.string("union"))), n.array(n.seq(n.decimal(17.01), n.string("plus"))), n.array(n.seq(n.decimal(17.02), n.string("minus"))), n.array(n.seq(n.integer(18), n.string("for-each"))), n.array(n.seq(n.decimal(19.01), n.string("select"))), n.array(n.seq(n.decimal(19.02), n.string("select-all"))), n.array(n.seq(n.decimal(20.01), n.string("filter"))), n.array(n.seq(n.decimal(20.03), n.string("lookup"))), n.array(n.seq(n.decimal(20.04), n.string("array"))), n.array(n.seq(n.decimal(20.08), n.string("select-attribute")))));
+export const operatorMap = n.map(n.seq(n.pair(n.decimal(2.06),n.string("iff")),n.pair(n.decimal(2.09),n.string("item")),n.pair(n.decimal(5.01),n.string("eq")),n.pair(n.decimal(5.02),n.string("ne")),n.pair(n.decimal(5.03),n.string("lt")),n.pair(n.decimal(5.04),n.string("le")),n.pair(n.decimal(5.05),n.string("gt")),n.pair(n.decimal(5.06),n.string("ge")),n.pair(n.decimal(5.07),n.string("geq")),n.pair(n.decimal(5.08),n.string("gne")),n.pair(n.decimal(5.09),n.string("gle")),n.pair(n.decimal(5.10),n.string("gge")),n.pair(n.decimal(5.11),n.string("precedes")),n.pair(n.decimal(5.12),n.string("follows")),n.pair(n.decimal(5.13),n.string("glt")),n.pair(n.decimal(5.14),n.string("ggt")),n.pair(n.integer(6),n.string("concat")),n.pair(n.decimal(8.01),n.string("add")),n.pair(n.decimal(8.02),n.string("subtract")),n.pair(n.decimal(9.01),n.string("multiply")),n.pair(n.decimal(10.02),n.string("union")),n.pair(n.decimal(17.01),n.string("plus")),n.pair(n.decimal(17.02),n.string("minus")),n.pair(n.integer(18),n.string("for-each")),n.pair(n.decimal(19.01),n.string("select")),n.pair(n.decimal(19.02),n.string("select-all")),n.pair(n.decimal(20.01),n.string("filter")),n.pair(n.decimal(20.03),n.string("lookup")),n.pair(n.decimal(20.04),n.string("array")),n.pair(n.decimal(20.08),n.string("select-attribute")),n.pair(n.decimal(27.01),n.string("pair"))));
 
-export const fns = n.seq(n.string("position"), n.string("last"), n.string("name"), n.string("node-name"), n.string("nilled"), n.string("string"), n.string("data"), n.string("base-uri"), n.string("document-uri"), n.string("number"), n.string("string-length"), n.string("normalize-space"));
+export const fns = n.seq(n.string("position"),n.string("last"),n.string("name"),n.string("node-name"),n.string("nilled"),n.string("string"),n.string("data"),n.string("base-uri"),n.string("document-uri"),n.string("number"),n.string("string-length"),n.string("normalize-space"));
 
-export function normalizeQuery() {
+export function normalizeQuery(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==2){
+        $.init($.string("query"),$.item("params"));
+        return ($.item("query",fn.replace(fn.replace(fn.replace(fn.replace($.get("query"),n.string("%3E"),n.string(">")),n.string("%3C"),n.string("<")),n.string("%2C"),n.string(",")),n.string("%3A"),n.string(":"))),
 
-    return n.initialize(arguments, [
-        ["query", null, "string"],
-        ["params", null, "item"]
-    ], function($) {
+$.item("query",fn.replace($.get("query"),n.string("([\\*\\+\\?])\\s+([,\\)\\{])"),n.string("$1$2"))),
 
-        return ($ = n.put($, "query", n.item(fn.replace(fn.replace(fn.replace(fn.replace(n.fetch($, "query"), n.string("%3E"), n.string(">")), n.string("%3C"), n.string("<")), n.string("%2C"), n.string(",")), n.string("%3A"), n.string(":")))),
+$.item("query",fn.foldLeft(n.filter(map.keys(operators),function($_0) { return n.and(n.ne($_0,n.decimal(5.07)),n.ne($_0,n.integer(1)));}),$.get("query"),function(...a){
+    var l = a.length,
+        $ = n.frame(a);
+    if(l==2){
+        $.init($.item("cur"),$.item("next"));
+        return n.item(fn.replace($.get("cur"),escapeForRegex($.get("next")),$.test(n.eq(fn.round($.get("next")),n.integer(22))) ?
 
-            $ = n.put($, "query", n.item(fn.replace(n.fetch($, "query"), n.string("([\\*\\+\\?])\\s+([,\\)\\{])"), n.string("$1$2")))),
+ (fn.concat(n.string("$1"),toOp($.get("next")),n.string("$2"))) :
 
-            $ = n.put($, "query", n.item(fn.foldLeft(n.filter(map.keys(operators), function($_0) {
-                return n.and(n.ne($_0, n.decimal(5.07)), n.ne($_0, n.integer(1)));
-            }), n.fetch($, "query"), function() {
+ (fn.concat(n.string("$1 "),opStr($.get("next")),n.string(" $2")))));
+    }
+    return n.error("err:XPST0017","Anonymous function called with "+l+" arguments doesn't match any of the known signatures.");
+})),
 
-                return n.initialize(arguments, [
-                    ["cur", null, "item"],
-                    ["next", null, "item"]
-                ], function($) {
+$.item("query",fn.foldLeft(types,$.get("query"),function(...a){
+    var l = a.length,
+        $ = n.frame(a);
+    if(l==2){
+        $.init($.item("cur"),$.item("next"));
+        return ($.item("cur",fn.replace($.get("cur"),fn.concat(n.string("xs:"),$.get("next"),n.string("\\s*([^\\(])")),fn.concat(n.string("core:"),$.get("next"),n.string("()$1")))),
 
-                    return n.stop($, n.item(fn.replace(n.fetch($, "cur"), escapeForRegex(n.fetch($, "next")), n.iff($, n.eq(fn.round(n.fetch($, "next")), n.integer(22)),
+n.item(fn.replace($.get("cur"),fn.concat(n.string("xs:"),$.get("next"),n.string("\\s*\\(")),fn.concat(n.string("core:"),$.get("next"),n.string("(")))));
+    }
+    return n.error("err:XPST0017","Anonymous function called with "+l+" arguments doesn't match any of the known signatures.");
+})),
 
-                        function($) {
+$.item("query",fn.replace($.get("query"),n.string(","),n.string("=#1="))),
 
-                            return fn.concat(n.string("$1"), toOp(n.fetch($, "next")), n.string("$2"));
+$.item("query",fn.replace($.get("query"),n.string("=(#\\p{N}+#?\\p{N}*)="),n.string("%3D$1%3D"))),
 
-                        },
+$.item("query",fn.replace($.get("query"),n.string("="),n.string("=#5#07="))),
 
-                        function($) {
+$.item("query",fn.replace($.get("query"),n.string("%3D"),n.string("="))),
 
-                            return fn.concat(n.string("$1 "), opStr(n.fetch($, "next")), n.string(" $2"));
+$.item("query",fn.replace($.get("query"),n.concat(n.concat(n.string("("),operatorRegexp),n.string(")")),n.string(" $1 "))),
 
-                        }))));
-                });
+$.item("query",fn.replace($.get("query"),n.string("\\s+"),n.string(" "))),
 
-            }))),
+$.item("query",fn.replace($.get("query"),n.string("=#19#01=\\s*=#20#08="),n.string("=#20#08="))),
 
-            $ = n.put($, "query", n.item(fn.foldLeft(types, n.fetch($, "query"), function() {
+$.item("query",fn.stringJoin(fn.forEach(fn.tokenize($.get("query"),n.string(";")),function(...a){
+    var l = a.length,
+        $ = n.frame(a);
+    if(l==1){
+        $.init($.item("cur"));
+        return ($.item("parts",n.filter(n.select(fn.analyzeString($.get("cur"),n.string("([^\\s\\(\\),\\.]+)")),n.seq(n.string("*"))),function($_0) { return n.or(n.geq(fn.name($_0),n.string("fn:match")),n.geq(fn.matches(fn.string($_0),n.string("^\\s*$")),fn.false()));})),
 
-                return n.initialize(arguments, [
-                    ["cur", null, "item"],
-                    ["next", null, "item"]
-                ], function($) {
+$.item("ret",block($.get("parts"),n.string(""))),
 
-                    return ($ = n.put($, "cur", n.item(fn.replace(n.fetch($, "cur"), fn.concat(n.string("xs:"), n.fetch($, "next"), n.string("\\s*([^\\(])")), fn.concat(n.string("core:"), n.fetch($, "next"), n.string("()$1"))))),
+n.item($.test($.get("ret")) ?
 
-                        n.stop($, n.item(fn.replace(n.fetch($, "cur"), fn.concat(n.string("xs:"), n.fetch($, "next"), n.string("\\s*\\(")), fn.concat(n.string("core:"), n.fetch($, "next"), n.string("("))))));
-                });
+ ($.get("ret")) :
 
-            }))),
+ (n.seq())));
+    }
+    return n.error("err:XPST0017","Anonymous function called with "+l+" arguments doesn't match any of the known signatures.");
+}),n.string(","))),
 
-            $ = n.put($, "query", n.item(fn.replace(n.fetch($, "query"), n.string(","), n.string("=#1=")))),
+$.item("query",fn.replace($.get("query"),n.string("\\s+"),n.string(""))),
 
-            $ = n.put($, "query", n.item(fn.replace(n.fetch($, "query"), n.string("=(#\\p{N}+#?\\p{N}*)="), n.string("%3D$1%3D")))),
-
-            $ = n.put($, "query", n.item(fn.replace(n.fetch($, "query"), n.string("="), n.string("=#5#07=")))),
-
-            $ = n.put($, "query", n.item(fn.replace(n.fetch($, "query"), n.string("%3D"), n.string("=")))),
-
-            $ = n.put($, "query", n.item(fn.replace(n.fetch($, "query"), n.concat(n.concat(n.string("("), operatorRegexp), n.string(")")), n.string(" $1 ")))),
-
-            $ = n.put($, "query", n.item(fn.replace(n.fetch($, "query"), n.string("\\s+"), n.string(" ")))),
-
-            $ = n.put($, "query", n.item(fn.replace(n.fetch($, "query"), n.string("=#19#01=\\s*=#20#08="), n.string("=#20#08=")))),
-
-            $ = n.put($, "query", n.item(block(n.filter(n.select(fn.analyzeString(n.fetch($, "query"), n.string("([^\\s\\(\\),\\.;]+)")), n.seq(n.string("*"))), function($_0) {
-                return n.or(n.geq(fn.name($_0), n.string("fn:match")), n.geq(fn.matches(fn.string($_0), n.string("^\\s*$")), fn.false()));
-            }), n.seq()))),
-
-            $ = n.put($, "query", n.item(fn.replace(fn.stringJoin(n.fetch($, "query")), n.string("\\s+"), n.string("")))),
-
-            n.stop($, n.item(n.fetch($, "query"))));
-    });
-
+n.item($.get("query")));
+    }
+    return n.error("err:XPST0017","Function normalizeQuery called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function seqtype() {
+export function seqtype(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==3){
+        $.init($.item("parts"),$.item("ret"),$.item("lastseen"));
+        return ($.item("head",n.select(n.filter(n.select(fn.head($.get("parts")),n.seq(n.string("fn:group"))),function($_0) { return n.geq(n.selectAttribute($_0,n.string("nr")),n.integer(1));}),function($_0) { return fn.string($_0);})),
 
-    return n.initialize(arguments, [
-        ["parts", null, "item"],
-        ["ret", null, "item"],
-        ["lastseen", null, "item"]
-    ], function($) {
+$.item("maybeSeqtype",$.test(fn.matches($.get("head"),operatorRegexp)) ?
 
-        return ($ = n.put($, "head", n.item(n.select(n.filter(n.select(fn.head(n.fetch($, "parts")), n.seq(n.string("fn:group"))), function($_0) {
-                return n.geq(n.selectAttribute($_0, n.string("nr")), n.integer(1));
-            }), function($_0) {
-                return fn.string($_0);
-            }))),
+ (opNum($.get("head"))) :
 
-            $ = n.put($, "maybeSeqtype", n.item(n.iff($, fn.matches(n.fetch($, "head"), operatorRegexp),
+ (n.integer(0))),
 
-                function($) {
+$.test(n.eq($.get("maybeSeqtype"),n.decimal(20.06))) ?
 
-                    return opNum(n.fetch($, "head"));
+ (body($.get("parts"),fn.concat($.get("ret"),n.string(",")),n.seq($.get("lastseen"),n.decimal(21.06)))) :
 
-                },
-
-                function($) {
-
-                    return n.integer(0);
-
-                }))),
-
-            n.iff($, n.eq(n.fetch($, "maybeSeqtype"), n.decimal(20.06)),
-
-                function($) {
-
-                    return n.stop($, n.item(body(n.fetch($, "parts"), n.seq(n.fetch($, "ret"), n.string(",")), n.seq(n.fetch($, "lastseen"), n.decimal(21.06)))));
-
-                },
-
-                function($) {
-
-                    return n.cont($, fn.tail(n.fetch($, "parts")), n.fetch($, "ret"), n.fetch($, "lastseen"));
-
-                }));
-    });
-
+ (seqtype(fn.tail($.get("parts")),$.get("ret"),$.get("lastseen"))));
+    }
+    return n.error("err:XPST0017","Function seqtype called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function as() {
+export function as(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==6){
+        $.init($.item("param"),$.item("parts"),$.item("ret"),$.item("lastseen"),$.item("subtype"),$.item("seqtype"));
+        return ($.item("head",n.select(fn.head($.get("parts")),function($_0) { return fn.string($_0);})),
 
-    return n.initialize(arguments, [
-        ["param", null, "item"],
-        ["parts", null, "item"],
-        ["ret", null, "item"],
-        ["lastseen", null, "item"],
-        ["subtype", null, "item"],
-        ["seqtype", null, "item"]
-    ], function($) {
+$.item("next",n.select(n.filter($.get("parts"),function($_0) { return n.geq(fn.position($_0),n.integer(2));}),function($_0) { return fn.string($_0);})),
 
-        return ($ = n.put($, "head", n.item(n.select(fn.head(n.fetch($, "parts")), function($_0) {
-                return fn.string($_0);
-            }))),
+$.item("no",$.test(fn.matches($.get("head"),operatorRegexp)) ?
 
-            $ = n.put($, "next", n.item(n.select(n.filter(n.fetch($, "parts"), function($_0) {
-                return n.geq(fn.position($_0), n.integer(2));
-            }), function($_0) {
-                return fn.string($_0);
-            }))),
+ (opNum($.get("head"))) :
 
-            $ = n.put($, "no", n.item(n.iff($, fn.matches(n.fetch($, "head"), operatorRegexp),
+ (n.integer(0))),
 
-                function($) {
+$.item("non",$.test(fn.matches($.get("next"),operatorRegexp)) ?
 
-                    return opNum(n.fetch($, "head"));
+ (opNum($.get("next"))) :
 
-                },
+ (n.integer(0))),
 
-                function($) {
+$.test(n.eq($.get("no"),n.decimal(20.06))) ?
 
-                    return n.integer(0);
+ (body($.get("parts"),fn.concat($.get("ret"),$.test($.get("subtype")) ?
 
-                }))),
+ (n.string(")")) :
 
-            $ = n.put($, "non", n.item(n.iff($, fn.matches(n.fetch($, "next"), operatorRegexp),
+ (n.string("")),n.string(",")),n.seq($.get("lastseen"),n.decimal(21.06)))) :
 
-                function($) {
+ ($.test(n.eq($.get("no"),n.integer(24))) ?
 
-                    return opNum(n.fetch($, "next"));
+ (as($.get("param"),fn.tail($.get("parts")),fn.concat($.get("ret"),$.test($.get("subtype")) ?
 
-                },
+ (n.string(")")) :
 
-                function($) {
+ (n.string("")),n.string(",")),$.get("lastseen"),$.get("subtype"),fn.true())) :
 
-                    return n.integer(0);
+ ($.test(n.eq($.get("no"),n.integer(1))) ?
 
-                }))),
+ ($.test($.get("subtype")) ?
 
-            n.iff($, n.eq(n.fetch($, "no"), n.decimal(20.06)),
+ (as($.get("param"),fn.tail($.get("parts")),fn.concat($.get("ret"),n.string(",")),$.get("lastseen"),$.get("subtype"),$.get("seqtype"))) :
 
-                function($) {
+ (params(fn.tail($.get("parts")),fn.concat($.get("ret"),n.string(",")),n.seq()))) :
 
-                    return n.stop($, n.item(body(n.fetch($, "parts"), n.seq(n.fetch($, "ret"), n.iff($, n.fetch($, "subtype"),
+ ($.test(fn.matches($.get("head"),fn.concat(n.string("core:["),ncname,n.string("]+")))) ?
 
-                        function($) {
+ ($.test(fn.matches($.get("next"),n.string("^\\s*\\(\\s*$"))) ?
 
-                            return n.string(")");
+ (as(n.seq(),fn.subsequence($.get("parts"),n.integer(3)),fn.concat($.get("ret"),$.get("head"),n.string("("),$.get("param"),n.string(","),$.test(n.eq($.get("head"),n.string("core:function"))) ?
 
-                        },
+ (n.string("(")) :
 
-                        function($) {
+ (n.string(""))),$.get("lastseen"),fn.true(),$.get("seqtype"))) :
 
-                            return n.string("");
+ (as(n.seq(),fn.tail($.get("parts")),fn.concat($.get("ret"),$.get("head"),n.string("("),$.get("param"),$.test(n.eq($.get("head"),n.string("core:function"))) ?
 
-                        }), n.string(",")), n.seq(n.fetch($, "lastseen"), n.decimal(21.06)))));
+ (n.string(",(")) :
 
-                },
+ (n.string(""))),$.get("lastseen"),$.get("subtype"),$.get("seqtype")))) :
 
-                function($) {
+ ($.test(fn.matches($.get("head"),n.string("[\\?\\+\\*]"))) ?
 
-                    return n.iff($, n.eq(n.fetch($, "no"), n.integer(24)),
+ (as($.get("param"),fn.tail($.get("parts")),fn.concat($.get("ret"),$.get("head")),$.get("lastseen"),$.get("subtype"),$.get("seqtype"))) :
 
-                        function($) {
+ ($.test(fn.matches($.get("head"),n.string("^(\\(\\))?\\s*\\)"))) ?
 
-                            return n.cont($, n.fetch($, "param"), fn.tail(n.fetch($, "parts")), n.seq(n.fetch($, "ret"), n.iff($, n.fetch($, "subtype"),
+ ($.test(n.and($.get("subtype"),n.geq($.get("non"),n.seq(n.integer(1),n.integer(24))))) ?
 
-                                function($) {
+ (as($.get("param"),fn.tail($.get("parts")),fn.concat($.get("ret"),$.test(n.eq($.get("non"),n.integer(24))) ?
 
-                                    return n.string(")");
+ (n.string("")) :
 
-                                },
+ (n.string(")"))),$.get("lastseen"),fn.false(),$.get("seqtype"))) :
 
-                                function($) {
+ ($.test(n.eq($.get("non"),n.integer(24))) ?
 
-                                    return n.string("");
+ (as(n.seq(),fn.tail($.get("parts")),fn.concat($.get("ret"),$.test($.get("subtype")) ?
 
-                                }), n.string(",")), n.fetch($, "lastseen"), n.fetch($, "subtype"), fn.true());
+ (n.string(")")) :
 
-                        },
+ (n.string("")),n.string("))")),$.get("lastseen"),fn.false(),fn.false())) :
 
-                        function($) {
+ ($.test(n.eq($.get("non"),n.decimal(20.06))) ?
 
-                            return n.iff($, n.eq(n.fetch($, "no"), n.integer(1)),
+ (body(fn.tail($.get("parts")),fn.concat($.get("ret"),$.test($.get("subtype")) ?
 
-                                function($) {
+ (n.string(")")) :
 
-                                    return n.iff($, n.fetch($, "subtype"),
+ (n.string("")),$.test(fn.matches($.get("head"),n.string("^\\(\\)"))) ?
 
-                                        function($) {
+ (n.string(")")) :
 
-                                            return n.cont($, n.fetch($, "param"), fn.tail(n.fetch($, "parts")), n.seq(n.fetch($, "ret"), n.string(",")), n.fetch($, "lastseen"), n.fetch($, "subtype"), n.fetch($, "seqtype"));
+ (n.string("")),n.string("),core:item(),")),n.seq($.get("lastseen"),n.decimal(21.06)))) :
 
-                                        },
+ (console.log($.get("parts")))))) :
 
-                                        function($) {
+ (as($.get("param"),fn.tail($.get("parts")),fn.concat($.get("ret"),$.test(n.and(n.eq($.get("non"),n.integer(1)),$.get("seqtype"))) ?
 
-                                            return n.stop($, n.item(params(fn.tail(n.fetch($, "parts")), n.seq(n.fetch($, "ret"), n.string(",")), n.seq())));
+ (n.string(")")) :
 
-                                        });
-
-                                },
-
-                                function($) {
-
-                                    return n.iff($, fn.matches(n.fetch($, "head"), fn.concat(n.string("core:["), ncname, n.string("]+"))),
-
-                                        function($) {
-
-                                            return n.iff($, fn.matches(n.fetch($, "next"), n.string("^\\s*\\(\\s*$")),
-
-                                                function($) {
-
-                                                    return n.cont($, n.seq(), fn.subsequence(n.fetch($, "parts"), n.integer(3)), n.seq(n.fetch($, "ret"), n.fetch($, "head"), n.string("("), n.fetch($, "param"), n.string(","), n.iff($, n.eq(n.fetch($, "head"), n.string("core:function")),
-
-                                                        function($) {
-
-                                                            return n.string("(");
-
-                                                        },
-
-                                                        function($) {
-
-                                                            return n.string("");
-
-                                                        })), n.fetch($, "lastseen"), fn.true(), n.fetch($, "seqtype"));
-
-                                                },
-
-                                                function($) {
-
-                                                    return n.cont($, n.seq(), fn.tail(n.fetch($, "parts")), n.seq(n.fetch($, "ret"), n.fetch($, "head"), n.string("("), n.fetch($, "param"), n.iff($, n.eq(n.fetch($, "head"), n.string("core:function")),
-
-                                                        function($) {
-
-                                                            return n.string(",(");
-
-                                                        },
-
-                                                        function($) {
-
-                                                            return n.string("");
-
-                                                        })), n.fetch($, "lastseen"), n.fetch($, "subtype"), n.fetch($, "seqtype"));
-
-                                                });
-
-                                        },
-
-                                        function($) {
-
-                                            return n.iff($, fn.matches(n.fetch($, "head"), n.string("[\\?\\+\\*]")),
-
-                                                function($) {
-
-                                                    return n.cont($, n.fetch($, "param"), fn.tail(n.fetch($, "parts")), n.seq(n.fetch($, "ret"), n.fetch($, "head")), n.fetch($, "lastseen"), n.fetch($, "subtype"), n.fetch($, "seqtype"));
-
-                                                },
-
-                                                function($) {
-
-                                                    return n.iff($, fn.matches(n.fetch($, "head"), n.string("^(\\(\\))?\\s*\\)")),
-
-                                                        function($) {
-
-                                                            return n.iff($, n.and(n.fetch($, "subtype"), n.geq(n.fetch($, "non"), n.seq(n.integer(1), n.integer(24)))),
-
-                                                                function($) {
-
-                                                                    return n.cont($, n.fetch($, "param"), fn.tail(n.fetch($, "parts")), n.seq(n.fetch($, "ret"), n.iff($, n.eq(n.fetch($, "non"), n.integer(24)),
-
-                                                                        function($) {
-
-                                                                            return n.string("");
-
-                                                                        },
-
-                                                                        function($) {
-
-                                                                            return n.string(")");
-
-                                                                        })), n.fetch($, "lastseen"), fn.false(), n.fetch($, "seqtype"));
-
-                                                                },
-
-                                                                function($) {
-
-                                                                    return n.iff($, n.eq(n.fetch($, "non"), n.integer(24)),
-
-                                                                        function($) {
-
-                                                                            return n.cont($, n.seq(), fn.tail(n.fetch($, "parts")), n.seq(n.fetch($, "ret"), n.iff($, n.fetch($, "subtype"),
-
-                                                                                function($) {
-
-                                                                                    return n.string(")");
-
-                                                                                },
-
-                                                                                function($) {
-
-                                                                                    return n.string("");
-
-                                                                                }), n.string("))")), n.fetch($, "lastseen"), fn.false(), fn.false());
-
-                                                                        },
-
-                                                                        function($) {
-
-                                                                            return n.stop($, n.item(n.iff($, n.eq(n.fetch($, "non"), n.decimal(20.06)),
-
-                                                                                function($) {
-
-                                                                                    return body(fn.tail(n.fetch($, "parts")), n.seq(n.fetch($, "ret"), n.iff($, n.fetch($, "subtype"),
-
-                                                                                        function($) {
-
-                                                                                            return n.string(")");
-
-                                                                                        },
-
-                                                                                        function($) {
-
-                                                                                            return n.string("");
-
-                                                                                        }), n.iff($, fn.matches(n.fetch($, "head"), n.string("^\\(\\)")),
-
-                                                                                        function($) {
-
-                                                                                            return n.string(")");
-
-                                                                                        },
-
-                                                                                        function($) {
-
-                                                                                            return n.string("");
-
-                                                                                        }), n.string("),core:item(),")), n.seq(n.fetch($, "lastseen"), n.decimal(21.06)));
-
-                                                                                },
-
-                                                                                function($) {
-
-                                                                                    return console.log(n.fetch($, "parts"));
-
-                                                                                })));
-
-                                                                        });
-
-                                                                });
-
-                                                        },
-
-                                                        function($) {
-
-                                                            return n.cont($, n.fetch($, "param"), fn.tail(n.fetch($, "parts")), n.seq(n.fetch($, "ret"), n.iff($, n.and(n.eq(n.fetch($, "non"), n.integer(1)), n.fetch($, "seqtype")),
-
-                                                                function($) {
-
-                                                                    return n.string(")");
-
-                                                                },
-
-                                                                function($) {
-
-                                                                    return n.string("");
-
-                                                                }), n.string(")")), n.fetch($, "lastseen"), n.fetch($, "subtype"), n.fetch($, "seqtype"));
-
-                                                        });
-
-                                                });
-
-                                        });
-
-                                });
-
-                        });
-
-                }));
-    });
-
+ (n.string("")),n.string(")")),$.get("lastseen"),$.get("subtype"),$.get("seqtype")))))))));
+    }
+    return n.error("err:XPST0017","Function as called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function params() {
+export function params(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==3){
+        $.init($.item("parts"),$.item("ret"),$.item("lastseen"));
+        return ($.item("maybeParam",n.select(fn.head($.get("parts")),function($_0) { return fn.string($_0);})),
 
-    return n.initialize(arguments, [
-        ["parts", null, "item"],
-        ["ret", null, "item"],
-        ["lastseen", null, "item"]
-    ], function($) {
+$.item("next",n.select(n.filter($.get("parts"),function($_0) { return n.geq(fn.position($_0),n.integer(2));}),function($_0) { return fn.string($_0);})),
 
-        return ($ = n.put($, "maybeParam", n.item(n.select(fn.head(n.fetch($, "parts")), function($_0) {
-                return fn.string($_0);
-            }))),
+$.test(fn.matches($.get("maybeParam"),n.string("^(\\(\\))?\\s*\\)"))) ?
 
-            $ = n.put($, "next", n.item(n.select(n.filter(n.fetch($, "parts"), function($_0) {
-                return n.geq(fn.position($_0), n.integer(2));
-            }), function($_0) {
-                return fn.string($_0);
-            }))),
+ ($.test(n.eq($.get("next"),n.string("=#24="))) ?
 
-            n.iff($, fn.matches(n.fetch($, "maybeParam"), n.string("^(\\(\\))?\\s*\\)")),
+ (as(n.seq(),fn.tail($.get("parts")),fn.concat($.get("ret"),n.string(")")),$.get("lastseen"),fn.false(),fn.false())) :
 
-                function($) {
+ (body(fn.tail($.get("parts")),fn.concat($.get("ret"),n.string("),core:item(),")),n.seq($.get("lastseen"),n.decimal(21.06))))) :
 
-                    return n.stop($, n.item(n.iff($, n.eq(n.fetch($, "next"), n.string("=#24=")),
+ ($.test(fn.matches($.get("maybeParam"),n.string("=#1="))) ?
 
-                        function($) {
+ (params(fn.tail($.get("parts")),fn.concat($.get("ret"),n.string(",")),$.get("lastseen"))) :
 
-                            return as(n.seq(), fn.tail(n.fetch($, "parts")), n.seq(n.fetch($, "ret"), n.string(")")), n.fetch($, "lastseen"), fn.false(), fn.false());
+ ($.test(fn.matches($.get("maybeParam"),n.string("^\\$"))) ?
 
-                        },
+ ($.test(n.eq($.get("next"),n.string("=#24="))) ?
 
-                        function($) {
+ (as(fn.replace($.get("maybeParam"),n.string("^\\$"),n.string("\\$,")),fn.subsequence($.get("parts"),n.integer(3)),$.get("ret"),$.get("lastseen"),fn.false(),fn.false())) :
 
-                            return body(fn.tail(n.fetch($, "parts")), n.seq(n.fetch($, "ret"), n.string("),core:item(),")), n.seq(n.fetch($, "lastseen"), n.decimal(21.06)));
+ (params(fn.tail($.get("parts")),fn.concat($.get("ret"),n.string("core:item("),fn.replace($.get("maybeParam"),n.string("^\\$"),n.string("\\$,")),n.string(")")),$.get("lastseen")))) :
 
-                        })));
-
-                },
-
-                function($) {
-
-                    return n.iff($, fn.matches(n.fetch($, "maybeParam"), n.string("=#1=")),
-
-                        function($) {
-
-                            return n.cont($, fn.tail(n.fetch($, "parts")), n.seq(n.fetch($, "ret"), n.string(",")), n.fetch($, "lastseen"));
-
-                        },
-
-                        function($) {
-
-                            return n.iff($, fn.matches(n.fetch($, "maybeParam"), n.string("^\\$")),
-
-                                function($) {
-
-                                    return n.iff($, n.eq(n.fetch($, "next"), n.string("=#24=")),
-
-                                        function($) {
-
-                                            return n.stop($, n.item(as(fn.replace(n.fetch($, "maybeParam"), n.string("^\\$"), n.string("\\$,")), fn.subsequence(n.fetch($, "parts"), n.integer(3)), n.fetch($, "ret"), n.fetch($, "lastseen"), fn.false(), fn.false())));
-
-                                        },
-
-                                        function($) {
-
-                                            return n.cont($, fn.tail(n.fetch($, "parts")), n.seq(n.fetch($, "ret"), n.string("core:item("), fn.replace(n.fetch($, "maybeParam"), n.string("^\\$"), n.string("\\$,")), n.string(")")), n.fetch($, "lastseen"));
-
-                                        });
-
-                                },
-
-                                function($) {
-
-                                    return n.cont($, fn.tail(n.fetch($, "parts")), n.fetch($, "ret"), n.fetch($, "lastseen"));
-
-                                });
-
-                        });
-
-                }));
-    });
-
+ (params(fn.tail($.get("parts")),$.get("ret"),$.get("lastseen"))))));
+    }
+    return n.error("err:XPST0017","Function params called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function xfn() {
-
-    return n.initialize(arguments, [
-        ["parts", null, "item"],
-        ["ret", null, "item"]
-    ], function($) {
-
-        return n.stop($, n.item(params(fn.tail(n.fetch($, "parts")), n.seq(n.fetch($, "ret"), n.select(n.filter(n.select(fn.head(n.fetch($, "parts")), n.seq(n.string("fn:group"))), function($_0) {
-            return n.geq(n.selectAttribute($_0, n.string("nr")), n.integer(1));
-        }), function($_0) {
-            return fn.string($_0);
-        }), n.string(",(),(")), n.seq())));
-    });
-
+export function xfn(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==2){
+        $.init($.item("parts"),$.item("ret"));
+        return n.item(params(fn.tail($.get("parts")),fn.concat($.get("ret"),n.select(n.filter(n.select(fn.head($.get("parts")),n.seq(n.string("fn:group"))),function($_0) { return n.geq(n.selectAttribute($_0,n.string("nr")),n.integer(1));}),function($_0) { return fn.string($_0);}),n.string(",(),(")),n.seq()));
+    }
+    return n.error("err:XPST0017","Function xfn called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function ns() {
+export function ns(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==2){
+        $.init($.item("parts"),$.item("ret"));
+        return ($.item("ns",fn.replace(n.select(fn.head($.get("parts")),function($_0) { return fn.string($_0);}),n.string("\\s"),n.string(""))),
 
-    return n.initialize(arguments, [
-        ["parts", null, "item"],
-        ["ret", null, "item"]
-    ], function($) {
+$.item("rest",fn.tail($.get("parts"))),
 
-        return ($ = n.put($, "ns", n.item(fn.replace(n.select(fn.head(n.fetch($, "parts")), function($_0) {
-                return fn.string($_0);
-            }), n.string("\\s"), n.string("")))),
-
-            $ = n.put($, "rest", n.item(fn.tail(n.fetch($, "parts")))),
-
-            n.stop($, n.item(fn.stringJoin(n.fetch($, "rest")))));
-    });
-
+n.item(fn.stringJoin($.get("rest"))));
+    }
+    return n.error("err:XPST0017","Function ns called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function xvar() {
-
-    return n.initialize(arguments, [
-        ["parts", null, "item"],
-        ["ret", null, "item"]
-    ], function($) {
-
-        return n.stop($, n.item(body(fn.subsequence(n.fetch($, "parts"), n.integer(3)), n.seq(n.fetch($, "ret"), n.select(n.filter(n.fetch($, "parts"), function($_0) {
-            return n.geq(fn.position($_0), n.integer(1));
-        }), function($_0) {
-            return fn.string($_0);
-        }), n.string(",(),")), n.seq(n.decimal(2.18)))));
-    });
-
+export function xvar(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==2){
+        $.init($.item("parts"),$.item("ret"));
+        return n.item(body(fn.subsequence($.get("parts"),n.integer(3)),fn.concat($.get("ret"),n.select(n.filter($.get("parts"),function($_0) { return n.geq(fn.position($_0),n.integer(1));}),function($_0) { return fn.string($_0);}),n.string(",(),")),n.seq(n.decimal(2.18))));
+    }
+    return n.error("err:XPST0017","Function xvar called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function annot() {
-
-    return n.initialize(arguments, [
-        ["parts", null, "item"],
-        ["ret", null, "item"],
-        ["annot", null, "item"]
-    ], function($) {
-
-        return ($ = n.put($, "maybeAnnot", n.item(n.select(n.filter(n.select(fn.head(n.fetch($, "parts")), n.seq(n.string("fn:group"))), function($_0) {
-                return n.geq(n.selectAttribute($_0, n.string("nr")), n.integer(1));
-            }), function($_0) {
-                return fn.string($_0);
-            }))),
-
-            $ = n.put($, "rest", n.item(fn.tail(n.fetch($, "parts")))),
-
-            n.iff($, fn.matches(n.fetch($, "maybeAnnot"), n.string("^%")),
-
-                function($) {
-
-                    return n.cont($, n.fetch($, "rest"), n.fetch($, "ret"), fn.replace(n.fetch($, "maybeAnnot"), n.string("^%"), n.string("-")));
-
-                },
-
-                function($) {
-
-                    return n.stop($, n.item(n.iff($, n.geq(n.fetch($, "maybeAnnot"), n.string("=#21#06=")),
-
-                        function($) {
-
-                            return xfn(n.fetch($, "rest"), n.seq(n.fetch($, "ret"), n.string("core:define"), n.fetch($, "annot"), n.string("($,")));
-
-                        },
-
-                        function($) {
-
-                            return n.iff($, n.geq(n.fetch($, "maybeAnnot"), n.string("=#2#18=")),
-
-                                function($) {
-
-                                    return xvar(n.fetch($, "rest"), n.seq(n.fetch($, "ret"), n.string("core:var"), n.fetch($, "annot"), n.string("($,")));
-
-                                },
-
-                                function($) {
-
-                                    return n.fetch($, "ret");
-
-                                });
-
-                        })));
-
-                }));
-    });
-
+export function xns(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==2){
+        $.init($.item("parts"),$.item("ret"));
+        return n.item(block(fn.subsequence($.get("parts"),n.integer(4)),fn.concat($.get("ret"),n.string("core:namespace($,"),n.filter($.get("parts"),function($_0) { return n.geq(fn.position($_0),n.integer(1));}),n.string(","),n.filter($.get("parts"),function($_0) { return n.geq(fn.position($_0),n.integer(3));}),n.string(")"))));
+    }
+    return n.error("err:XPST0017","Function xns called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function xversion() {
+export function annot(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==3){
+        $.init($.item("parts"),$.item("ret"),$.item("annot"));
+        return ($.item("maybeAnnot",n.select(n.filter(n.select(fn.head($.get("parts")),n.seq(n.string("fn:group"))),function($_0) { return n.geq(n.selectAttribute($_0,n.string("nr")),n.integer(1));}),function($_0) { return fn.string($_0);})),
 
-    return n.initialize(arguments, [
-        ["parts", null, "item"],
-        ["ret", null, "item"]
-    ], function($) {
+$.item("rest",fn.tail($.get("parts"))),
 
-        return n.stop($, n.item(block(fn.subsequence(n.fetch($, "parts"), n.integer(3)), n.seq(n.fetch($, "ret"), n.string("core:xq-version($,"), n.select(n.filter(n.fetch($, "parts"), function($_0) {
-            return n.geq(fn.position($_0), n.integer(2));
-        }), function($_0) {
-            return fn.string($_0);
-        }), n.string(")")))));
-    });
+$.test(fn.matches($.get("maybeAnnot"),n.string("^%"))) ?
 
+ (annot($.get("rest"),$.get("ret"),fn.replace($.get("maybeAnnot"),n.string("^%"),n.string("-")))) :
+
+ ($.test(n.geq($.get("maybeAnnot"),n.string("namespace"))) ?
+
+ (xns($.get("rest"),$.get("ret"))) :
+
+ ($.test(n.geq($.get("maybeAnnot"),n.string("=#21#06="))) ?
+
+ (xfn($.get("rest"),fn.concat($.get("ret"),n.string("core:define"),$.get("annot"),n.string("($,")))) :
+
+ ($.test(n.geq($.get("maybeAnnot"),n.string("=#2#18="))) ?
+
+ (xvar($.get("rest"),fn.concat($.get("ret"),n.string("core:var"),$.get("annot"),n.string("($,")))) :
+
+ ($.get("ret"))))));
+    }
+    return n.error("err:XPST0017","Function annot called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function xmodule() {
-
-    return n.initialize(arguments, [
-        ["parts", null, "item"],
-        ["ret", null, "item"]
-    ], function($) {
-
-        return n.stop($, n.item(block(fn.subsequence(n.fetch($, "parts"), n.integer(5)), n.seq(n.fetch($, "ret"), n.string("core:module($,"), n.select(n.filter(n.fetch($, "parts"), function($_0) {
-            return n.geq(fn.position($_0), n.integer(2));
-        }), function($_0) {
-            return fn.string($_0);
-        }), n.string(","), n.select(n.filter(n.fetch($, "parts"), function($_0) {
-            return n.geq(fn.position($_0), n.integer(4));
-        }), function($_0) {
-            return fn.string($_0);
-        }), n.string(",())")))));
-    });
-
+export function xversion(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==2){
+        $.init($.item("parts"),$.item("ret"));
+        return n.item(block(fn.subsequence($.get("parts"),n.integer(3)),fn.concat($.get("ret"),n.string("core:xq-version($,"),n.select(n.filter($.get("parts"),function($_0) { return n.geq(fn.position($_0),n.integer(2));}),function($_0) { return fn.string($_0);}),n.string(")"))));
+    }
+    return n.error("err:XPST0017","Function xversion called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function close() {
-
-    return n.initialize(arguments, [
-        ["lastseen", null, "decimal"],
-        ["no", null, "decimal"],
-        ["ret", null, "decimal"]
-    ], function($) {
-
-        return n.iff($, n.or(fn.empty(n.fetch($, "lastseen")), n.eq(n.fetch($, "no"), n.integer(0))),
-
-            function($) {
-
-                return n.stop($, n.item(fn.reverse(n.seq(n.fetch($, "ret"), n.fetch($, "lastseen")))));
-
-            },
-
-            function($) {
-
-                return n.iff($, n.ne(fn.head(n.fetch($, "lastseen")), n.decimal(0.01)),
-
-                    function($) {
-
-                        return n.cont($, fn.tail(n.fetch($, "lastseen")), n.fetch($, "no"), n.seq(fn.head(n.fetch($, "lastseen")), n.fetch($, "ret")));
-
-                    },
-
-                    function($) {
-
-                        return n.cont($, fn.tail(n.fetch($, "lastseen")), n.subtract(n.fetch($, "no"), n.integer(1)), n.fetch($, "ret"));
-
-                    });
-
-            });
-    });
-
+export function xmodule(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==2){
+        $.init($.item("parts"),$.item("ret"));
+        return n.item(block(fn.subsequence($.get("parts"),n.integer(5)),fn.concat($.get("ret"),n.string("core:module($,"),n.select(n.filter($.get("parts"),function($_0) { return n.geq(fn.position($_0),n.integer(2));}),function($_0) { return fn.string($_0);}),n.string(","),n.select(n.filter($.get("parts"),function($_0) { return n.geq(fn.position($_0),n.integer(4));}),function($_0) { return fn.string($_0);}),n.string(",())"))));
+    }
+    return n.error("err:XPST0017","Function xmodule called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function closer() {
+export function close(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==3){
+        $.init($.decimal("lastseen"),$.decimal("no"),$.decimal("ret"));
+        return $.test(n.or(fn.empty($.get("lastseen")),n.eq($.get("no"),n.integer(0)))) ?
 
-    return n.initialize(arguments, [
-        ["b", null, "decimal"],
-        ["c", null, "integer"]
-    ], function($) {
+ (fn.reverse(n.seq($.get("ret"),$.get("lastseen")))) :
 
-        return n.iff($, n.and(fn.exists(n.fetch($, "b")), n.geq(fn.head(n.fetch($, "b")), n.seq(n.decimal(2.08), n.decimal(2.11)))),
+ ($.test(n.ne(fn.head($.get("lastseen")),n.decimal(0.01))) ?
 
-            function($) {
+ (close(fn.tail($.get("lastseen")),$.get("no"),n.seq(fn.head($.get("lastseen")),$.get("ret")))) :
 
-                return n.cont($, fn.tail(n.fetch($, "b")), n.add(n.fetch($, "c"), n.integer(1)));
-
-            },
-
-            function($) {
-
-                return n.stop($, n.item(n.fetch($, "c")));
-
-            });
-    });
-
+ (close(fn.tail($.get("lastseen")),n.subtract($.get("no"),n.integer(1)),$.get("ret"))));
+    }
+    return n.error("err:XPST0017","Function close called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function lastIndexOf() {
+export function closer(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==2){
+        $.init($.decimal("b"),$.integer("c"));
+        return $.test(n.and(fn.exists($.get("b")),n.geq(fn.head($.get("b")),n.seq(n.decimal(2.08),n.decimal(2.11))))) ?
 
-    return n.initialize(arguments, [
-        ["lastseen", null, "decimal"],
-        ["a", null, "decimal"]
-    ], function($) {
+ (closer(fn.tail($.get("b")),n.add($.get("c"),n.integer(1)))) :
 
-        return ($ = n.put($, "id", n.item(fn.indexOf(n.fetch($, "lastseen"), n.fetch($, "a")))),
-
-            n.stop($, n.item(n.iff($, fn.empty(n.fetch($, "id")),
-
-                function($) {
-
-                    return n.integer(1);
-
-                },
-
-                function($) {
-
-                    return n.filter(n.fetch($, "id"), function($_0) {
-                        return n.geq(fn.position($_0), fn.last($_0));
-                    });
-
-                }))));
-    });
-
+ ($.get("c"));
+    }
+    return n.error("err:XPST0017","Function closer called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function pop() {
+export function lastIndexOf(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==2){
+        $.init($.decimal("lastseen"),$.decimal("a"));
+        return ($.item("id",fn.indexOf($.get("lastseen"),$.get("a"))),
 
-    return n.initialize(arguments, [
-        ["a", null, "item"]
-    ], function($) {
+n.item($.test(fn.empty($.get("id"))) ?
 
-        return n.stop($, n.item(fn.reverse(fn.tail(fn.reverse(n.fetch($, "a"))))));
-    });
+ (n.integer(1)) :
 
+ (n.filter($.get("id"),function($_0) { return n.geq(fn.position($_0),fn.last($_0));}))));
+    }
+    return n.error("err:XPST0017","Function lastIndexOf called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function anon() {
-
-    return n.initialize(arguments, [
-        ["head", null, "item"],
-        ["parts", null, "item"],
-        ["ret", null, "item"],
-        ["lastseen", null, "item"]
-    ], function($) {
-
-        return n.stop($, n.item(params(n.fetch($, "parts"), n.seq(n.fetch($, "ret"), n.string("core:function((")), n.fetch($, "lastseen"))));
-    });
-
+export function pop(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==1){
+        $.init($.item("a"));
+        return n.item(fn.reverse(fn.tail(fn.reverse($.get("a")))));
+    }
+    return n.error("err:XPST0017","Function pop called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function comment() {
-
-    return n.initialize(arguments, [
-        ["parts", null, "item"],
-        ["ret", null, "item"],
-        ["lastseen", null, "item"]
-    ], function($) {
-
-        return ($ = n.put($, "head", n.item(n.select(fn.head(n.fetch($, "parts")), function($_0) {
-                return fn.string($_0);
-            }))),
-
-            $ = n.put($, "rest", n.item(fn.tail(n.fetch($, "parts")))),
-
-            n.iff($, n.geq(n.fetch($, "head"), n.string("=#25#02=")),
-
-                function($) {
-
-                    return n.stop($, n.item(body(n.fetch($, "rest"), n.fetch($, "ret"), n.fetch($, "lastseen"))));
-
-                },
-
-                function($) {
-
-                    return n.cont($, n.fetch($, "rest"), n.fetch($, "ret"), n.fetch($, "lastseen"));
-
-                }));
-    });
-
+export function anon(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==4){
+        $.init($.item("head"),$.item("parts"),$.item("ret"),$.item("lastseen"));
+        return n.item(params($.get("parts"),fn.concat($.get("ret"),n.string("core:function((")),$.get("lastseen")));
+    }
+    return n.error("err:XPST0017","Function anon called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function bodyOp() {
+export function comment(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==3){
+        $.init($.item("parts"),$.item("ret"),$.item("lastseen"));
+        return ($.item("head",n.select(fn.head($.get("parts")),function($_0) { return fn.string($_0);})),
 
-    return n.initialize(arguments, [
-        ["no", null, "item"],
-        ["next", null, "item"],
-        ["lastseen", null, "item"],
-        ["rest", null, "item"],
-        ["ret", null, "item"]
-    ], function($) {
+$.item("rest",fn.tail($.get("parts"))),
 
-        return ($ = n.put($, "llast", n.item(n.filter(n.fetch($, "lastseen"), function($_0) {
-                return n.geq(fn.position($_0), fn.last($_0));
-            }))),
+$.test(n.geq($.get("head"),n.string("=#25#02="))) ?
 
-            $ = n.put($, "ret", n.item(n.iff($, n.eq(n.fetch($, "llast"), n.decimal(19.01)),
+ (body($.get("rest"),$.get("ret"),$.get("lastseen"))) :
 
-                function($) {
-
-                    return n.seq(n.fetch($, "ret"), n.string(")"));
-
-                },
-
-                function($) {
-
-                    return n.fetch($, "ret");
-
-                }))),
-
-            $ = n.put($, "lastseen", n.item(n.iff($, n.eq(n.fetch($, "llast"), n.decimal(19.01)),
-
-                function($) {
-
-                    return pop(n.fetch($, "lastseen"));
-
-                },
-
-                function($) {
-
-                    return n.fetch($, "lastseen");
-
-                }))),
-
-            n.stop($, n.item(n.iff($, n.eq(n.fetch($, "no"), n.integer(1)),
-
-                function($) {
-
-                    return $ = n.put($, "old", n.item(n.fetch($, "lastseen"))),
-
-                        $ = n.put($, "closer", n.item(closer(fn.reverse(n.fetch($, "lastseen")), n.integer(0)))),
-
-                        $ = n.put($, "lastseen", n.item(fn.subsequence(n.fetch($, "lastseen"), n.integer(1), n.subtract(fn.count(n.fetch($, "lastseen")), n.fetch($, "closer"))))),
-
-                        $ = n.put($, "ret", n.item(n.seq(n.fetch($, "ret"), fn.stringJoin(n.forEach(n.seq(n.to(n.integer(1), n.fetch($, "closer"))), n.string(")"))), n.iff($, n.eq(n.filter(n.fetch($, "lastseen"), function($_0) {
-                                return n.geq(fn.position($_0), n.subtract(fn.last($_0), n.integer(1)));
-                            }), n.decimal(21.07)),
-
-                            function($) {
-
-                                return n.string(")),=#20#04=((");
-
-                            },
-
-                            function($) {
-
-                                return n.string(",");
-
-                            })))),
-
-                        body(n.fetch($, "rest"), n.fetch($, "ret"), n.fetch($, "lastseen"));
-
-                },
-
-                function($) {
-
-                    return n.iff($, n.eq(n.fetch($, "no"), n.decimal(25.01)),
-
-                        function($) {
-
-                            return comment(n.fetch($, "rest"), n.fetch($, "ret"), n.fetch($, "lastseen"));
-
-                        },
-
-                        function($) {
-
-                            return n.iff($, n.eq(n.fetch($, "no"), n.decimal(21.06)),
-
-                                function($) {
-
-                                    return anon(n.fetch($, "next"), fn.tail(n.fetch($, "rest")), n.fetch($, "ret"), n.fetch($, "lastseen"));
-
-                                },
-
-                                function($) {
-
-                                    return n.iff($, n.eq(fn.round(n.fetch($, "no")), n.integer(21)),
-
-                                        function($) {
-
-                                            return $ = n.put($, "ret", n.item(n.seq(n.fetch($, "ret"), opStr(n.fetch($, "no")), n.string("(")))),
-
-                                                $ = n.put($, "qn", n.item(n.iff($, n.ne(n.fetch($, "next"), n.string("=#20#06=")),
-
-                                                    function($) {
-
-                                                        return n.fetch($, "next");
-
-                                                    },
-
-                                                    function($) {
-
-                                                        return n.seq();
-
-                                                    }))),
-
-                                                $ = n.put($, "rest", n.item(n.iff($, fn.exists(n.fetch($, "qn")),
-
-                                                    function($) {
-
-                                                        return fn.tail(n.fetch($, "rest"));
-
-                                                    },
-
-                                                    function($) {
-
-                                                        return n.fetch($, "rest");
-
-                                                    }))),
-
-                                                $ = n.put($, "ret", n.item(n.iff($, fn.exists(n.fetch($, "qn")),
-
-                                                    function($) {
-
-                                                        return n.seq(n.fetch($, "ret"), n.fetch($, "next"), n.string(","));
-
-                                                    },
-
-                                                    function($) {
-
-                                                        return n.fetch($, "ret");
-
-                                                    }))),
-
-                                                body(n.fetch($, "rest"), n.fetch($, "ret"), n.seq(n.fetch($, "lastseen"), n.fetch($, "no")));
-
-                                        },
-
-                                        function($) {
-
-                                            return $ = n.put($, "old", n.item(n.fetch($, "lastseen"))),
-
-                                                $ = n.put($, "llast", n.item(n.filter(n.fetch($, "lastseen"), function($_0) {
-                                                    return n.geq(fn.position($_0), fn.last($_0));
-                                                }))),
-
-                                                $ = n.put($, "positional", n.item(n.and(n.and(n.eq(n.fetch($, "no"), n.decimal(20.01)), n.fetch($, "next")), n.seq(n.or(n.seq(n.and(fn.matches(n.fetch($, "next"), n.concat(n.concat(n.string("^([\\+\\-]?(\\p{N}+))$|^\\$["), ncname), n.string("]+$"))), n.eq(n.filter(n.fetch($, "rest"), function($_0) {
-                                                    return n.geq(fn.position($_0), n.integer(2));
-                                                }), n.string("=#20#02=")))), fn.matches(n.fetch($, "next"), n.string("(fn:)?last"))))))),
-
-                                                $ = n.put($, "hascomma", n.item(fn.matches(n.filter(n.fetch($, "ret"), function($_0) {
-                                                    return n.geq(fn.position($_0), fn.last($_0));
-                                                }), n.string(",$")))),
-
-                                                $ = n.put($, "letopener", n.item(n.and(n.eq(n.fetch($, "no"), n.decimal(2.09)), n.seq(n.or(fn.not(n.or(n.geq(n.fetch($, "llast"), n.seq(n.decimal(2.09), n.decimal(2.10))), n.seq(n.and(n.eq(n.fetch($, "llast"), n.decimal(2.08)), n.geq(n.fetch($, "hascomma"), fn.false()))))), n.seq(n.eq(n.fetch($, "llast"), n.decimal(20.06)))))))),
-
-                                                $ = n.put($, "elsecloser", n.item(n.iff($, n.eq(n.fetch($, "no"), n.decimal(2.08)),
-
-                                                    function($) {
-
-                                                        return lastIndexOf(n.fetch($, "lastseen"), n.decimal(2.07));
-
-                                                    },
-
-                                                    function($) {
-
-                                                        return n.integer(0);
-
-                                                    }))),
-
-                                                $ = n.put($, "retncloser", n.item(n.iff($, n.eq(n.fetch($, "no"), n.decimal(2.11)),
-
-                                                    function($) {
-
-                                                        return lastIndexOf(n.fetch($, "lastseen"), n.decimal(2.1));
-
-                                                    },
-
-                                                    function($) {
-
-                                                        return n.integer(0);
-
-                                                    }))),
-
-                                                $ = n.put($, "letclose", n.item(n.and(n.and(n.eq(n.fetch($, "no"), n.decimal(2.09)), fn.not(n.or(n.eq(n.fetch($, "llast"), n.decimal(20.06)), fn.empty(n.fetch($, "lastseen"))))), n.geq(n.fetch($, "hascomma"), fn.false())))),
-
-                                                $ = n.put($, "letcloser", n.item(n.iff($, n.and(n.fetch($, "letclose"), n.geq(n.fetch($, "llast"), n.seq(n.decimal(2.08), n.decimal(2.11)))),
-
-                                                    function($) {
-
-                                                        return closer(fn.reverse(n.fetch($, "lastseen")), n.integer(0));
-
-                                                    },
-
-                                                    function($) {
-
-                                                        return n.integer(0);
-
-                                                    }))),
-
-                                                $ = n.put($, "ret", n.item(n.seq(n.fetch($, "ret"), n.iff($, n.and(n.eq(n.fetch($, "no"), n.decimal(20.06)), n.eq(n.fetch($, "llast"), n.decimal(21.07))),
-
-                                                    function($) {
-
-                                                        return n.iff($, n.eq(n.fetch($, "next"), n.string("=#20#07=")),
-
-                                                            function($) {
-
-                                                                return n.string("())");
-
-                                                            },
-
-                                                            function($) {
-
-                                                                return n.string("(=#20#04=((");
-
-                                                            });
-
-                                                    },
-
-                                                    function($) {
-
-                                                        return n.iff($, n.geq(n.fetch($, "no"), n.seq(n.decimal(2.06), n.decimal(2.09), n.decimal(20.01), n.decimal(20.04))),
-
-                                                            function($) {
-
-                                                                return n.seq(n.iff($, n.fetch($, "letclose"),
-
-                                                                    function($) {
-
-                                                                        return n.seq(fn.stringJoin(n.forEach(n.seq(n.to(n.integer(1), n.fetch($, "letcloser"))), n.string(")"))), n.iff($, n.eq(n.filter(n.fetch($, "lastseen"), function($_0) {
-                                                                                return n.geq(fn.position($_0), n.subtract(fn.last($_0), n.fetch($, "letcloser")));
-                                                                            }), n.decimal(2.10)),
-
-                                                                            function($) {
-
-                                                                                return n.string(")");
-
-                                                                            },
-
-                                                                            function($) {
-
-                                                                                return n.string("");
-
-                                                                            }), n.iff($, n.fetch($, "hascomma"),
-
-                                                                            function($) {
-
-                                                                                return n.string("");
-
-                                                                            },
-
-                                                                            function($) {
-
-                                                                                return n.string(",");
-
-                                                                            }));
-
-                                                                    },
-
-                                                                    function($) {
-
-                                                                        return n.string("");
-
-                                                                    }), n.iff($, n.fetch($, "letopener"),
-
-                                                                    function($) {
-
-                                                                        return n.string("(");
-
-                                                                    },
-
-                                                                    function($) {
-
-                                                                        return n.string("");
-
-                                                                    }), opStr(n.fetch($, "no")), n.iff($, n.eq(n.fetch($, "no"), n.decimal(20.04)),
-
-                                                                    function($) {
-
-                                                                        return n.string("(");
-
-                                                                    },
-
-                                                                    function($) {
-
-                                                                        return n.string("");
-
-                                                                    }), n.iff($, n.eq(n.fetch($, "no"), n.decimal(2.06)),
-
-                                                                    function($) {
-
-                                                                        return n.string("");
-
-                                                                    },
-
-                                                                    function($) {
-
-                                                                        return n.string("(");
-
-                                                                    }), n.iff($, n.eq(n.fetch($, "no"), n.decimal(2.09)),
-
-                                                                    function($) {
-
-                                                                        return fn.concat(n.string("$,"), fn.replace(n.fetch($, "next"), n.string("^\\$|\\s"), n.string("")));
-
-                                                                    },
-
-                                                                    function($) {
-
-                                                                        return n.iff($, n.eq(n.fetch($, "no"), n.decimal(20.01)),
-
-                                                                            function($) {
-
-                                                                                return fn.concat(n.iff($, fn.matches(n.fetch($, "next"), n.string("#20#08")),
-
-                                                                                    function($) {
-
-                                                                                        return n.string(".");
-
-                                                                                    },
-
-                                                                                    function($) {
-
-                                                                                        return n.iff($, n.fetch($, "positional"),
-
-                                                                                            function($) {
-
-                                                                                                return n.string("position(.)=#5#07=");
-
-                                                                                            },
-
-                                                                                            function($) {
-
-                                                                                                return n.string("");
-
-                                                                                            });
-
-                                                                                    }), n.fetch($, "next"));
-
-                                                                            },
-
-                                                                            function($) {
-
-                                                                                return n.string("");
-
-                                                                            });
-
-                                                                    }));
-
-                                                            },
-
-                                                            function($) {
-
-                                                                return n.iff($, n.or(n.eq(n.fetch($, "no"), n.integer(26)), n.seq(n.and(n.eq(n.fetch($, "no"), n.decimal(2.10)), n.eq(n.filter(n.fetch($, "lastseen"), function($_0) {
-                                                                        return n.geq(fn.position($_0), n.subtract(fn.last($_0), n.integer(1)));
-                                                                    }), n.decimal(21.07))))),
-
-                                                                    function($) {
-
-                                                                        return n.string(",");
-
-                                                                    },
-
-                                                                    function($) {
-
-                                                                        return n.iff($, n.eq(n.fetch($, "no"), n.decimal(20.07)),
-
-                                                                            function($) {
-
-                                                                                return $ = n.put($, "lastindex", n.item(lastIndexOf(n.fetch($, "lastseen"), n.decimal(20.06)))),
-
-                                                                                    $ = n.put($, "closes", n.item(n.filter(fn.subsequence(n.fetch($, "lastseen"), n.fetch($, "lastindex"), fn.count(n.fetch($, "lastseen"))), function($_0) {
-                                                                                        return n.geq($_0, n.seq(n.decimal(2.08), n.decimal(2.11)));
-                                                                                    }))),
-
-                                                                                    $ = n.put($, "closes", n.item(n.seq(n.fetch($, "closes"), n.decimal(2.11)))),
-
-                                                                                    $ = n.put($, "llast", n.item(n.filter(n.fetch($, "lastseen"), function($_0) {
-                                                                                        return n.geq(fn.position($_0), n.subtract(n.fetch($, "lastindex"), n.integer(1)));
-                                                                                    }))),
-
-                                                                                    fn.concat(fn.stringJoin(n.forEach(n.fetch($, "closes"), n.string(")"))), n.iff($, n.eq(n.fetch($, "next"), n.string("=#20#06=")),
-
-                                                                                        function($) {
-
-                                                                                            return n.string(",");
-
-                                                                                        },
-
-                                                                                        function($) {
-
-                                                                                            return n.iff($, n.eq(n.fetch($, "llast"), n.decimal(21.07)),
-
-                                                                                                function($) {
-
-                                                                                                    return n.string(")))");
-
-                                                                                                },
-
-                                                                                                function($) {
-
-                                                                                                    return n.iff($, n.eq(fn.round(n.fetch($, "llast")), n.integer(21)),
-
-                                                                                                        function($) {
-
-                                                                                                            return n.string(")");
-
-                                                                                                        },
-
-                                                                                                        function($) {
-
-                                                                                                            return n.string("");
-
-                                                                                                        });
-
-                                                                                                });
-
-                                                                                        }));
-
-                                                                            },
-
-                                                                            function($) {
-
-                                                                                return n.iff($, n.geq(n.fetch($, "no"), n.seq(n.decimal(2.07), n.decimal(2.10))),
-
-                                                                                    function($) {
-
-                                                                                        return fn.concat(n.iff($, n.eq(n.fetch($, "llast"), n.decimal(2.11)),
-
-                                                                                            function($) {
-
-                                                                                                return n.string(")");
-
-                                                                                            },
-
-                                                                                            function($) {
-
-                                                                                                return n.string("");
-
-                                                                                            }), n.string(","));
-
-                                                                                    },
-
-                                                                                    function($) {
-
-                                                                                        return n.iff($, n.eq(n.fetch($, "no"), n.decimal(2.08)),
-
-                                                                                            function($) {
-
-                                                                                                return fn.concat(fn.stringJoin(n.forEach(fn.subsequence(n.fetch($, "lastseen"), n.add(n.fetch($, "elsecloser"), n.integer(1))), n.string(")"))), n.string(","));
-
-                                                                                            },
-
-                                                                                            function($) {
-
-                                                                                                return n.iff($, n.eq(n.fetch($, "no"), n.decimal(2.11)),
-
-                                                                                                    function($) {
-
-                                                                                                        return fn.concat(fn.stringJoin(n.forEach(fn.subsequence(n.fetch($, "lastseen"), n.add(n.fetch($, "retncloser"), n.integer(1))), n.string(")"))), n.string("),"));
-
-                                                                                                    },
-
-                                                                                                    function($) {
-
-                                                                                                        return n.iff($, n.eq(n.fetch($, "no"), n.decimal(20.02)),
-
-                                                                                                            function($) {
-
-                                                                                                                return n.iff($, n.eq(n.fetch($, "llast"), n.decimal(20.04)),
-
-                                                                                                                    function($) {
-
-                                                                                                                        return n.string("))");
-
-                                                                                                                    },
-
-                                                                                                                    function($) {
-
-                                                                                                                        return n.string(")");
-
-                                                                                                                    });
-
-                                                                                                            },
-
-                                                                                                            function($) {
-
-                                                                                                                return n.iff($, n.eq(n.fetch($, "no"), n.decimal(20.06)),
-
-                                                                                                                    function($) {
-
-                                                                                                                        return n.string("(");
-
-                                                                                                                    },
-
-                                                                                                                    function($) {
-
-                                                                                                                        return n.iff($, n.eq(n.fetch($, "no"), n.decimal(19.01)),
-
-                                                                                                                            function($) {
-
-                                                                                                                                return n.concat(opStr(n.fetch($, "no")), n.string("("));
-
-                                                                                                                            },
-
-                                                                                                                            function($) {
-
-                                                                                                                                return opStr(n.fetch($, "no"));
-
-                                                                                                                            });
-
-                                                                                                                    });
-
-                                                                                                            });
-
-                                                                                                    });
-
-                                                                                            });
-
-                                                                                    });
-
-                                                                            });
-
-                                                                    });
-
-                                                            });
-
-                                                    })))),
-
-                                                $ = n.put($, "rest", n.item(n.iff($, n.and(n.and(n.eq(n.fetch($, "no"), n.decimal(20.06)), n.eq(n.fetch($, "llast"), n.decimal(21.07))), n.eq(n.fetch($, "next"), n.string("=#20#07="))),
-
-                                                    function($) {
-
-                                                        return fn.tail(n.fetch($, "rest"));
-
-                                                    },
-
-                                                    function($) {
-
-                                                        return n.iff($, n.or(fn.empty(n.fetch($, "rest")), fn.not(n.geq(n.fetch($, "no"), n.seq(n.decimal(2.09), n.decimal(20.01))))),
-
-                                                            function($) {
-
-                                                                return n.fetch($, "rest");
-
-                                                            },
-
-                                                            function($) {
-
-                                                                return n.iff($, n.and(n.geq(n.fetch($, "next"), fns), fn.matches(n.filter(n.fetch($, "rest"), function($_0) {
-                                                                        return n.geq(fn.position($_0), n.integer(2));
-                                                                    }), n.string("\\)"))),
-
-                                                                    function($) {
-
-                                                                        return fn.insertBefore(fn.remove(fn.tail(n.fetch($, "rest")), n.integer(1)), n.integer(1), n.element(n.string("fn:match"), n.seq(n.element(n.string("fn:group"), n.seq(n.attribute(n.string("nr"), n.seq(n.integer(1))), n.string("(.)"))))));
-
-                                                                    },
-
-                                                                    function($) {
-
-                                                                        return fn.tail(n.fetch($, "rest"));
-
-                                                                    });
-
-                                                            });
-
-                                                    }))),
-
-                                                $ = n.put($, "lastseen", n.item(n.iff($, n.geq(n.fetch($, "no"), n.seq(n.decimal(2.06), n.decimal(2.09), n.decimal(20.01), n.decimal(20.04))),
-
-                                                    function($) {
-
-                                                        return $ = n.put($, "lastseen", n.item(n.iff($, n.fetch($, "letclose"),
-
-                                                                function($) {
-
-                                                                    return fn.subsequence(n.fetch($, "lastseen"), n.integer(1), n.subtract(fn.count(n.fetch($, "lastseen")), n.fetch($, "letcloser")));
-
-                                                                },
-
-                                                                function($) {
-
-                                                                    return n.fetch($, "lastseen");
-
-                                                                }))),
-
-                                                            $ = n.put($, "lastseen", n.item(n.iff($, n.and(n.fetch($, "letclose"), n.eq(n.filter(n.fetch($, "lastseen"), function($_0) {
-                                                                    return n.geq(fn.position($_0), fn.last($_0));
-                                                                }), n.decimal(2.10))),
-
-                                                                function($) {
-
-                                                                    return pop(n.fetch($, "lastseen"));
-
-                                                                },
-
-                                                                function($) {
-
-                                                                    return n.fetch($, "lastseen");
-
-                                                                }))),
-
-                                                            n.seq(n.fetch($, "lastseen"),
-
-                                                                n.fetch($, "no"));
-
-                                                    },
-
-                                                    function($) {
-
-                                                        return n.iff($, n.or(n.eq(n.fetch($, "no"), n.integer(26)), n.seq(n.and(n.eq(n.fetch($, "no"), n.decimal(2.10)), n.eq(n.filter(n.fetch($, "lastseen"), function($_0) {
-                                                                return n.geq(fn.position($_0), n.subtract(fn.last($_0), n.integer(1)));
-                                                            }), n.decimal(21.07))))),
-
-                                                            function($) {
-
-                                                                return n.fetch($, "lastseen");
-
-                                                            },
-
-                                                            function($) {
-
-                                                                return n.iff($, n.geq(n.fetch($, "no"), n.decimal(20.07)),
-
-                                                                    function($) {
-
-                                                                        return $ = n.put($, "lastseen", n.item(fn.subsequence(n.fetch($, "lastseen"), n.integer(1), n.subtract(lastIndexOf(n.fetch($, "lastseen"), n.decimal(20.06)), n.integer(1))))),
-
-                                                                            n.iff($, n.and(n.eq(fn.round(n.filter(n.fetch($, "lastseen"), function($_0) {
-                                                                                    return n.geq(fn.position($_0), fn.last($_0));
-                                                                                })), n.integer(21)), n.ne(n.fetch($, "next"), n.string("=#20#06="))),
-
-                                                                                function($) {
-
-                                                                                    return pop(n.fetch($, "lastseen"));
-
-                                                                                },
-
-                                                                                function($) {
-
-                                                                                    return n.fetch($, "lastseen");
-
-                                                                                });
-
-                                                                    },
-
-                                                                    function($) {
-
-                                                                        return n.iff($, n.geq(n.fetch($, "no"), n.seq(n.decimal(2.07), n.decimal(2.10))),
-
-                                                                            function($) {
-
-                                                                                return $ = n.put($, "lastseen", n.item(n.iff($, n.or(n.eq(n.fetch($, "llast"), n.decimal(2.11)), n.seq(n.and(n.eq(n.fetch($, "no"), n.decimal(2.07)), n.eq(n.fetch($, "llast"), n.decimal(0.01))))),
-
-                                                                                        function($) {
-
-                                                                                            return pop(n.fetch($, "lastseen"));
-
-                                                                                        },
-
-                                                                                        function($) {
-
-                                                                                            return n.fetch($, "lastseen");
-
-                                                                                        }))),
-
-                                                                                    $ = n.put($, "last", n.item(n.filter(fn.indexOf(n.fetch($, "lastseen"), n.subtract(n.fetch($, "no"), n.decimal(n.decimal(0.01)))), function($_0) {
-                                                                                        return n.geq(fn.position($_0), fn.last($_0));
-                                                                                    }))),
-
-                                                                                    n.seq(fn.remove(n.fetch($, "lastseen"), n.fetch($, "last")),
-
-                                                                                        n.fetch($, "no"));
-
-                                                                            },
-
-                                                                            function($) {
-
-                                                                                return n.iff($, n.eq(n.fetch($, "no"), n.decimal(2.08)),
-
-                                                                                    function($) {
-
-                                                                                        return $ = n.put($, "lastseen", n.item(fn.subsequence(n.fetch($, "lastseen"), n.integer(1), n.subtract(n.fetch($, "elsecloser"), n.integer(1))))),
-
-                                                                                            n.seq(n.fetch($, "lastseen"),
-
-                                                                                                n.fetch($, "no"));
-
-                                                                                    },
-
-                                                                                    function($) {
-
-                                                                                        return n.iff($, n.eq(n.fetch($, "no"), n.decimal(2.11)),
-
-                                                                                            function($) {
-
-                                                                                                return $ = n.put($, "lastseen", n.item(fn.subsequence(n.fetch($, "lastseen"), n.integer(1), n.subtract(n.fetch($, "retncloser"), n.integer(1))))),
-
-                                                                                                    n.seq(n.fetch($, "lastseen"),
-
-                                                                                                        n.fetch($, "no"));
-
-                                                                                            },
-
-                                                                                            function($) {
-
-                                                                                                return n.iff($, n.and(n.and(n.eq(n.fetch($, "no"), n.decimal(20.06)), n.eq(n.fetch($, "llast"), n.decimal(21.07))), n.eq(n.fetch($, "next"), n.string("=#20#07="))),
-
-                                                                                                    function($) {
-
-                                                                                                        return pop(n.fetch($, "lastseen"));
-
-                                                                                                    },
-
-                                                                                                    function($) {
-
-                                                                                                        return n.iff($, n.or(n.or(n.eq(n.fetch($, "no"), n.decimal(20.06)), n.eq(fn.round(n.fetch($, "no")), n.integer(21))), n.eq(n.fetch($, "no"), n.decimal(19.01))),
-
-                                                                                                            function($) {
-
-                                                                                                                return n.seq(n.fetch($, "lastseen"), n.fetch($, "no"));
-
-                                                                                                            },
-
-                                                                                                            function($) {
-
-                                                                                                                return n.iff($, n.eq(n.fetch($, "no"), n.decimal(20.02)),
-
-                                                                                                                    function($) {
-
-                                                                                                                        return pop(n.fetch($, "lastseen"));
-
-                                                                                                                    },
-
-                                                                                                                    function($) {
-
-                                                                                                                        return n.fetch($, "lastseen");
-
-                                                                                                                    });
-
-                                                                                                            });
-
-                                                                                                    });
-
-                                                                                            });
-
-                                                                                    });
-
-                                                                            });
-
-                                                                    });
-
-                                                            });
-
-                                                    }))),
-
-                                                $ = n.put($, "nu", n.item(console.log(n.seq(n.fetch($, "no"), n.string(" :: "), fn.stringJoin(n.fetch($, "old"), n.string(",")), n.string("->"), fn.stringJoin(n.fetch($, "lastseen"), n.string(",")), n.string(" || "), fn.replace(fn.replace(fn.stringJoin(n.fetch($, "ret")), n.string("=#2#06="), n.string("if")), n.string("=#2#09="), n.string("let")))))),
-
-                                                body(n.fetch($, "rest"), n.fetch($, "ret"), n.fetch($, "lastseen"));
-
-                                        });
-
-                                });
-
-                        });
-
-                }))));
-    });
-
+ (comment($.get("rest"),$.get("ret"),$.get("lastseen"))));
+    }
+    return n.error("err:XPST0017","Function comment called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function isArray() {
+export function bodyOp(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==5){
+        $.init($.item("no"),$.item("next"),$.item("lastseen"),$.item("rest"),$.string("ret"));
+        return ($.item("llast",n.filter($.get("lastseen"),function($_0) { return n.geq(fn.position($_0),fn.last($_0));})),
 
-    return n.initialize(arguments, [
-        ["head", null, "item"],
-        ["non", null, "item"],
-        ["next", null, "item"]
-    ], function($) {
+$.item("ret",$.test(n.eq($.get("llast"),n.decimal(19.01))) ?
 
-        return n.stop($, n.item(n.and(n.and(n.eq(n.fetch($, "non"), n.decimal(20.01)), n.geq(fn.matches(n.fetch($, "head"), n.string("\\)\\s*$")), fn.false())), fn.matches(n.fetch($, "head"), n.concat(n.concat(n.string("^(\\s|\\(|,|"), operatorRegexp), n.string(")"))))));
-    });
+ (fn.concat($.get("ret"),n.string(")"))) :
 
+ ($.get("ret"))),
+
+$.item("lastseen",$.test(n.eq($.get("llast"),n.decimal(19.01))) ?
+
+ (pop($.get("lastseen"))) :
+
+ ($.get("lastseen"))),
+
+$.test(n.eq($.get("no"),n.integer(1))) ?
+
+ ($.item("old",$.get("lastseen")),
+
+$.item("closer",closer(fn.reverse($.get("lastseen")),n.integer(0))),
+
+$.item("lastseen",fn.subsequence($.get("lastseen"),n.integer(1),n.subtract(fn.count($.get("lastseen")),$.get("closer")))),
+
+$.item("ret",fn.concat($.get("ret"),fn.stringJoin(n.forEach(n.seq(n.to(n.integer(1),$.get("closer"))),n.string(")"))),$.test(n.eq(n.filter($.get("lastseen"),function($_0) { return n.geq(fn.position($_0),n.subtract(fn.last($_0),n.integer(1)));}),n.decimal(21.07))) ?
+
+ (n.string("),=#27#01=(")) :
+
+ (n.string(",")))),
+
+body($.get("rest"),$.get("ret"),$.get("lastseen"))) :
+
+ ($.test(n.eq($.get("no"),n.decimal(25.01))) ?
+
+ (comment($.get("rest"),$.get("ret"),$.get("lastseen"))) :
+
+ ($.test(n.eq($.get("no"),n.decimal(21.06))) ?
+
+ (anon($.get("next"),fn.tail($.get("rest")),$.get("ret"),$.get("lastseen"))) :
+
+ ($.test(n.eq(fn.round($.get("no")),n.integer(21))) ?
+
+ ($.item("ret",fn.concat($.get("ret"),opStr($.get("no")),n.string("("))),
+
+$.item("qn",$.test(n.ne($.get("next"),n.string("=#20#06="))) ?
+
+ ($.get("next")) :
+
+ (n.seq())),
+
+$.item("rest",$.test(fn.exists($.get("qn"))) ?
+
+ (fn.tail($.get("rest"))) :
+
+ ($.get("rest"))),
+
+$.item("ret",$.test(fn.exists($.get("qn"))) ?
+
+ (fn.concat($.get("ret"),$.get("next"),n.string(","))) :
+
+ ($.get("ret"))),
+
+body($.get("rest"),$.get("ret"),n.seq($.get("lastseen"),$.get("no")))) :
+
+ ($.item("old",$.get("lastseen")),
+
+$.item("llast",n.filter($.get("lastseen"),function($_0) { return n.geq(fn.position($_0),fn.last($_0));})),
+
+$.item("positional",n.and(n.and(n.eq($.get("no"),n.decimal(20.01)),$.get("next")),n.seq(n.or(n.seq(n.and(fn.matches($.get("next"),n.concat(n.concat(n.string("^([\\+\\-]?(\\p{N}+))$|^\\$["),ncname),n.string("]+$"))),n.eq(n.filter($.get("rest"),function($_0) { return n.geq(fn.position($_0),n.integer(2));}),n.string("=#20#02=")))),fn.matches($.get("next"),n.string("(fn:)?last")))))),
+
+$.item("hascomma",fn.matches($.get("ret"),n.string(",$"))),
+
+$.item("letopener",n.and(n.eq($.get("no"),n.decimal(2.09)),n.seq(n.or(fn.not(n.or(n.geq($.get("llast"),n.seq(n.decimal(2.09),n.decimal(2.10))),n.seq(n.and(n.eq($.get("llast"),n.decimal(2.08)),n.geq($.get("hascomma"),fn.false()))))),n.seq(n.eq($.get("llast"),n.decimal(20.06))))))),
+
+$.item("elsecloser",$.test(n.eq($.get("no"),n.decimal(2.08))) ?
+
+ (lastIndexOf($.get("lastseen"),n.decimal(2.07))) :
+
+ (n.integer(0))),
+
+$.item("retncloser",$.test(n.eq($.get("no"),n.decimal(2.11))) ?
+
+ (lastIndexOf($.get("lastseen"),n.decimal(2.1))) :
+
+ (n.integer(0))),
+
+$.item("letclose",n.and(n.and(n.eq($.get("no"),n.decimal(2.09)),fn.not(n.or(n.eq($.get("llast"),n.decimal(20.06)),fn.empty($.get("lastseen"))))),n.geq($.get("hascomma"),fn.false()))),
+
+$.item("letcloser",$.test(n.and($.get("letclose"),n.geq($.get("llast"),n.seq(n.decimal(2.08),n.decimal(2.11))))) ?
+
+ (closer(fn.reverse($.get("lastseen")),n.integer(0))) :
+
+ (n.integer(0))),
+
+$.item("ret",fn.concat($.get("ret"),$.test(n.geq($.get("no"),n.seq(n.decimal(2.06),n.decimal(2.09),n.decimal(20.01),n.decimal(20.04)))) ?
+
+ (fn.concat($.test($.get("letclose")) ?
+
+ (fn.concat(fn.stringJoin(n.forEach(n.seq(n.to(n.integer(1),$.get("letcloser"))),n.string(")"))),$.test(n.eq(n.filter($.get("lastseen"),function($_0) { return n.geq(fn.position($_0),n.subtract(fn.last($_0),$.get("letcloser")));}),n.decimal(2.10))) ?
+
+ (n.string(")")) :
+
+ (n.string("")),$.test($.get("hascomma")) ?
+
+ (n.string("")) :
+
+ (n.string(",")))) :
+
+ (n.string("")),$.test($.get("letopener")) ?
+
+ (n.string("(")) :
+
+ (n.string("")),opStr($.get("no")),$.test(n.eq($.get("no"),n.decimal(20.04))) ?
+
+ (n.string("(")) :
+
+ (n.string("")),$.test(n.eq($.get("no"),n.decimal(2.06))) ?
+
+ (n.string("")) :
+
+ (n.string("(")),$.test(n.eq($.get("no"),n.decimal(2.09))) ?
+
+ (fn.concat(n.string("$,"),fn.replace($.get("next"),n.string("^\\$|\\s"),n.string("")))) :
+
+ ($.test(n.eq($.get("no"),n.decimal(20.01))) ?
+
+ (fn.concat($.test(fn.matches($.get("next"),n.string("#20#08"))) ?
+
+ (n.string(".")) :
+
+ ($.test($.get("positional")) ?
+
+ (n.string("position(.)=#5#07=")) :
+
+ (n.string(""))),$.get("next"))) :
+
+ (n.string(""))))) :
+
+ ($.test(n.or(n.eq($.get("no"),n.integer(26)),n.seq(n.and(n.eq($.get("no"),n.decimal(2.10)),n.eq(n.filter($.get("lastseen"),function($_0) { return n.geq(fn.position($_0),n.subtract(fn.last($_0),n.integer(1)));}),n.decimal(21.07)))))) ?
+
+ (n.string(",")) :
+
+ ($.test(n.eq($.get("no"),n.decimal(20.07))) ?
+
+ ($.item("lastindex",lastIndexOf($.get("lastseen"),n.decimal(20.06))),
+
+$.item("closes",n.filter(fn.subsequence($.get("lastseen"),$.get("lastindex"),fn.count($.get("lastseen"))),function($_0) { return n.geq($_0,n.seq(n.decimal(2.08),n.decimal(2.11)));})),
+
+$.item("closes",$.test(n.eq($.get("next"),n.string("=#20#06="))) ?
+
+ ($.get("closes")) :
+
+ (n.seq($.get("closes"),n.decimal(2.11)))),
+
+$.item("llast",n.filter($.get("lastseen"),function($_0) { return n.geq(fn.position($_0),n.subtract($.get("lastindex"),n.integer(1)));})),
+
+fn.concat($.test(n.eq(fn.round($.get("llast")),n.integer(21))) ?
+
+ (n.string(")")) :
+
+ (n.string("")),$.test(n.and(n.seq(n.or(n.eq($.get("llast"),n.decimal(21.07)),fn.empty($.get("llast")))),n.geq(fn.matches($.get("ret"),n.string("\\($")),fn.false()))) ?
+
+ (n.string(")")) :
+
+ (n.string("")),fn.stringJoin(n.forEach($.get("closes"),n.string(")"))),$.test(n.eq($.get("next"),n.string("=#20#06="))) ?
+
+ (n.string(",")) :
+
+ (n.string("")))) :
+
+ ($.test(n.geq($.get("no"),n.seq(n.decimal(2.07),n.decimal(2.10)))) ?
+
+ (fn.concat($.test(n.eq($.get("llast"),n.decimal(2.11))) ?
+
+ (n.string(")")) :
+
+ (n.string("")),n.string(","))) :
+
+ ($.test(n.eq($.get("no"),n.decimal(2.08))) ?
+
+ (fn.concat(fn.stringJoin(n.forEach(fn.subsequence($.get("lastseen"),n.add($.get("elsecloser"),n.integer(1))),n.string(")"))),n.string(","))) :
+
+ ($.test(n.eq($.get("no"),n.decimal(2.11))) ?
+
+ (fn.concat(fn.stringJoin(n.forEach(fn.subsequence($.get("lastseen"),n.add($.get("retncloser"),n.integer(1))),n.string(")"))),n.string("),"))) :
+
+ ($.test(n.eq($.get("no"),n.decimal(20.02))) ?
+
+ ($.test(n.eq($.get("llast"),n.decimal(20.04))) ?
+
+ (n.string("))")) :
+
+ (n.string(")"))) :
+
+ ($.test(n.eq($.get("no"),n.decimal(20.06))) ?
+
+ ($.test(n.or(n.eq($.get("llast"),n.decimal(21.07)),n.ne(fn.round($.get("llast")),n.integer(21)))) ?
+
+ ($.test(n.or(fn.empty($.get("next")),n.eq($.get("next"),n.string("=#20#07=")))) ?
+
+ (n.string("(")) :
+
+ (n.string("(=#27#01=("))) :
+
+ (n.string("("))) :
+
+ ($.test(n.eq($.get("no"),n.decimal(19.01))) ?
+
+ (n.concat(opStr($.get("no")),n.string("("))) :
+
+ (opStr($.get("no"))))))))))))),
+
+$.item("rest",$.test(n.or(fn.empty($.get("rest")),fn.not(n.geq($.get("no"),n.seq(n.decimal(2.09),n.decimal(20.01)))))) ?
+
+ ($.get("rest")) :
+
+ ($.test(n.and(n.geq($.get("next"),fns),fn.matches(n.filter($.get("rest"),function($_0) { return n.geq(fn.position($_0),n.integer(2));}),n.string("\\)")))) ?
+
+ (fn.insertBefore(fn.remove(fn.tail($.get("rest")),n.integer(1)),n.integer(1),n.element(n.string("fn:match"),n.seq(n.element(n.string("fn:group"),n.seq(n.attribute(n.string("nr"),n.seq(n.integer(1))),n.string("(.)"))))))) :
+
+ (fn.tail($.get("rest"))))),
+
+$.item("lastseen",$.test(n.geq($.get("no"),n.seq(n.decimal(2.06),n.decimal(2.09),n.decimal(20.01),n.decimal(20.04)))) ?
+
+ ($.item("lastseen",$.test($.get("letclose")) ?
+
+ (fn.subsequence($.get("lastseen"),n.integer(1),n.subtract(fn.count($.get("lastseen")),$.get("letcloser")))) :
+
+ ($.get("lastseen"))),
+
+$.item("lastseen",$.test(n.and($.get("letclose"),n.eq(n.filter($.get("lastseen"),function($_0) { return n.geq(fn.position($_0),fn.last($_0));}),n.decimal(2.10)))) ?
+
+ (pop($.get("lastseen"))) :
+
+ ($.get("lastseen"))),
+
+n.seq($.get("lastseen"),
+
+$.get("no"))) :
+
+ ($.test(n.or(n.eq($.get("no"),n.integer(26)),n.seq(n.and(n.eq($.get("no"),n.decimal(2.10)),n.eq(n.filter($.get("lastseen"),function($_0) { return n.geq(fn.position($_0),n.subtract(fn.last($_0),n.integer(1)));}),n.decimal(21.07)))))) ?
+
+ ($.get("lastseen")) :
+
+ ($.test(n.geq($.get("no"),n.decimal(20.07))) ?
+
+ ($.item("lastseen",fn.subsequence($.get("lastseen"),n.integer(1),n.subtract(lastIndexOf($.get("lastseen"),n.decimal(20.06)),n.integer(1)))),
+
+$.test(n.and(n.eq(fn.round(n.filter($.get("lastseen"),function($_0) { return n.geq(fn.position($_0),fn.last($_0));})),n.integer(21)),n.eq($.get("next"),n.string("=#20#06=")))) ?
+
+ ($.get("lastseen")) :
+
+ (pop($.get("lastseen")))) :
+
+ ($.test(n.geq($.get("no"),n.seq(n.decimal(2.07),n.decimal(2.10)))) ?
+
+ ($.item("lastseen",$.test(n.or(n.eq($.get("llast"),n.decimal(2.11)),n.seq(n.and(n.eq($.get("no"),n.decimal(2.07)),n.eq($.get("llast"),n.decimal(0.01)))))) ?
+
+ (pop($.get("lastseen"))) :
+
+ ($.get("lastseen"))),
+
+$.item("last",n.filter(fn.indexOf($.get("lastseen"),n.subtract($.get("no"),n.decimal(n.decimal(0.01)))),function($_0) { return n.geq(fn.position($_0),fn.last($_0));})),
+
+n.seq(fn.remove($.get("lastseen"),$.get("last")),
+
+$.get("no"))) :
+
+ ($.test(n.eq($.get("no"),n.decimal(2.08))) ?
+
+ ($.item("lastseen",fn.subsequence($.get("lastseen"),n.integer(1),n.subtract($.get("elsecloser"),n.integer(1)))),
+
+n.seq($.get("lastseen"),
+
+$.get("no"))) :
+
+ ($.test(n.eq($.get("no"),n.decimal(2.11))) ?
+
+ ($.item("lastseen",fn.subsequence($.get("lastseen"),n.integer(1),n.subtract($.get("retncloser"),n.integer(1)))),
+
+n.seq($.get("lastseen"),
+
+$.get("no"))) :
+
+ ($.test(n.or(n.or(n.eq($.get("no"),n.decimal(20.06)),n.eq(fn.round($.get("no")),n.integer(21))),n.eq($.get("no"),n.decimal(19.01)))) ?
+
+ (n.seq($.get("lastseen"),$.get("no"))) :
+
+ ($.test(n.eq($.get("no"),n.decimal(20.02))) ?
+
+ (pop($.get("lastseen"))) :
+
+ ($.get("lastseen")))))))))),
+
+body($.get("rest"),$.get("ret"),$.get("lastseen")))))));
+    }
+    return n.error("err:XPST0017","Function bodyOp called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function parenCloser() {
-
-    return n.initialize(arguments, [
-        ["head", null, "item"],
-        ["lastseen", null, "item"]
-    ], function($) {
-
-        return n.stop($, n.item(n.iff($, fn.matches(n.fetch($, "head"), n.string("[\\(\\)]+")),
-
-            function($) {
-
-                return $ = n.put($, "cp", n.item(fn.stringToCodepoints(n.fetch($, "head")))),
-
-                    $ = n.put($, "old", n.item(n.fetch($, "lastseen"))),
-
-                    $ = n.put($, "lastseen", n.item(n.seq(n.fetch($, "lastseen"), n.forEach(n.filter(n.fetch($, "cp"), function($_0) {
-                        return n.eq($_0, n.integer(40));
-                    }), n.decimal(0.01))))),
-
-                    close(fn.reverse(n.fetch($, "lastseen")), fn.count(n.filter(n.fetch($, "cp"), function($_0) {
-                        return n.eq($_0, n.integer(41));
-                    })), n.seq());
-
-            },
-
-            function($) {
-
-                return n.fetch($, "lastseen");
-
-            })));
-    });
-
+export function isArray(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==3){
+        $.init($.item("head"),$.item("non"),$.item("next"));
+        return n.item(n.and(n.and(n.eq($.get("non"),n.decimal(20.01)),n.geq(fn.matches($.get("head"),n.string("\\)\\s*$")),fn.false())),fn.matches($.get("head"),n.concat(n.concat(n.string("^(\\s|\\(|,|"),operatorRegexp),n.string(")")))));
+    }
+    return n.error("err:XPST0017","Function isArray called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function body() {
+export function parenCloser(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==2){
+        $.init($.item("head"),$.item("lastseen"));
+        return n.item($.test(fn.matches($.get("head"),n.string("[\\(\\)]+"))) ?
 
-    return n.initialize(arguments, [
-        ["parts", null, "item"],
-        ["ret", null, "item"],
-        ["lastseen", null, "item"]
-    ], function($) {
+ ($.item("cp",fn.stringToCodepoints($.get("head"))),
 
-        return n.iff($, fn.empty(n.fetch($, "parts")),
+$.item("old",$.get("lastseen")),
 
-            function($) {
+$.item("lastseen",n.seq($.get("lastseen"),n.forEach(n.filter($.get("cp"),function($_0) { return n.eq($_0,n.integer(40));}),n.decimal(0.01)))),
 
-                return n.stop($, n.item(n.seq(n.fetch($, "ret"), fn.stringJoin(n.forEach(n.filter(n.fetch($, "lastseen"), function($_0) {
-                    return n.geq($_0, n.seq(n.decimal(2.08), n.decimal(2.11), n.decimal(20.07)));
-                }), n.string(")"))))));
+close(fn.reverse($.get("lastseen")),fn.count(n.filter($.get("cp"),function($_0) { return n.eq($_0,n.integer(41));})),n.seq())) :
 
-            },
-
-            function($) {
-
-                return $ = n.put($, "head", n.item(n.select(fn.head(n.fetch($, "parts")), function($_0) {
-                        return fn.string($_0);
-                    }))),
-
-                    $ = n.put($, "rest", n.item(fn.tail(n.fetch($, "parts")))),
-
-                    $ = n.put($, "lastseen", n.item(parenCloser(n.fetch($, "head"), n.fetch($, "lastseen")))),
-
-                    n.iff($, n.geq(n.fetch($, "head"), n.string("=#25#01=")),
-
-                        function($) {
-
-                            return n.stop($, n.item(comment(n.fetch($, "rest"), n.fetch($, "ret"), n.fetch($, "lastseen"))));
-
-                        },
-
-                        function($) {
-
-                            return n.iff($, fn.matches(n.fetch($, "head"), n.string(";")),
-
-                                function($) {
-
-                                    return n.stop($, n.item(block(n.fetch($, "parts"), n.iff($, n.eq(n.filter(n.fetch($, "lastseen"), function($_0) {
-                                            return n.geq(fn.position($_0), fn.last($_0));
-                                        }), n.decimal(2.18)),
-
-                                        function($) {
-
-                                            return n.seq(n.fetch($, "ret"), fn.replace(n.fetch($, "head"), n.string(";"), n.string("")), n.string(")"));
-
-                                        },
-
-                                        function($) {
-
-                                            return n.fetch($, "ret");
-
-                                        }))));
-
-                                },
-
-                                function($) {
-
-                                    return $ = n.put($, "next", n.item(n.iff($, fn.empty(n.fetch($, "rest")),
-
-                                            function($) {
-
-                                                return n.seq();
-
-                                            },
-
-                                            function($) {
-
-                                                return n.select(fn.head(n.fetch($, "rest")), function($_0) {
-                                                    return fn.string($_0);
-                                                });
-
-                                            }))),
-
-                                        $ = n.put($, "non", n.item(n.iff($, fn.matches(n.fetch($, "next"), operatorRegexp),
-
-                                            function($) {
-
-                                                return opNum(n.fetch($, "next"));
-
-                                            },
-
-                                            function($) {
-
-                                                return n.integer(0);
-
-                                            }))),
-
-                                        $ = n.put($, "rest", n.item(n.iff($, isArray(n.fetch($, "head"), n.fetch($, "non"), n.fetch($, "next")),
-
-                                            function($) {
-
-                                                return fn.insertBefore(fn.tail(n.fetch($, "rest")), n.integer(1), n.element(n.string("fn:match"), n.seq(n.element(n.string("fn:group"), n.seq(n.attribute(n.string("nr"), n.seq(n.integer(1))), opStr(n.decimal(20.04)))))));
-
-                                            },
-
-                                            function($) {
-
-                                                return n.iff($, n.and(n.geq(n.fetch($, "head"), fns), fn.matches(n.fetch($, "next"), n.string("\\)"))),
-
-                                                    function($) {
-
-                                                        return fn.insertBefore(fn.tail(n.fetch($, "rest")), n.integer(1), n.element(n.string("fn:match"), n.seq(n.element(n.string("fn:group"), n.seq(n.attribute(n.string("nr"), n.seq(n.integer(1))), n.string("(.)"))))));
-
-                                                    },
-
-                                                    function($) {
-
-                                                        return n.fetch($, "rest");
-
-                                                    });
-
-                                            }))),
-
-                                        $ = n.put($, "head", n.item(n.iff($, n.and(fn.empty(n.fetch($, "ret")), n.eq(n.fetch($, "head"), n.string("=#20#01="))),
-
-                                            function($) {
-
-                                                return n.string("=#20#04=");
-
-                                            },
-
-                                            function($) {
-
-                                                return n.fetch($, "head");
-
-                                            }))),
-
-                                        n.iff($, fn.matches(n.fetch($, "head"), operatorRegexp),
-
-                                            function($) {
-
-                                                return n.stop($, n.item(bodyOp(opNum(n.fetch($, "head")), n.fetch($, "next"), n.fetch($, "lastseen"), n.fetch($, "rest"), n.fetch($, "ret"))));
-
-                                            },
-
-                                            function($) {
-
-                                                return n.cont($, n.fetch($, "rest"), n.seq(n.fetch($, "ret"), n.fetch($, "head")), n.fetch($, "lastseen"));
-
-                                            });
-
-                                });
-
-                        });
-
-            });
-    });
-
+ ($.get("lastseen")));
+    }
+    return n.error("err:XPST0017","Function parenCloser called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function ximport() {
+export function body(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==3){
+        $.init($.item("parts"),$.item("ret"),$.item("lastseen"));
+        return $.test(fn.empty($.get("parts"))) ?
 
-    return n.initialize(arguments, [
-        ["parts", null, "item"],
-        ["ret", null, "item"]
-    ], function($) {
+ (fn.concat($.get("ret"),fn.stringJoin(n.forEach(n.filter($.get("lastseen"),function($_0) { return n.geq($_0,n.seq(n.decimal(2.08),n.decimal(2.11),n.decimal(20.07),n.decimal(2.18)));}),n.string(")"))))) :
 
-        return ($ = n.put($, "rest", n.item(fn.subsequence(n.fetch($, "parts"), n.integer(6)))),
+ ($.item("head",n.select(fn.head($.get("parts")),function($_0) { return fn.string($_0);})),
 
-            $ = n.put($, "maybeAt", n.item(n.select(fn.head(n.fetch($, "rest")), function($_0) {
-                return fn.string($_0);
-            }))),
+$.item("rest",fn.tail($.get("parts"))),
 
-            n.stop($, n.item(n.iff($, fn.matches(n.fetch($, "maybeAt"), n.string("at")),
+$.item("lastseen",parenCloser($.get("head"),$.get("lastseen"))),
 
-                function($) {
+$.test(n.geq($.get("head"),n.string("=#25#01="))) ?
 
-                    return block(fn.subsequence(n.fetch($, "rest"), n.integer(3)), n.seq(n.fetch($, "ret"), n.string("core:import($,"), n.select(n.filter(n.fetch($, "parts"), function($_0) {
-                        return n.geq(fn.position($_0), n.integer(3));
-                    }), function($_0) {
-                        return fn.string($_0);
-                    }), n.string(","), n.select(n.filter(n.fetch($, "parts"), function($_0) {
-                        return n.geq(fn.position($_0), n.integer(5));
-                    }), function($_0) {
-                        return fn.string($_0);
-                    }), n.string(","), n.select(n.filter(n.fetch($, "rest"), function($_0) {
-                        return n.geq(fn.position($_0), n.integer(2));
-                    }), function($_0) {
-                        return fn.string($_0);
-                    }), n.string(")")));
+ (comment($.get("rest"),$.get("ret"),$.get("lastseen"))) :
 
-                },
+ ($.test(fn.matches($.get("head"),n.string(";"))) ?
 
-                function($) {
+ (block($.get("parts"),$.get("ret"))) :
 
-                    return block(n.fetch($, "rest"), n.seq(n.fetch($, "ret"), n.string("core:import($,"), n.select(n.filter(n.fetch($, "parts"), function($_0) {
-                        return n.geq(fn.position($_0), n.integer(3));
-                    }), function($_0) {
-                        return fn.string($_0);
-                    }), n.string(","), n.select(n.filter(n.fetch($, "parts"), function($_0) {
-                        return n.geq(fn.position($_0), n.integer(5));
-                    }), function($_0) {
-                        return fn.string($_0);
-                    }), n.string(")")));
+ ($.item("next",$.test(fn.empty($.get("rest"))) ?
 
-                }))));
-    });
+ (n.seq()) :
 
+ (n.select(fn.head($.get("rest")),function($_0) { return fn.string($_0);}))),
+
+$.item("non",$.test(fn.matches($.get("next"),operatorRegexp)) ?
+
+ (opNum($.get("next"))) :
+
+ (n.integer(0))),
+
+$.item("rest",$.test(isArray($.get("head"),$.get("non"),$.get("next"))) ?
+
+ (fn.insertBefore(fn.tail($.get("rest")),n.integer(1),n.element(n.string("fn:match"),n.seq(n.element(n.string("fn:group"),n.seq(n.attribute(n.string("nr"),n.seq(n.integer(1))),opStr(n.decimal(20.04)))))))) :
+
+ ($.test(n.and(n.geq($.get("head"),fns),fn.matches($.get("next"),n.string("\\)")))) ?
+
+ (fn.insertBefore(fn.tail($.get("rest")),n.integer(1),n.element(n.string("fn:match"),n.seq(n.element(n.string("fn:group"),n.seq(n.attribute(n.string("nr"),n.seq(n.integer(1))),n.string("(.)"))))))) :
+
+ ($.get("rest")))),
+
+$.item("head",$.test(n.and(fn.empty($.get("ret")),n.eq($.get("head"),n.string("=#20#01=")))) ?
+
+ (n.string("=#20#04=")) :
+
+ ($.get("head"))),
+
+$.test(fn.matches($.get("head"),operatorRegexp)) ?
+
+ (bodyOp(opNum($.get("head")),$.get("next"),$.get("lastseen"),$.get("rest"),$.get("ret"))) :
+
+ (body($.get("rest"),fn.concat($.get("ret"),$.get("head")),$.get("lastseen"))))));
+    }
+    return n.error("err:XPST0017","Function body called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function block() {
+export function ximport(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==2){
+        $.init($.item("parts"),$.item("ret"));
+        return ($.item("rest",fn.subsequence($.get("parts"),n.integer(6))),
 
-    return n.initialize(arguments, [
-        ["parts", null, "item"],
-        ["ret", null, "item"]
-    ], function($) {
+$.item("maybeAt",n.select(fn.head($.get("rest")),function($_0) { return fn.string($_0);})),
 
-        return n.iff($, fn.empty(n.fetch($, "parts")),
+n.item($.test(fn.matches($.get("maybeAt"),n.string("at"))) ?
 
-            function($) {
+ (block(fn.subsequence($.get("rest"),n.integer(3)),fn.concat($.get("ret"),n.string("core:import($,"),n.select(n.filter($.get("parts"),function($_0) { return n.geq(fn.position($_0),n.integer(3));}),function($_0) { return fn.string($_0);}),n.string(","),n.select(n.filter($.get("parts"),function($_0) { return n.geq(fn.position($_0),n.integer(5));}),function($_0) { return fn.string($_0);}),n.string(","),n.select(n.filter($.get("rest"),function($_0) { return n.geq(fn.position($_0),n.integer(2));}),function($_0) { return fn.string($_0);}),n.string(")")))) :
 
-                return n.stop($, n.item(n.fetch($, "ret")));
-
-            },
-
-            function($) {
-
-                return $ = n.put($, "val", n.item(n.select(fn.head(n.fetch($, "parts")), function($_0) {
-                        return fn.string($_0);
-                    }))),
-
-                    $ = n.put($, "rest", n.item(fn.tail(n.fetch($, "parts")))),
-
-                    n.iff($, fn.matches(n.fetch($, "val"), operatorRegexp),
-
-                        function($) {
-
-                            return $ = n.put($, "no", n.item(opNum(n.fetch($, "val")))),
-
-                                n.stop($, n.item(n.iff($, n.eq(n.fetch($, "no"), n.decimal(2.14)),
-
-                                    function($) {
-
-                                        return xversion(n.fetch($, "rest"), n.fetch($, "ret"));
-
-                                    },
-
-                                    function($) {
-
-                                        return n.iff($, n.eq(n.fetch($, "no"), n.decimal(2.16)),
-
-                                            function($) {
-
-                                                return xmodule(n.fetch($, "rest"), n.fetch($, "ret"));
-
-                                            },
-
-                                            function($) {
-
-                                                return n.iff($, n.eq(n.fetch($, "no"), n.decimal(2.17)),
-
-                                                    function($) {
-
-                                                        return annot(n.fetch($, "rest"), n.fetch($, "ret"), n.string(""));
-
-                                                    },
-
-                                                    function($) {
-
-                                                        return n.iff($, n.eq(n.fetch($, "no"), n.decimal(2.19)),
-
-                                                            function($) {
-
-                                                                return ximport(n.fetch($, "rest"), n.fetch($, "ret"));
-
-                                                            },
-
-                                                            function($) {
-
-                                                                return body(n.fetch($, "parts"), n.fetch($, "ret"), n.seq());
-
-                                                            });
-
-                                                    });
-
-                                            });
-
-                                    })));
-
-                        },
-
-                        function($) {
-
-                            return n.iff($, fn.matches(n.fetch($, "val"), n.string(";")),
-
-                                function($) {
-
-                                    return n.iff($, fn.empty(n.fetch($, "rest")),
-
-                                        function($) {
-
-                                            return n.stop($, n.item(n.fetch($, "ret")));
-
-                                        },
-
-                                        function($) {
-
-                                            return n.cont($, n.fetch($, "rest"), n.seq(n.fetch($, "ret"), n.string(",")));
-
-                                        });
-
-                                },
-
-                                function($) {
-
-                                    return n.stop($, n.item(body(n.fetch($, "parts"), n.fetch($, "ret"), n.seq())));
-
-                                });
-
-                        });
-
-            });
-    });
-
+ (block($.get("rest"),fn.concat($.get("ret"),n.string("core:import($,"),n.select(n.filter($.get("parts"),function($_0) { return n.geq(fn.position($_0),n.integer(3));}),function($_0) { return fn.string($_0);}),n.string(","),n.select(n.filter($.get("parts"),function($_0) { return n.geq(fn.position($_0),n.integer(5));}),function($_0) { return fn.string($_0);}),n.string(")"))))));
+    }
+    return n.error("err:XPST0017","Function ximport called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function toOp() {
+export function block(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==2){
+        $.init($.item("parts"),$.item("ret"));
+        return $.test(fn.empty($.get("parts"))) ?
 
-    return n.initialize(arguments, [
-        ["opnum", null, "item"]
-    ], function($) {
+ ($.get("ret")) :
 
-        return n.stop($, n.item(n.iff($, map.contains(operatorMap, n.fetch($, "opnum")),
+ ($.item("val",n.select(fn.head($.get("parts")),function($_0) { return fn.string($_0);})),
 
-            function($) {
+$.item("rest",fn.tail($.get("parts"))),
 
-                return n.concat(n.string("core:"), n.call(operatorMap, n.fetch($, "opnum")));
+$.test(fn.matches($.get("val"),operatorRegexp)) ?
 
-            },
+ ($.item("no",opNum($.get("val"))),
 
-            function($) {
+$.test(n.eq($.get("no"),n.decimal(2.14))) ?
 
-                return n.concat(n.string("core:"), fn.replace(n.call(operators, n.fetch($, "opnum")), n.string(" "), n.string("-")));
+ (xversion($.get("rest"),$.get("ret"))) :
 
-            })));
-    });
+ ($.test(n.eq($.get("no"),n.decimal(2.16))) ?
 
+ (xmodule($.get("rest"),$.get("ret"))) :
+
+ ($.test(n.eq($.get("no"),n.decimal(2.17))) ?
+
+ (annot($.get("rest"),$.get("ret"),n.string(""))) :
+
+ ($.test(n.eq($.get("no"),n.decimal(2.19))) ?
+
+ (ximport($.get("rest"),$.get("ret"))) :
+
+ (body($.get("parts"),$.get("ret"),n.seq())))))) :
+
+ ($.test(fn.matches($.get("val"),n.string(";"))) ?
+
+ ($.test(fn.empty($.get("rest"))) ?
+
+ ($.get("ret")) :
+
+ (block($.get("rest"),fn.concat($.get("ret"),n.string(","))))) :
+
+ (body($.get("parts"),$.get("ret"),n.seq()))));
+    }
+    return n.error("err:XPST0017","Function block called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function fromOp() {
+export function toOp(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==1){
+        $.init($.item("opnum"));
+        return n.item($.test(map.contains(operatorMap,$.get("opnum"))) ?
 
-    return n.initialize(arguments, [
-        ["op", null, "item"]
-    ], function($) {
+ (n.concat(n.string("core:"),n.call(operatorMap,$.get("opnum")))) :
 
-        return ($ = n.put($, "k", n.item(map.keys(operatorsI))),
-
-            $ = n.put($, "i", n.item(n.filter(fn.indexOf(n.fetch($, "k"), fn.replace(n.fetch($, "op"), n.string("^core:"), n.string(""))), function($_0) {
-                return n.geq(fn.position($_0), n.integer(1));
-            }))),
-
-            n.stop($, n.item(n.decimal(n.call(operatorsI, n.filter(n.fetch($, "k"), function($_0) {
-                return n.geq(fn.position($_0), n.fetch($, "i"));
-            }))))));
-    });
-
+ (n.concat(n.string("core:"),fn.replace(n.call(operators,$.get("opnum")),n.string(" "),n.string("-")))));
+    }
+    return n.error("err:XPST0017","Function toOp called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function rename() {
+export function fromOp(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==1){
+        $.init($.item("op"));
+        return ($.item("k",map.keys(operatorsI)),
 
-    return n.initialize(arguments, [
-        ["a", null, "item"],
-        ["fn", null, "item"]
-    ], function($) {
+$.item("i",n.filter(fn.indexOf($.get("k"),fn.replace($.get("op"),n.string("^core:"),n.string(""))),function($_0) { return n.geq(fn.position($_0),n.integer(1));})),
 
-        return array.forEach(n.fetch($, "a"), function() {
-
-            return n.initialize(arguments, [
-                ["t", null, "item"]
-            ], function($) {
-
-                return n.stop($, n.item(n.iff($, n.instanceOf(n.fetch($, "t"), Map),
-
-                    function($) {
-
-                        return n.map(n.seq(n.array(n.seq(n.string("name"), n.call(n.fetch($, "fn"), n.call(n.fetch($, "t"), n.string("name"))))), n.array(n.seq(n.string("args"), n.cont($, n.call(n.fetch($, "t"), n.string("args")), n.fetch($, "fn")))), n.array(n.seq(n.string("suffix"), n.call(n.fetch($, "t"), n.string("suffix"))))));
-
-                    },
-
-                    function($) {
-
-                        return n.stop($, n.item(n.fetch($, "t")));
-
-                    })));
-            });
-
-        });
-    });
-
+n.item(n.decimal(n.call(operatorsI,n.filter($.get("k"),function($_0) { return n.geq(fn.position($_0),$.get("i"));})))));
+    }
+    return n.error("err:XPST0017","Function fromOp called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function escapeForRegex() {
-
-    return n.initialize(arguments, [
-        ["key", null, "item"]
-    ], function($) {
-
-        return ($ = n.put($, "arg", n.item(n.call(operators, n.fetch($, "key")))),
-
-            $ = n.put($, "pre", n.item(n.string("(^|[\\s,\\(\\);\\[\\]]+)"))),
-
-            n.stop($, n.string(n.iff($, fn.matches(n.fetch($, "arg"), n.string("\\p{L}+")),
-
-                function($) {
-
-                    return n.iff($, n.eq(n.fetch($, "key"), n.decimal(21.06)),
-
-                        function($) {
-
-                            return n.concat(n.concat(n.concat(n.concat(n.fetch($, "pre"), n.fetch($, "arg")), n.string("([\\s")), ncname), n.string(":]*\\s*\\((\\$|\\)))"));
-
-                        },
-
-                        function($) {
-
-                            return n.iff($, n.eq(fn.round(n.fetch($, "key")), n.integer(21)),
-
-                                function($) {
-
-                                    return n.concat(n.concat(n.concat(n.concat(n.fetch($, "pre"), n.fetch($, "arg")), n.string("([\\s\\$")), ncname), n.string(",:]*=#20#06)"));
-
-                                },
-
-                                function($) {
-
-                                    return n.iff($, n.or(n.eq(n.fetch($, "key"), n.decimal(2.04)), n.eq(fn.round(n.fetch($, "key")), n.integer(22))),
-
-                                        function($) {
-
-                                            return n.concat(n.concat(n.fetch($, "pre"), n.fetch($, "arg")), n.string("(\\()"));
-
-                                        },
-
-                                        function($) {
-
-                                            return n.iff($, n.eq(fn.round(n.fetch($, "key")), n.integer(24)),
-
-                                                function($) {
-
-                                                    return n.concat(n.concat(n.fetch($, "pre"), n.fetch($, "arg")), n.string("(\\s)"));
-
-                                                },
-
-                                                function($) {
-
-                                                    return n.iff($, n.geq(n.fetch($, "arg"), n.string("if")),
-
-                                                        function($) {
-
-                                                            return n.concat(n.concat(n.fetch($, "pre"), n.fetch($, "arg")), n.string("(\\s?)"));
-
-                                                        },
-
-                                                        function($) {
-
-                                                            return n.iff($, n.geq(n.fetch($, "arg"), n.string("then")),
-
-                                                                function($) {
-
-                                                                    return n.concat(n.concat(n.string("\\)(\\s*)"), n.fetch($, "arg")), n.string("(\\s?)"));
-
-                                                                },
-
-                                                                function($) {
-
-                                                                    return n.concat(n.concat(n.string("(^|\\s)"), n.fetch($, "arg")), n.string("(\\s|$)"));
-
-                                                                });
-
-                                                        });
-
-                                                });
-
-                                        });
-
-                                });
-
-                        });
-
-                },
-
-                function($) {
-
-                    return $ = n.put($, "arg", n.item(fn.replace(n.fetch($, "arg"), n.string("(\\.|\\[|\\]|\\\\|\\||\\-|\\^|\\$|\\?|\\*|\\+|\\{|\\}|\\(|\\))"), n.string("\\\\$1")))),
-
-                        n.iff($, n.eq(n.fetch($, "key"), n.integer(26)),
-
-                            function($) {
-
-                                return n.concat(n.concat(n.string("(\\s?)"), n.fetch($, "arg")), n.string("(\\s*[^\\p{L}])"));
-
-                            },
-
-                            function($) {
-
-                                return n.iff($, n.eq(n.fetch($, "key"), n.decimal(2.10)),
-
-                                    function($) {
-
-                                        return n.string("(\\s?):\\s*=([^#])");
-
-                                    },
-
-                                    function($) {
-
-                                        return n.iff($, n.geq(n.fetch($, "key"), n.seq(n.decimal(8.02), n.decimal(17.02))),
-
-                                            function($) {
-
-                                                return n.concat(n.concat(n.fetch($, "pre"), n.fetch($, "arg")), n.string("([\\s\\p{N}])?"));
-
-                                            },
-
-                                            function($) {
-
-                                                return n.iff($, n.geq(n.fetch($, "key"), n.seq(n.decimal(8.01), n.decimal(9.01), n.decimal(20.03))),
-
-                                                    function($) {
-
-                                                        return n.concat(n.concat(n.string("([^/])"), n.fetch($, "arg")), n.string("(\\s*[^,\\)\\{])"));
-
-                                                    },
-
-                                                    function($) {
-
-                                                        return n.concat(n.concat(n.string("(\\s?)"), n.fetch($, "arg")), n.string("(\\s?)"));
-
-                                                    });
-
-                                            });
-
-                                    });
-
-                            });
-
-                }))));
-    });
-
+export function rename(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==2){
+        $.init($.item("a"),$.item("fn"));
+        return array.forEach($.get("a"),function(...a){
+    var l = a.length,
+        $ = n.frame(a);
+    if(l==1){
+        $.init($.item("t"));
+        return n.item($.test(n.instanceOf($.get("t"),Map)) ?
+
+ (n.map(n.seq(n.pair(n.string("name"),n.call($.get("fn"),n.call($.get("t"),n.string("name")))),n.pair(n.string("args"),rename(n.call($.get("t"),n.string("args")),$.get("fn"))),n.pair(n.string("suffix"),n.call($.get("t"),n.string("suffix")))))) :
+
+ ($.get("t")));
+    }
+    return n.error("err:XPST0017","Anonymous function called with "+l+" arguments doesn't match any of the known signatures.");
+});
+    }
+    return n.error("err:XPST0017","Function rename called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function unaryOp() {
+export function escapeForRegex(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==1){
+        $.init($.item("key"));
+        return ($.item("arg",n.call(operators,$.get("key"))),
 
-    return n.initialize(arguments, [
-        ["op", null, "item"]
-    ], function($) {
+$.item("pre",n.string("(^|[\\s,\\(\\);\\[\\]]+)")),
 
-        return n.stop($, n.item(opStr(n.add(opNum(n.fetch($, "op")), n.integer(9)))));
-    });
+n.string($.test(fn.matches($.get("arg"),n.string("\\p{L}+"))) ?
 
+ ($.test(n.eq($.get("key"),n.decimal(2.17))) ?
+
+ (n.concat(n.concat(n.string("(\\s?|;?)"),$.get("arg")),n.string("(\\s?)"))) :
+
+ ($.test(n.eq($.get("key"),n.decimal(21.06))) ?
+
+ (n.concat(n.concat(n.concat(n.concat($.get("pre"),$.get("arg")),n.string("([\\s")),ncname),n.string(":]*\\s*\\((\\$|\\)))"))) :
+
+ ($.test(n.eq(fn.round($.get("key")),n.integer(21))) ?
+
+ (n.concat(n.concat(n.concat(n.concat($.get("pre"),$.get("arg")),n.string("([\\s\\$")),ncname),n.string(",:]*=#20#06)"))) :
+
+ ($.test(n.or(n.eq($.get("key"),n.decimal(2.04)),n.eq(fn.round($.get("key")),n.integer(22)))) ?
+
+ (n.concat(n.concat($.get("pre"),$.get("arg")),n.string("(\\()"))) :
+
+ ($.test(n.eq(fn.round($.get("key")),n.integer(24))) ?
+
+ (n.concat(n.concat($.get("pre"),$.get("arg")),n.string("(\\s)"))) :
+
+ ($.test(n.geq($.get("arg"),n.string("if"))) ?
+
+ (n.concat(n.concat($.get("pre"),$.get("arg")),n.string("(\\s?)"))) :
+
+ ($.test(n.geq($.get("arg"),n.string("then"))) ?
+
+ (n.concat(n.concat(n.string("\\)(\\s*)"),$.get("arg")),n.string("(\\s?)"))) :
+
+ (n.concat(n.concat(n.string("(^|\\s)"),$.get("arg")),n.string("(\\s|$)")))))))))) :
+
+ ($.item("arg",fn.replace($.get("arg"),n.string("(\\.|\\[|\\]|\\\\|\\||\\-|\\^|\\$|\\?|\\*|\\+|\\{|\\}|\\(|\\))"),n.string("\\\\$1"))),
+
+$.test(n.eq($.get("key"),n.integer(26))) ?
+
+ (n.concat(n.concat(n.string("(\\s?)"),$.get("arg")),n.string("(\\s*[^\\p{L}])"))) :
+
+ ($.test(n.eq($.get("key"),n.decimal(2.10))) ?
+
+ (n.string("(\\s?):\\s*=([^#])")) :
+
+ ($.test(n.geq($.get("key"),n.seq(n.decimal(8.02),n.decimal(17.02)))) ?
+
+ (n.concat(n.concat($.get("pre"),$.get("arg")),n.string("([\\s\\p{N}])?"))) :
+
+ ($.test(n.geq($.get("key"),n.seq(n.decimal(8.01),n.decimal(9.01),n.decimal(20.03)))) ?
+
+ (n.concat(n.concat(n.string("([^/])"),$.get("arg")),n.string("(\\s*[^,\\)\\{])"))) :
+
+ (n.concat(n.concat(n.string("(\\s?)"),$.get("arg")),n.string("(\\s?)")))))))));
+    }
+    return n.error("err:XPST0017","Function escapeForRegex called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function opInt() {
-
-    return n.initialize(arguments, [
-        ["op", null, "item"]
-    ], function($) {
-
-        return n.stop($, n.item(n.decimal(fn.replace(n.fetch($, "op"), n.string("^=#(\\p{N}+)#?\\p{N}*=$"), n.string("$1")))));
-    });
-
+export function unaryOp(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==1){
+        $.init($.item("op"));
+        return n.item(opStr(n.add(opNum($.get("op")),n.integer(9))));
+    }
+    return n.error("err:XPST0017","Function unaryOp called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function opNum() {
-
-    return n.initialize(arguments, [
-        ["op", null, "item"]
-    ], function($) {
-
-        return n.stop($, n.decimal(n.decimal(fn.replace(n.fetch($, "op"), n.string("^=#(\\p{N}+)#?(\\p{N}*)=$"), n.string("$1.$2")))));
-    });
-
+export function opInt(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==1){
+        $.init($.item("op"));
+        return n.item(n.decimal(fn.replace($.get("op"),n.string("^=#(\\p{N}+)#?\\p{N}*=$"),n.string("$1"))));
+    }
+    return n.error("err:XPST0017","Function opInt called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function opStr() {
-
-    return n.initialize(arguments, [
-        ["op", null, "item"]
-    ], function($) {
-
-        return n.stop($, n.item(fn.concat(n.string("=#"), fn.replace(fn.string(n.fetch($, "op")), n.string("\\."), n.string("#")), n.string("="))));
-    });
-
+export function opNum(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==1){
+        $.init($.item("op"));
+        return n.decimal(n.decimal(fn.replace($.get("op"),n.string("^=#(\\p{N}+)#?(\\p{N}*)=$"),n.string("$1.$2"))));
+    }
+    return n.error("err:XPST0017","Function opNum called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-export function operatorPrecedence() {
+export function opStr(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==1){
+        $.init($.item("op"));
+        return n.item(fn.concat(n.string("=#"),fn.replace(fn.string($.get("op")),n.string("\\."),n.string("#")),n.string("=")));
+    }
+    return n.error("err:XPST0017","Function opStr called with "+l+" arguments doesn't match any of the known signatures.");
+}
 
-    return n.initialize(arguments, [
-        ["val", null, "item"],
-        ["operator", null, "item"],
-        ["ret", null, "item"]
-    ], function($) {
+export function operatorPrecedence(... a) {
+	var l = a.length,
+        $ = n.frame(a);
+    if(l==3){
+        $.init($.item("val"),$.item("operator"),$.item("ret"));
+        return ($.item("rev",array.reverse($.get("ret"))),
 
-        return ($ = n.put($, "rev", n.item(array.reverse(n.fetch($, "ret")))),
+$.item("last",array.head($.get("rev"))),
 
-            $ = n.put($, "last", n.item(array.head(n.fetch($, "rev")))),
+$.item("hasPrecedingOp",n.and(n.instanceOf($.get("last"),Map),fn.matches(n.call($.get("last"),n.string("name")),operatorRegexp))),
 
-            $ = n.put($, "hasPrecedingOp", n.item(n.and(n.instanceOf(n.fetch($, "last"), Map), fn.matches(n.call(n.fetch($, "last"), n.string("name")), operatorRegexp)))),
+$.item("isUnaryOp",n.and(n.geq(opInt($.get("operator")),n.integer(8)),n.seq(n.or(fn.empty($.get("last")),n.seq(n.and(n.and($.get("hasPrecedingOp"),n.instanceOf(n.call($.get("last"),n.string("suffix")),n.boolean())),n.geq(n.call($.get("last"),n.string("suffix")),fn.false()))))))),
 
-            $ = n.put($, "isUnaryOp", n.item(n.and(n.geq(opInt(n.fetch($, "operator")), n.integer(8)), n.seq(n.or(fn.empty(n.fetch($, "last")), n.seq(n.and(n.and(n.fetch($, "hasPrecedingOp"), n.instanceOf(n.call(n.fetch($, "last"), n.string("suffix")), n.boolean())), n.geq(n.call(n.fetch($, "last"), n.string("suffix")), fn.false())))))))),
+$.item("operator",$.test($.get("isUnaryOp")) ?
 
-            $ = n.put($, "operator", n.item(n.iff($, n.fetch($, "isUnaryOp"),
+ (unaryOp($.get("operator"))) :
 
-                function($) {
+ ($.get("operator"))),
 
-                    return unaryOp(n.fetch($, "operator"));
+$.item("preceeds",n.and($.get("hasPrecedingOp"),n.ggt(opInt($.get("operator")),opInt(n.call($.get("last"),n.string("name")))))),
 
-                },
+$.item("name",$.test($.get("preceeds")) ?
 
-                function($) {
+ (n.call($.get("last"),n.string("name"))) :
 
-                    return n.fetch($, "operator");
+ ($.get("operator"))),
 
-                }))),
+$.item("args",$.test($.get("preceeds")) ?
 
-            $ = n.put($, "preceeds", n.item(n.and(n.fetch($, "hasPrecedingOp"), n.ggt(opInt(n.fetch($, "operator")), opInt(n.call(n.fetch($, "last"), n.string("name"))))))),
+ (function($_0) { return $.item("argsize",array.size(n.call($.get("last"),n.string("args")))),
 
-            $ = n.put($, "name", n.item(n.iff($, n.fetch($, "preceeds"),
+$.item("nargs",$.test($.get("isUnaryOp")) ?
 
-                function($) {
+ (n.array(n.seq())) :
 
-                    return n.call(n.fetch($, "last"), n.string("name"));
+ (n.filter(n.call(n.string("core:geq"),n.seq(fn.position($_0),n.call($.get("last"),n.string("args")))),n.seq(n.integer(2))))),
 
-                },
+$.item("nargs",$.test($.get("val")) ?
 
-                function($) {
+ (array.append($.get("nargs"),$.get("val"))) :
 
-                    return n.fetch($, "operator");
+ ($.get("nargs"))),
 
-                }))),
+$.test(n.and(n.ggt($.get("argsize"),n.integer(1)),$.get("isUnaryOp"))) ?
 
-            $ = n.put($, "args", n.item(n.iff($, n.fetch($, "preceeds"),
+ ($.item("pre",n.call(n.call(n.string("core:call"),n.seq($.get("last"),n.seq(n.string("args")))),n.seq(n.integer(2)))),
 
-                function($) {
+n.array(n.seq(n.call($.get("last"),n.seq(n.string("args"))),n.seq(n.integer(1)),n.map(n.seq(n.pair(n.string("name"),n.call($.get("pre"),n.string("name"))),n.pair(n.string("args"),array.append(n.call($.get("pre"),n.string("args")),n.map(n.seq(n.pair(n.string("name"),$.get("operator")),n.pair(n.string("args"),$.get("nargs")),n.pair(n.string("suffix"),n.string("")))))),n.pair(n.string("suffix"),n.string(""))))))) :
 
-                    return function($_0) {
-                        return $ = n.put($, "argsize", n.item(array.size(n.call(n.fetch($, "last"), n.string("args"))))),
+ (n.array(n.seq(n.call($.get("last"),n.seq(n.string("args"))),n.seq(n.integer(1)),n.map(n.seq(n.pair(n.string("name"),$.get("operator")),n.pair(n.string("args"),$.get("nargs")),n.pair(n.string("suffix"),n.string("")))))));}) :
 
-                            $ = n.put($, "nargs", n.item(n.iff($, n.fetch($, "isUnaryOp"),
+ ($.item("nargs",$.test(fn.empty($.get("last"))) ?
 
-                                function($) {
+ (n.array(n.seq())) :
 
-                                    return n.array(n.seq());
+ (n.array(n.seq($.get("last"))))),
 
-                                },
+$.test($.get("val")) ?
 
-                                function($) {
+ (array.append($.get("nargs"),$.get("val"))) :
 
-                                    return n.filter(n.geq(fn.position($_0), n.call(n.fetch($, "last"), n.string("args"))), n.seq(n.integer(2)));
+ ($.get("nargs")))),
 
-                                }))),
-
-                            $ = n.put($, "nargs", n.item(n.iff($, n.fetch($, "val"),
-
-                                function($) {
-
-                                    return array.append(n.fetch($, "nargs"), n.fetch($, "val"));
-
-                                },
-
-                                function($) {
-
-                                    return n.fetch($, "nargs");
-
-                                }))),
-
-                            n.iff($, n.and(n.ggt(n.fetch($, "argsize"), n.integer(1)), n.fetch($, "isUnaryOp")),
-
-                                function($) {
-
-                                    return $ = n.put($, "pre", n.item(n.call(n.call(n.fetch($, "last"), n.seq(n.string("args"))), n.seq(n.integer(2))))),
-
-                                        n.array(n.seq(n.call(n.fetch($, "last"), n.seq(n.string("args"))), n.seq(n.integer(1)), n.map(n.seq(n.array(n.seq(n.string("name"), n.call(n.fetch($, "pre"), n.string("name")))), n.array(n.seq(n.string("args"), array.append(n.call(n.fetch($, "pre"), n.string("args")), n.map(n.seq(n.array(n.seq(n.string("name"), n.fetch($, "operator"))), n.array(n.seq(n.string("args"), n.fetch($, "nargs"))), n.array(n.seq(n.string("suffix"), n.string("")))))))), n.array(n.seq(n.string("suffix"), n.string("")))))));
-
-                                },
-
-                                function($) {
-
-                                    return n.array(n.seq(n.call(n.fetch($, "last"), n.seq(n.string("args"))), n.seq(n.integer(1)), n.map(n.seq(n.array(n.seq(n.string("name"), n.fetch($, "operator"))), n.array(n.seq(n.string("args"), n.fetch($, "nargs"))), n.array(n.seq(n.string("suffix"), n.string("")))))));
-
-                                });
-                    };
-
-                },
-
-                function($) {
-
-                    return $ = n.put($, "nargs", n.item(n.iff($, fn.empty(n.fetch($, "last")),
-
-                            function($) {
-
-                                return n.array(n.seq());
-
-                            },
-
-                            function($) {
-
-                                return n.array(n.seq(n.fetch($, "last")));
-
-                            }))),
-
-                        n.iff($, n.fetch($, "val"),
-
-                            function($) {
-
-                                return array.append(n.fetch($, "nargs"), n.fetch($, "val"));
-
-                            },
-
-                            function($) {
-
-                                return n.fetch($, "nargs");
-
-                            });
-
-                }))),
-
-            n.stop($, n.item(array.append(array.reverse(array.tail(n.fetch($, "rev"))), n.map(n.seq(n.array(n.seq(n.string("name"), n.fetch($, "name"))), n.array(n.seq(n.string("args"), n.fetch($, "args"))), n.array(n.seq(n.string("suffix"), fn.exists(n.fetch($, "val"))))))))));
-    });
-
+n.item(array.append(array.reverse(array.tail($.get("rev"))),n.map(n.seq(n.pair(n.string("name"),$.get("name")),n.pair(n.string("args"),$.get("args")),n.pair(n.string("suffix"),fn.exists($.get("val"))))))));
+    }
+    return n.error("err:XPST0017","Function operatorPrecedence called with "+l+" arguments doesn't match any of the known signatures.");
 }

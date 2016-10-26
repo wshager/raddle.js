@@ -1,4 +1,4 @@
-import { seq, toSeq, _isSeq, _first, _boolean } from "xvtype";
+import { seq, toSeq, _isSeq, _first, _boolean, text, element, attribute, minus, instanceOf } from "xvtype";
 
 import {
     concat, forEach, filter, foldLeft, foldRight, error,
@@ -8,7 +8,6 @@ import {
 
 import { array, _isArray } from "xvarray";
 import { map, entry, _isMap } from "xvmap";
-import { element, attribute, text } from "xvnode";
 
 // mix in bools you shall!
 const fn = booleans;
@@ -87,6 +86,18 @@ class Context {
     number(k,v=null){
         return this.let(k,v,number);
     }
+    array(k, v = null){
+        return this.let(k, v);
+    }
+    map(k, v = null){
+        return this.let(k, v);
+    }
+    element(k, v = null){
+        return this.let(k, v);
+    }
+    attribute(k, v = null){
+        return this.let(k, v);
+    }
     get(k){
         if(k !== undefined) return this._frame[k];
         var ret = this._frame[0];
@@ -122,11 +133,13 @@ class Context {
     }
 }
 
-export function frame(args){
-	var f = function(selector, context){
+export function frame(...a){
+    var args = a.pop();
+    var f = function (selector, context) {
         //return n.query(selector,context);
     };
     f.__proto__ = new Context(args);
+    if(a.length>0 && a[0] !== undefined) f._frame = a[0]._frame;
     return f;
 }
 
@@ -138,22 +151,11 @@ export function call($fn,...args){
     return seq(fn.apply(null,args));
 }
 
-// TODO mix logic from xvtype into xvop
-export function and($a,$b){
-    return _boolean($a) && _boolean($b);
-}
-export function or($a, $b){
-    return _boolean($a) || _boolean($b);
-}
-
 export const pair = entry;
 
 export {
-    //stringJoin, concat, analyzeString, tokenize, substring, stringToCodepoints, codepointsToString, matches, replace, stringLength,
-    //subsequence, remove, head, tail, count, reverse, insertBefore, forEach, filter, foldLeft, foldRight,
     seq, toSeq, _first, _isSeq, filter, forEach, foldLeft, foldRight, item, string, number, boolean, integer, double, float, decimal, data, to, array, map, error, concat,
-    element, attribute, text
-    //doc, collection, parse, name, position, last, not, apply, sort, round, booleans
+    element, attribute, text, minus, instanceOf
 };
 
 export * from "xvop";

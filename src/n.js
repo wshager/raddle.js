@@ -1,7 +1,9 @@
 import { seq, toSeq, _isSeq, _first, _boolean, text, element, attribute, minus, instanceOf } from "xvtype";
 
+import * as xverr from "xverr";
+
 import {
-    concat, forEach, filter, foldLeft, foldRight, error,
+    concat, forEach, filter, foldLeft, foldRight,
     item, string, number, boolean, integer, double, float, decimal, data, to,
     doc, collection, parse, name, position, last, not, apply, sort, round, booleans
 } from "xvfn";
@@ -24,7 +26,7 @@ class Context {
         var l = a.length;
         this._arity = l - 1;
         if (this._arity !== this._args.length) {
-            return error("err:XPST0017");
+            return xverr.error("err:XPST0017");
         }
         var i = 0;
         for (var k in this._params) {
@@ -46,7 +48,7 @@ class Context {
         var l = a.length;
         this._arity = l;
         if (this._arity !== this._args.length) {
-            return error("err:XPST0017");
+            return xverr.error("err:XPST0017");
         }
         var i = 0;
         for (var k in this._params) {
@@ -153,8 +155,15 @@ export function call($fn,...args){
 
 export const pair = entry;
 
+export function error(fn,l){
+    if(typeof fn == "function"){
+        return xverr.error("err:XPST0017", "Function " + fn.name + " did not receive the correct number of arguments.");
+    }
+    return xverr.error("err:XPST0017", "Anonymous function did not receive the correct number of arguments.");
+}
+
 export {
-    seq, toSeq, _first, _isSeq, filter, forEach, foldLeft, foldRight, item, string, number, boolean, integer, double, float, decimal, data, to, array, map, error, concat,
+    seq, toSeq, _first, _isSeq, filter, forEach, foldLeft, foldRight, item, string, number, boolean, integer, double, float, decimal, data, to, array, map, concat,
     element, attribute, text, minus, instanceOf
 };
 

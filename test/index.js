@@ -6,10 +6,13 @@ var n = require("../lib/n");
 
 var xqc = require("../lib/xq-compat");
 
-var au = require("../lib/array-util");
+var a = require("../lib/array-util");
+
+var array =  require("xvarray");
 
 var rdl = require("../lib/raddle");
 
+var js = require("../lib/js");
 
 for(var k in fn.booleans) fn[k] = fn.booleans[k];
 
@@ -36,7 +39,11 @@ function x2(... a) {
     return fn.error("err:XPST0017","Function x called with "+l+" arguments doesn't match any of the known signatures.");
 }
 
-
-console.log(rdl.parse("[1,2,3]",n.map({
+var params = n.map({
     "$compat":"xquery"
-})).first());
+});
+var tree = rdl.parse(`declare function local:test($c){
+    7 + 1
+};`,params);
+console.log(tree);
+//console.log(js.transpile(tree,params));

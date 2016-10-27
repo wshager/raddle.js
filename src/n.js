@@ -147,10 +147,17 @@ export function frame(...a){
 
 export function call($fn,...args){
     let fn = _first($fn);
-    if(_isMap(fn) || _isArray(fn)) {
+    if (_isMap(fn)) {
         return seq(fn.get(_first(args[0])));
     }
-    return seq(fn.apply(null,args));
+    if(_isArray(fn)){
+        return seq(fn.get(_first(args[0])-1));
+    }
+    try {
+        return seq(fn.apply(null, args));
+    } catch(e) {
+        //console.log(e);
+    }
 }
 
 export const pair = entry;

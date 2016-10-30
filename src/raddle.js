@@ -30,6 +30,7 @@ export function mapPut$3(...$_a) {
         .item("key")
         .item("val");
     return map.new(n.seq($("map"), n.map(n.seq(n.pair($("key"), $("val"))))));
+
 }
 
 export function parseStrings$3(...$_a) {
@@ -53,6 +54,7 @@ export function parseStrings$3(...$_a) {
                 });
             }
         })($.frame());
+
     })));
     $ = $("string", n.call($("normalizer"), $("string"), $("params")));
     return array.join(fn.forEach(fn.tokenize($("string"), n.string(";")), function(...$_a) {
@@ -69,6 +71,7 @@ export function parseStrings$3(...$_a) {
                     return $("name");
                 }
             })($.frame());
+
         });
 
     }));
@@ -80,12 +83,14 @@ export function normalizeQuery$2(...$_a) {
         .string("query")
         .item("params");
     return fn.replace($("query"), n.string("&#9;|&#10;|&#13;"), n.string(""));
+
 }
 
 export function parse$1(...$_a) {
     var $ = n.frame($_a)
         .string("query");
     return parse($("query"), n.map(n.seq()));
+
 }
 
 export function parse$2(...$_a) {
@@ -99,11 +104,13 @@ export function parse$2(...$_a) {
                     .item("query")
                     .item("params");
                 return normalizeQuery(xqc.normalizeQuery($("query"), $("params")), $("params"));
+
             };
         } else {
             return normalizeQuery;
         }
     })($.frame()), $("params"));
+
 }
 
 export function getIndexFromTokens$1(...$_a) {
@@ -120,13 +127,14 @@ export function getIndexFromTokens$1(...$_a) {
         }));
         return ($ => {
             if ($.test($.test(fn.exists($("x"))) && $.test(n.glt($("x"), $("y"))))) {
-                return n.seq(n.seq());
+                return n.seq();
             } else {
                 return n.add($("y"), n.integer(1));
             }
         })($.frame());
 
     });
+
 }
 
 export function getIndex$1(...$_a) {
@@ -153,12 +161,14 @@ export function getIndex$1(...$_a) {
     })), function($_0) {
         return n.geq(fn.position($_0), n.integer(1));
     });
+
 }
 
 export function clipString$1(...$_a) {
     var $ = n.frame($_a)
         .string("str");
     return fn.substring($("str"), n.integer(2), n.subtract(fn.stringLength($("str")), n.integer(2)));
+
 }
 
 export function valueFromStrings$2(...$_a) {
@@ -172,6 +182,7 @@ export function valueFromStrings$2(...$_a) {
             return $("val");
         }
     })($.frame());
+
 }
 
 export function appendOrNest$5(...$_a) {
@@ -220,7 +231,7 @@ export function appendOrNest$5(...$_a) {
                                 if ($.test($("hasPrecedingOp"))) {
                                     return xqc.opInt(n.call($("last"), n.string("name")));
                                 } else {
-                                    return n.seq(n.seq());
+                                    return n.seq();
                                 }
                             })($.frame()));
                             $ = $("preceeds", $.test($.test($("hasPrecedingOp")) && $.test(n.ggt($("op"), $("prevOp")))) && $.test(fn.not($.test(n.eq($("op"), n.integer(20))) && $.test(n.eq($("prevOp"), n.integer(19))))));
@@ -259,7 +270,7 @@ export function appendPropOrValue$4(...$_a) {
                         if ($.test(fn.exists($("string")))) {
                             return valueFromStrings($("string"), $("strings"));
                         } else {
-                            return n.seq(n.seq());
+                            return n.seq();
                         }
                     })($.frame()), $("operator"), $("ret"));
                 } else {
@@ -270,6 +281,7 @@ export function appendPropOrValue$4(...$_a) {
             return array.append($("ret"), valueFromStrings($("string"), $("strings")));
         }
     })($.frame());
+
 }
 
 export function wrapOpenParen$5(...$_a) {
@@ -280,6 +292,7 @@ export function wrapOpenParen$5(...$_a) {
         .item("group")
         .item("ret");
     return wrap(fn.subsequence($("rest"), $("index")), $("strings"), appendOrNest(fn.subsequence($("rest"), n.integer(1), $("index")), $("strings"), $("group"), $("ret"), fn.replace(n.filter($("rest"), $_ => n.seq(n.subtract($("index"), n.integer(1)))), n.string("\\)"), n.string(""))));
+
 }
 
 export function wrap$4(...$_a) {
@@ -323,6 +336,7 @@ export function wrap$4(...$_a) {
             return $("ret");
         }
     })($.frame());
+
 }
 
 export function wrap$3(...$_a) {
@@ -331,6 +345,7 @@ export function wrap$3(...$_a) {
         .item("strings")
         .item("ret");
     return wrap(fn.tail($("match")), $("strings"), $("ret"), n.select(fn.head($("match")), n.seq(n.string("fn:group"))));
+
 }
 
 export function wrap$2(...$_a) {
@@ -338,6 +353,7 @@ export function wrap$2(...$_a) {
         .item("match")
         .item("strings");
     return wrap($("match"), $("strings"), n.array(n.seq()));
+
 }
 
 export function importModule$2(...$_a) {
@@ -374,6 +390,7 @@ export function stringify$2(...$_a) {
         .item("a")
         .item("params");
     return stringify($("a"), $("params"), fn.true());
+
 }
 
 export function stringify$3(...$_a) {
@@ -483,6 +500,7 @@ export function clip$1(...$_a) {
             return $("name");
         }
     })($.frame());
+
 }
 
 export function camelCase$1(...$_a) {

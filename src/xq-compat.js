@@ -1,7 +1,11 @@
 import * as n from "./n";
+
 import * as fn from "xvfn";
+
 for (var k in fn.booleans) fn[k] = fn.booleans[k];
+
 import * as map from "xvmap";
+
 import * as array from "xvarray";
 /* xquery version n.string("3.1") */
 
@@ -9,7 +13,7 @@ import * as array from "xvarray";
 
 n.seq()*/
 var module = n.module({
-    "uri" : "http://raddle.org/xquery-compat",
+    "uri": "http://raddle.org/xquery-compat",
     "prefix": "xqc"
 });
 
@@ -28,6 +32,7 @@ export const operatorsI = fn.foldLeft(map.keys(operators), n.map(n.seq()), funct
         .item("pre")
         .item("cur");
     return map.put($("pre"), n.call(operators, $("cur")), $("cur"));
+
 });
 
 export const types = n.seq(n.string("untypedAtomic"), n.string("dateTime"), n.string("dateTimeStamp"), n.string("date"), n.string("time"), n.string("duration"), n.string("yearMonthDuration"), n.string("dayTimeDuration"), n.string("float"), n.string("double"), n.string("decimal"), n.string("integer"), n.string("nonPositiveInteger"), n.string("negativeInteger"), n.string("long"), n.string("int"), n.string("short"), n.string("byte"), n.string("nonNegativeInteger"), n.string("unsignedLong"), n.string("unsignedInt"), n.string("unsignedShort"), n.string("unsignedByte"), n.string("positiveInteger"), n.string("gYearMonth"), n.string("gYear"), n.string("gMonthDay"), n.string("gDay"), n.string("gMonth"), n.string("string"), n.string("normalizedString"), n.string("token"), n.string("language"), n.string("NMTOKEN"), n.string("Name"), n.string("NCName"), n.string("ID"), n.string("IDREF"), n.string("ENTITY"), n.string("boolean"), n.string("base64Binary"), n.string("hexBinary"), n.string("anyURI"), n.string("QName"), n.string("NOTATION"));
@@ -57,6 +62,7 @@ export function normalizeQuery$2(...$_a) {
                 return fn.concat(n.string("$1 "), opStr($("next")), n.string(" $2"));
             }
         })($.frame()));
+
     }));
     $ = $("query", fn.foldLeft(types, $("query"), function(...$_a) {
         $ = $.frame($_a)
@@ -84,7 +90,7 @@ export function normalizeQuery$2(...$_a) {
             if ($.test($("ret"))) {
                 return $("ret");
             } else {
-                return n.seq(n.seq());
+                return n.seq();
             }
         })($.frame());
 
@@ -331,6 +337,7 @@ export function xfn$2(...$_a) {
     }), function($_0) {
         return fn.string($_0);
     }), n.string(",(),(")), n.seq());
+
 }
 
 export function ns$2(...$_a) {
@@ -354,6 +361,7 @@ export function xvar$2(...$_a) {
     }), function($_0) {
         return fn.string($_0);
     }), n.string(",(),")), n.seq(n.decimal(2.18)));
+
 }
 
 export function xns$2(...$_a) {
@@ -365,6 +373,7 @@ export function xns$2(...$_a) {
     }), n.string(","), n.filter($("parts"), function($_0) {
         return n.geq(fn.position($_0), n.integer(3));
     }), n.string(")")));
+
 }
 
 export function annot$3(...$_a) {
@@ -415,6 +424,7 @@ export function xversion$2(...$_a) {
     }), function($_0) {
         return fn.string($_0);
     }), n.string(")")));
+
 }
 
 export function xmodule$2(...$_a) {
@@ -430,6 +440,7 @@ export function xmodule$2(...$_a) {
     }), function($_0) {
         return fn.string($_0);
     }), n.string(",())")));
+
 }
 
 export function close$3(...$_a) {
@@ -450,6 +461,7 @@ export function close$3(...$_a) {
             })($.frame());
         }
     })($.frame());
+
 }
 
 export function closer$2(...$_a) {
@@ -463,6 +475,7 @@ export function closer$2(...$_a) {
             return $("c");
         }
     })($.frame());
+
 }
 
 export function lastIndexOf$2(...$_a) {
@@ -486,6 +499,7 @@ export function pop$1(...$_a) {
     var $ = n.frame($_a)
         .item("a");
     return fn.reverse(fn.tail(fn.reverse($("a"))));
+
 }
 
 export function anon$4(...$_a) {
@@ -495,6 +509,7 @@ export function anon$4(...$_a) {
         .item("ret")
         .item("lastseen");
     return params($("parts"), fn.concat($("ret"), n.string("core:anon($,(")), $("lastseen"));
+
 }
 
 export function comment$3(...$_a) {
@@ -571,7 +586,7 @@ export function bodyOp$5(...$_a) {
                                         if ($.test(n.ne($("next"), n.string("=#20#06=")))) {
                                             return $("next");
                                         } else {
-                                            return n.seq(n.seq());
+                                            return n.seq();
                                         }
                                     })($.frame()));
                                     $ = $("rest", ($ => {
@@ -862,7 +877,7 @@ export function bodyOp$5(...$_a) {
                                                                     $ = $("last", n.filter(fn.indexOf($("lastseen"), n.subtract($("no"), n.decimal(n.decimal(0.01)))), function($_0) {
                                                                         return n.geq(fn.position($_0), fn.last($_0));
                                                                     }));
-                                                                    return fn.remove($("lastseen"), $("last")), $("no");
+                                                                    return n.seq(fn.remove($("lastseen"), $("last")), $("no"));
                                                                 } else {
                                                                     return ($ => {
                                                                         if ($.test(n.eq($("no"), n.decimal(2.08)))) {
@@ -917,6 +932,7 @@ export function isArray$3(...$_a) {
         .item("non")
         .item("next");
     return $.test($.test(n.eq($("non"), n.decimal(20.01))) && $.test(n.geq(fn.matches($("head"), n.string("\\)\\s*$")), fn.false()))) && $.test(fn.matches($("head"), n.concat(n.concat(n.string("^(\\s|\\(|,|"), operatorRegexp), n.string(")"))));
+
 }
 
 export function parenCloser$2(...$_a) {
@@ -937,6 +953,7 @@ export function parenCloser$2(...$_a) {
             return $("lastseen");
         }
     })($.frame());
+
 }
 
 export function body$3(...$_a) {
@@ -965,7 +982,7 @@ export function body$3(...$_a) {
                         } else {
                             $ = $("next", ($ => {
                                 if ($.test(fn.empty($("rest")))) {
-                                    return n.seq(n.seq());
+                                    return n.seq();
                                 } else {
                                     return n.select(fn.head($("rest")), function($_0) {
                                         return fn.string($_0);
@@ -1012,6 +1029,7 @@ export function body$3(...$_a) {
             })($.frame());
         }
     })($.frame());
+
 }
 
 export function ximport$2(...$_a) {
@@ -1110,6 +1128,7 @@ export function block$2(...$_a) {
             })($.frame());
         }
     })($.frame());
+
 }
 
 export function toOp$1(...$_a) {
@@ -1122,6 +1141,7 @@ export function toOp$1(...$_a) {
             return n.concat(n.string("core:"), fn.replace(n.call(operators, $("opnum")), n.string(" "), n.string("-")));
         }
     })($.frame());
+
 }
 
 export function fromOp$1(...$_a) {
@@ -1157,7 +1177,9 @@ export function rename$2(...$_a) {
                 })($.frame());
             }
         })($.frame());
+
     });
+
 }
 
 export function escapeForRegex$1(...$_a) {
@@ -1246,24 +1268,28 @@ export function unaryOp$1(...$_a) {
     var $ = n.frame($_a)
         .item("op");
     return opStr(n.add(opNum($("op")), n.integer(9)));
+
 }
 
 export function opInt$1(...$_a) {
     var $ = n.frame($_a)
         .item("op");
     return n.decimal(fn.replace($("op"), n.string("^=#(\\p{N}+)#?\\p{N}*=$"), n.string("$1")));
+
 }
 
 export function opNum$1(...$_a) {
     var $ = n.frame($_a)
         .item("op");
     return n.decimal(fn.replace($("op"), n.string("^=#(\\p{N}+)#?(\\p{N}*)=$"), n.string("$1.$2")));
+
 }
 
 export function opStr$1(...$_a) {
     var $ = n.frame($_a)
         .item("op");
     return fn.concat(n.string("=#"), fn.replace(fn.string($("op")), n.string("\\."), n.string("#")), n.string("="));
+
 }
 
 export function operatorPrecedence$3(...$_a) {

@@ -14,91 +14,158 @@ import { map, entry, _isMap } from "xvmap";
 // mix in bools you shall!
 const fn = booleans;
 
-class Context {
-    constructor(args){
-        this._args = args;
-        this._params = {};
-        this._init = 0;
-        this._frame = {};
+/*
+func(... a) {
+    this._ref = typeof a[0] == "function" && a[0] !== this ? a.shift() : null;
+    var l = a.length;
+    this._arity = l - 1;
+    if (this._arity !== this._args.length) {
+        return xverr.error("err:XPST0017");
     }
-    func(... a) {
-        this._ref = typeof a[0] == "function" && a[0] !== this ? a.shift() : null;
-        var l = a.length;
-        this._arity = l - 1;
-        if (this._arity !== this._args.length) {
-            return xverr.error("err:XPST0017");
+    var i = 0;
+    for (var k in this._params) {
+        var type = this._params[k];
+        this._frame[k] = type(this._args[i]);//.cacheResult();
+        i++;
+    }
+    if (i < this._arity) {
+        // what?
+    }
+    this._body = a[l - 1];
+    var ret = this._body.call(this, this);
+    while(typeof ret == "function") {
+        ret = ret();
+    }
+    return ret;
+}
+init(...a){
+    var l = a.length;
+    this._arity = l;
+    if (this._arity !== this._args.length) {
+        return xverr.error("err:XPST0017");
+    }
+    var i = 0;
+    for (var k in this._params) {
+        var type = this._params[k];
+        this._frame[k] = type(this._args[i]);//.cacheResult();
+        i++;
+    }
+    if (i < this._arity) {
+        // what?
+    }
+}
+let(k,v=null,type=item){
+    var i = this._init;
+    if(v === null){
+        this._params[k] = type;
+        this._init++;
+    } else {
+        this._frame[k] = v;
+    }
+    return this;
+}
+ */
+
+// TODO load from json
+const modules = [{
+    "prefix": "n",
+    "uri":"http://raddle.org/native"
+}];
+
+const global = {
+    modules:{}
+};
+
+function addModuleToGlobal(module){
+    // conflict?
+    if(module.uri in global.modules) return;
+    global.modules[module.uri] = module;
+}
+
+export function frame(args=[],cx=null){
+    var f = function (key,value) {
+        if(value !== undefined) {
+            f._frame[key] = value;
+            return f;
         }
-        var i = 0;
-        for (var k in this._params) {
-            var type = this._params[k];
-            this._frame[k] = type(this._args[i]);//.cacheResult();
-            i++;
-        }
-        if (i < this._arity) {
-            // what?
-        }
-        this._body = a[l - 1];
-        var ret = this._body.call(this, this);
-        while(typeof ret == "function") {
-            ret = ret();
-        }
+        if(key !== undefined) return f._frame[key];
+        var ret = f._frame[0];
+        f._frame[0] = null;
         return ret;
+    };
+    var closure = cx && cx._frame ? cx._frame : null;
+    if(!cx) cx = new Context();
+    f._args = args;
+    // is this correct?
+    f._arity = args.length;
+    f._init = 0;
+    // TODO have last result linger on frame
+    f._frame = {};
+    if(closure) {
+        //if(f._init < f._arity) {
+            for(var k in closure) {
+                f._frame[k] =  closure[k];
+            }
+        //}
     }
-    init(...a){
-        var l = a.length;
-        this._arity = l;
-        if (this._arity !== this._args.length) {
-            return xverr.error("err:XPST0017");
-        }
-        var i = 0;
-        for (var k in this._params) {
-            var type = this._params[k];
-            this._frame[k] = type(this._args[i]);//.cacheResult();
-            i++;
-        }
-        if (i < this._arity) {
-            // what?
-        }
+    f.__proto__ = cx;
+    return f;
+}
+
+export function module(module){
+    return new Module(module);
+}
+
+class Module {
+    constructor(module){
+        addModuleToGlobal(module);
+        this._module = module;
     }
-    let(k,v=null,type=item){
-        var i = this._init;
-        if(v === null){
-            this._params[k] = type;
-            this._init++;
-        } else {
-            this._frame[k] = v;
-        }
+}
+
+class Context {
+    frame(args=[]){
+        return frame(args,this);
+    }
+    check(value,type) {
+        // TODO type test
+        return value;
+    }
+    let(k, type){
+        //if(this._init >= this._arity) return this;
+        this._frame[k] = this.check(this._args[this._init],type);
+        this._init++;
         return this;
     }
-    item(k,v=null){
-        return this.let(k,v,item);
+    item(k){
+        return this.let(k,item);
     }
-    string(k,v=null){
-        return this.let(k,v,string);
+    string(k){
+        return this.let(k,string);
     }
-    integer(k,v=null){
-        return this.let(k,v,integer);
+    integer(k){
+        return this.let(k,integer);
     }
-    decimal(k,v=null){
-        return this.let(k,v,decimal);
+    decimal(k){
+        return this.let(k,decimal);
     }
-    double(k,v=null){
-        return this.let(k,v,double);
+    double(k){
+        return this.let(k,double);
     }
-    number(k,v=null){
-        return this.let(k,v,number);
+    number(k){
+        return this.let(k,number);
     }
-    array(k, v = null){
-        return this.let(k, v);
+    array(k, valuetype = null){
+        return this.let(k, valuetype);
     }
-    map(k, v = null){
-        return this.let(k, v);
+    map(k, keytype = null, valuetype = null){
+        return this.let(k, keytype, valuetype);
     }
-    element(k, v = null){
-        return this.let(k, v);
+    element(k){
+        return this.let(k);
     }
-    attribute(k, v = null){
-        return this.let(k, v);
+    attribute(k){
+        return this.let(k);
     }
     get(k){
         if(k !== undefined) return this._frame[k];
@@ -135,14 +202,8 @@ class Context {
     }
 }
 
-export function frame(...a){
-    var args = a.pop();
-    var f = function (selector, context) {
-        //return n.query(selector,context);
-    };
-    f.__proto__ = new Context(args);
-    if(a.length>0 && a[0] !== undefined) f._frame = a[0]._frame;
-    return f;
+export function context(module){
+    return new Context(module);
 }
 
 export function call($fn,...args){

@@ -14,984 +14,1763 @@ import * as array from "xvarray";
 
 for (var k in fn.booleans) fn[k] = fn.booleans[k];
 
-export const typemap = n.map(n.seq(n.pair(n.string("boolean"), n.integer(0)), n.pair(n.string("integer"), n.integer(0)), n.pair(n.string("decimal"), n.integer(0)), n.pair(n.string("string"), n.integer(0)), n.pair(n.string("item"), n.integer(0)), n.pair(n.string("anyURI"), n.integer(0)), n.pair(n.string("map"), n.integer(2)), n.pair(n.string("anon"), n.integer(2)), n.pair(n.string("array"), n.integer(1)), n.pair(n.string("element"), n.integer(1)), n.pair(n.string("attribute"), n.integer(1))));
+var $ = n.frame();
 
-export const nativeOps = n.seq(n.string("or"), n.string("and"), n.string("eq"), n.string("ne"), n.string("lt"), n.string("le"), n.string("gt"), n.string("ge"), n.string("add"), n.string("subtract"), n.string("plus"), n.string("minus"), n.string("multiply"), n.string("div"), n.string("mod"), n.string("geq"), n.string("gne"), n.string("ggt"), n.string("glt"), n.string("gge"), n.string("gle"), n.string("concat"), n.string("filter"), n.string("filter-at"), n.string("for-each"), n.string("for-each-at"), n.string("to"), n.string("instance-of"));
+export const typemap = n.map(n.seq(n.pair(n.string("boolean"),n.integer(0)),n.pair(n.string("integer"),n.integer(0)),n.pair(n.string("decimal"),n.integer(0)),n.pair(n.string("string"),n.integer(0)),n.pair(n.string("item"),n.integer(0)),n.pair(n.string("anyURI"),n.integer(0)),n.pair(n.string("map"),n.integer(2)),n.pair(n.string("array"),n.integer(1)),n.pair(n.string("element"),n.integer(1)),n.pair(n.string("attribute"),n.integer(1))));
 
-export const autoConverted = n.map(n.seq(n.pair(n.string("true"), n.string("true()")), n.pair(n.string("false"), n.string("false()")), n.pair(n.string("null"), n.string("()")), n.pair(n.string("undefined"), n.string("()")), n.pair(n.string("Infinity"), n.string("1 div 0e0")), n.pair(n.string("-Infinity"), n.string("-1 div 0e0"))));
+export const nativeOps = n.seq(n.string("eq"),n.string("ne"),n.string("lt"),n.string("le"),n.string("gt"),n.string("ge"),n.string("add"),n.string("subtract"),n.string("plus"),n.string("minus"),n.string("multiply"),n.string("div"),n.string("mod"),n.string("geq"),n.string("gne"),n.string("ggt"),n.string("glt"),n.string("gge"),n.string("gle"),n.string("concat"),n.string("filter"),n.string("filter-at"),n.string("for-each"),n.string("for-each-at"),n.string("to"),n.string("instance-of"));
 
-export function xqVersion(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
+export const autoConverted = n.map(n.seq(n.pair(n.string("true"),n.string("true()")),n.pair(n.string("false"),n.string("false()")),n.pair(n.string("null"),n.string("()")),n.pair(n.string("undefined"),n.string("()")),n.pair(n.string("Infinity"),n.string("1 div 0e0")),n.pair(n.string("-Infinity"),n.string("-1 div 0e0"))));
 
-    if ($_l == 2) {
-        $.init($.item("frame"), $.item("version"));
-        return n.item(n.concat(n.concat(n.string("/* xquery version "), $.get("version")), n.string(" */")));
-    }
-    return n.error(xqVersion, $_l);
+export function xqVersion$2(...$_a) {
+	var $ = n.frame($_a)
+		.item("frame")
+		.item("version");
+	return n.concat(n.concat(n.string("/* xquery version "),$("version")),n.string(" */"));
+
 }
 
-export function isFnSeq(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
+export function and$2(...$_a) {
+	var $ = n.frame($_a)
+		.item("a")
+		.item("b");
+	return fn.concat(n.string("$.test("),$("a"),n.string(") &amp;&amp; $.test("),$("b"),n.string(")"));
 
-    if ($_l == 1) {
-        $.init($.item("value"));
-        return $.test(n.instanceOf($.get("value"), n.string())) ?
-            (fn.concat(n.string("isFnSeq("), $.get("value"), n.string(")"))) :
-            ($.test(n.eq(array.size($.get("value")), n.integer(0))) ?
-                (n.seq()) :
-                (array.flatten(array.forEach($.get("value"), function(...$_a) {
-                    var $_l = $_a.length;
-                    $ = n.frame($, $_a);
-                    if ($_l == 1) {
-                        $.init($.item("_"));
-                        return n.item($.test(n.instanceOf($.get("_"), n.map())) ?
-                            (isFnSeq(n.call($.get("_"), n.string("args")))) :
-                            ($.test(n.and(n.instanceOf($.get("_"), n.string()), fn.matches($.get("_"), n.string("^\\.$|^\\$$")))) ?
-                                ($.get("_")) :
-                                (n.seq())));
-                    }
-                    return n.error($_l);
-                }))));
-    }
-    return n.error(isFnSeq, $_l);
 }
 
-export function isCaller(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
+export function or$2(...$_a) {
+	var $ = n.frame($_a)
+		.item("a")
+		.item("b");
+	return fn.concat(n.string("$.test("),$("a"),n.string(") || $.test("),$("b"),n.string(")"));
 
-    if ($_l == 1) {
-        $.init($.item("args"));
-        return $.test(n.instanceOf($.get("args"), n.string())) ?
-            (fn.concat(n.string("isCaller("), $.get("args"), n.string(")"))) :
-            (a.foldLeft($.get("args"), fn.false(), function(...$_a) {
-                var $_l = $_a.length;
-                $ = n.frame($, $_a);
-                if ($_l == 2) {
-                    $.init($.item("pre"), $.item("arg"));
-                    return n.item(n.or($.get("pre"), n.seq(n.and(n.instanceOf($.get("arg"), n.map()), n.eq(n.call($.get("arg"), n.string("name")), n.string(""))))));
-                }
-                return n.error($_l);
-            }));
-    }
-    return n.error(isCaller, $_l);
 }
 
-export function processArgs(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
+function isFnSeq$1(...$_a) {
+	var $ = n.frame($_a)
+		.item("value");
+	return ($ => {
+	if($.test(n.instanceOf($("value"),n.string()))) {
+	return fn.concat(n.string("isFnSeq("),$("value"),n.string(")"));
+} else {
+	return ($ => {
+	if($.test(n.eq(array.size($("value")),n.integer(0)))) {
+	return n.seq();
+} else {
+	return array.flatten(array.forEach($("value"),function (...$_a) {
+	$ = $.frame($_a)
+		.item("_");
+	return ($ => {
+	if($.test(n.instanceOf($("_"),n.map()))) {
+	return ($ => {
+	if($.test(n.eq(n.call($("_"),n.string("name")),n.string("core:iff")))) {
+	return n.seq();
+} else {
+	return isFnSeq(n.call($("_"),n.string("args")));
+}
+	})($.frame());
+} else {
+	return ($ => {
+	if($.test($.test(n.instanceOf($("_"),n.string())) && $.test(fn.matches($("_"),n.string("^\\.$|^\\$$"))))) {
+	return $("_");
+} else {
+	return n.seq();
+}
+	})($.frame());
+}
+	})($.frame());
 
-    if ($_l == 2) {
-        $.init($.item("frame"), $.item("args"));
-        return n.item($.test(n.instanceOf($.get("frame"), n.string())) ?
-            (fn.concat(n.string("processArgs("), $.get("frame"), n.string(","), $.get("args"), n.string(")"))) :
-            ($.item("name", n.call($.get("frame"), n.string("$caller"))),
+}));
+}
+	})($.frame());
+}
+	})($.frame());
 
-                $.item("isInit", fn.matches($.get("name"), n.string("^core:init"))),
-
-                $.item("isDefn", n.geq($.get("name"), n.seq(n.string("core:define-private#6"), n.string("core:define#6")))),
-
-                $.item("isAnon", n.eq($.get("name"), n.string("core:anon#4"))),
-
-                $.item("isTypegen", fn.matches($.get("name"), n.concat(n.concat(n.string("^core:(typegen|"), fn.stringJoin(map.keys(typemap), n.string("|"))), n.string(")")))),
-
-                a.foldLeftAt($.get("args"), n.array(n.seq()), function(...$_a) {
-                    var $_l = $_a.length;
-                    $ = n.frame($, $_a);
-                    if ($_l == 3) {
-                        $.init($.item("pre"), $.item("arg"), $.item("at"));
-                        return n.item($.test(n.instanceOf($.get("arg"), n.array(n.item()))) ?
-                            ($.item("isParams", n.or(n.seq(n.and($.get("isDefn"), n.geq($.get("at"), n.integer(4)))), n.seq(n.and($.get("isAnon"), n.geq($.get("at"), n.integer(1)))))),
-
-                                $.item("isBody", n.or(n.seq(n.and($.get("isDefn"), n.geq($.get("at"), n.integer(6)))), n.seq(n.and($.get("isAnon"), n.geq($.get("at"), n.integer(3)))))),
-
-                                $.item("fnSeq", isFnSeq($.get("arg"))),
-
-                                $.item("isFnSeq", n.ggt(fn.count($.get("fnSeq")), n.integer(0))),
-
-                                array.append($.get("pre"), $.test($.get("isParams")) ?
-                                    ($.get("arg")) :
-                                    ($.test(n.and(n.geq($.get("isFnSeq"), fn.false()), n.geq($.get("isBody"), fn.false()))) ?
-                                        (a.forEachAt($.get("arg"), function(...$_a) {
-                                            var $_l = $_a.length;
-                                            $ = n.frame($, $_a);
-                                            if ($_l == 2) {
-                                                $.init($.item("_"), $.item("at"));
-                                                return n.item($.test(n.instanceOf($.get("_"), n.array(n.item()))) ?
-                                                    (processTree($.get("_"), $.get("frame"))) :
-                                                    (processValue($.get("_"), map.put($.get("frame"), n.string("$at"), $.get("at")))));
-                                            }
-                                            return n.error($_l);
-                                        })) :
-                                        ($.item("ret", processTree($.get("arg"), $.get("frame"), n.and($.get("isBody"), $.get("isFnSeq")), n.string(""), $.get("at"), $.test($.get("isBody")) ?
-                                                (n.call($.get("pre"), n.subtract($.get("at"), n.integer(1)))) :
-                                                (n.seq()))),
-
-                                            $.test(n.geq($.get("fnSeq"), n.string("."))) ?
-                                            (fn.concat(n.string("function($_0) { return "), $.get("ret"), n.string(";}"))) :
-                                            ($.test($.get("isFnSeq")) ?
-                                                ($.get("ret")) :
-                                                ($.get("ret"))))))) :
-                            ($.test(n.instanceOf($.get("arg"), n.map())) ?
-                                ($.item("s", array.size($.get("pre"))),
-
-                                    $.test(n.and(n.and(n.ne(n.call($.get("arg"), n.string("name")), n.string("")), n.ggt(array.size($.get("args")), $.get("at"))), isCaller(array.subarray($.get("args"), n.add($.get("at"), n.integer(1)))))) ?
-                                    (array.append($.get("pre"), n.map(n.seq(n.pair(n.string("name"), n.string("core:call")), n.pair(n.string("args"), n.array(n.seq(n.call($.get("arg"), n.string("name")), n.map(n.seq(n.pair(n.string("name"), n.string("")), n.pair(n.string("args"), n.call($.get("arg"), n.string("args")))))))))))) :
-                                    ($.test(n.and(n.eq(n.call($.get("arg"), n.string("name")), n.string("")), n.ggt($.get("s"), n.integer(1)))) ?
-                                        ($.item("last", n.call($.get("pre"), $.get("s"))),
-
-                                            $.test(n.and(n.instanceOf($.get("last"), n.map()), n.eq(n.call($.get("last"), n.string("name")), n.string("core:call")))) ?
-                                            (a.put($.get("pre"), $.get("s"), n.map(n.seq(n.pair(n.string("name"), n.string("core:call")), n.pair(n.string("args"), n.array(n.seq($.get("last"), n.map(n.seq(n.pair(n.string("name"), n.string("")), n.pair(n.string("args"), n.call($.get("arg"), n.string("args")))))))))))) :
-                                            (array.append($.get("pre"), processValue($.get("arg"), $.get("frame"))))) :
-                                        (array.append($.get("pre"), processValue($.get("arg"), $.get("frame")))))) :
-                                ($.test(n.eq($.get("arg"), n.string("."))) ?
-                                    (array.append($.get("pre"), n.string("$_0"))) :
-                                    ($.test(n.eq($.get("arg"), n.string("$"))) ?
-                                        (array.append($.get("pre"), $.get("frame"))) :
-                                        ($.test(fn.matches($.get("arg"), n.concat(n.concat(n.string("^\\$["), rdl.ncname), n.string("]+$")))) ?
-                                            (array.append($.get("pre"), $.test(fn.matches($.get("arg"), n.string("^\\$\\p{N}"))) ?
-                                                (fn.replace($.get("arg"), n.string("^\\$"), n.string("\\$_"))) :
-                                                (serialize(n.array(n.seq($.get("arg"), $.get("frame"))))))) :
-                                            ($.test(n.or(n.seq(n.and(n.seq(n.or($.get("isDefn"), $.get("isTypegen"))), n.eq($.get("at"), n.integer(2)))), n.seq(n.and($.get("isInit"), n.eq($.get("at"), n.integer(1)))))) ?
-                                                (array.append($.get("pre"), $.get("arg"))) :
-                                                ($.test(fn.matches($.get("arg"), n.concat(n.concat(n.string("^_["), rdl.suffix), n.string("]?$")))) ?
-                                                    (array.append($.get("pre"), fn.replace($.get("arg"), n.string("^_"), n.concat(n.string("_"), n.call($.get("frame"), n.string("$at")))))) :
-                                                    (array.append($.get("pre"), serialize(n.array(n.seq($.get("arg"), $.get("frame")))))))))))));
-                    }
-                    return n.error($_l);
-                })));
-    }
-    return n.error(processArgs, $_l);
 }
 
-export function native(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
+export function isCaller$1(...$_a) {
+	var $ = n.frame($_a)
+		.item("args");
+	return ($ => {
+	if($.test(n.instanceOf($("args"),n.string()))) {
+	return fn.concat(n.string("isCaller("),$("args"),n.string(")"));
+} else {
+	return a.foldLeft($("args"),fn.false(),function (...$_a) {
+	$ = $.frame($_a)
+		.item("pre")
+		.item("arg");
+	return $.test($("pre")) || $.test(n.seq($.test(n.instanceOf($("arg"),n.map())) && $.test(n.eq(n.call($("arg"),n.string("name")),n.string("")))));
 
-    if ($_l == 2) {
-        $.init($.item("op"), $.item("a"));
-        return n.item(fn.concat(n.string("n."), rdl.camelCase($.get("op")), n.string("("), $.get("a"), n.string(")")));
-    }
+});
+}
+	})($.frame());
 
-    if ($_l == 3) {
-        $.init($.item("op"), $.item("a"), $.item("b"));
-        return n.item(fn.concat(n.string("n."), rdl.camelCase($.get("op")), n.string("("), $.get("a"), n.string(","), $.get("b"), n.string(")")));
-    }
-    return n.error(native, $_l);
 }
 
-export function pair(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
+export function processArgs$3(...$_a) {
+	var $ = n.frame($_a)
+		.item("frame")
+		.item("args")
+		.item("caller");
+	return ($ => {
+	if($.test(n.instanceOf($("frame"),n.string()))) {
+	return fn.concat(n.string("processArgs("),$("frame"),n.string(","),$("args"),n.string(","),$("caller"),n.string(")"));
+} else {
+	$ = $("isDefn",n.geq($("caller"),n.seq(n.string("core:define-private#6"),n.string("core:define#6"))));
+	$ = $("isAnon",n.eq($("caller"),n.string("core:anon#4")));
+	$ = $("isIff",n.eq($("caller"),n.string("core:iff#3")));
+	$ = $("isInterop",n.eq($("caller"),n.string("core:interop#2")));
+	$ = $("isTypegen",fn.matches($("caller"),n.concat(n.concat(n.string("^core:(typegen|"),fn.stringJoin(map.keys(typemap),n.string("|"))),n.string(")"))));
+	return a.foldLeftAt($("args"),n.array(n.seq()),function (...$_a) {
+	$ = $.frame($_a)
+		.item("pre")
+		.item("arg")
+		.item("at");
+	return ($ => {
+	if($.test(n.instanceOf($("arg"),n.array(n.item())))) {
+	return ($ => {
+	if($.test($.test($.test(n.seq($.test($("isDefn")) && $.test(n.geq($("at"),n.integer(4))))) || $.test(n.seq($.test($("isAnon")) && $.test(n.geq($("at"),n.integer(2)))))) || $.test(n.seq($.test($("isInterop")) && $.test(n.geq($("at"),n.integer(2))))))) {
+	return array.append($("pre"),$("arg"));
+} else {
+	$ = $("isBody",$.test(n.seq($.test($("isDefn")) && $.test(n.geq($("at"),n.integer(6))))) || $.test(n.seq($.test($("isAnon")) && $.test(n.geq($("at"),n.integer(4))))));
+	$ = $("isThenelse",$.test($("isIff")) && $.test(n.geq($("at"),n.seq(n.integer(2),n.integer(3)))));
+	$ = $("arg",($ => {
+	if($.test($.test($("isBody")) && $.test(n.eq(array.size($("arg")),n.integer(1))))) {
+	$ = $("first",n.call($("arg"),n.integer(1)));
+	return ($ => {
+	if($.test($.test(n.instanceOf($("first"),n.map())) && $.test(n.eq(n.call($("first"),n.string("name")),n.string(""))))) {
+	return n.call($("first"),n.string("args"));
+} else {
+	return $("arg");
+}
+	})($.frame());
+	} else {
+	return $("arg");
+}
+	})($.frame()));
+	$ = $("isLetRet",$.test($.test(n.seq($.test($("isBody")) || $.test($("isThenelse")))) && $.test(n.ggt(array.size($("arg")),n.integer(1)))) && $.test(n.instanceOf(n.call($("arg"),n.integer(1)),n.map())));
+	$ = $("fnSeq",isFnSeq($("arg")));
+	$ = $("isFnSeq",n.ggt(fn.count($("fnSeq")),n.integer(0)));
+	return array.append($("pre"),($ => {
+	if($.test($.test($.test($("isFnSeq")) || $.test($("isBody"))) || $.test($("isThenelse")))) {
+	$ = $("val",processArgs($("frame"),$("arg"),n.string("")));
+	$ = $("s",array.size($("val")));
+	$ = $("ret",($ => {
+	if($.test(n.eq($("s"),n.integer(0)))) {
+	return n.string("return n.seq();&#13;");
+} else {
+	return ($ => {
+	if($.test(n.gt($("s"),n.integer(1)))) {
+	return ($ => {
+	if($.test($("isLetRet"))) {
+	return letRet($("val"),n.seq());
+} else {
+	return fn.concat(n.string("return n.seq("),fn.stringJoin(array.flatten($("val")),n.string(",")),n.string(");&#13;"));
+}
+	})($.frame());
+} else {
+	return fn.concat(n.string("return "),$("val"),n.string(";&#13;"));
+}
+	})($.frame());
+}
+	})($.frame()));
+	return ($ => {
+	if($.test(n.geq($("fnSeq"),n.string(".")))) {
+	return fn.concat(n.string("function($_0) {&#13;&#9;"),$("ret"),n.string("}"));
+} else {
+	return $("ret");
+}
+	})($.frame());
+	} else {
+	return a.forEachAt($("arg"),function (...$_a) {
+	$ = $.frame($_a)
+		.item("_")
+		.item("at");
+	return ($ => {
+	if($.test(n.instanceOf($("_"),n.array(n.item())))) {
+	return processTree($("_"),$("frame"));
+} else {
+	return processValue($("_"),$("frame"),$("at"));
+}
+	})($.frame());
 
-    if ($_l == 2) {
-        $.init($.item("key"), $.item("val"));
-        return n.item(fn.concat(n.string("n.pair("), $.get("key"), n.string(","), $.get("val"), n.string(")")));
-    }
-    return n.error(pair, $_l);
+});
+}
+	})($.frame()));
+	}
+	})($.frame());
+} else {
+	return ($ => {
+	if($.test(n.instanceOf($("arg"),n.map()))) {
+	$ = $("s",array.size($("pre")));
+	return ($ => {
+	if($.test($.test($.test(n.eq(fn.matches(n.call($("arg"),n.string("name")),n.string("^(core:call)?$")),fn.false())) && $.test(n.ggt(array.size($("args")),$("at")))) && $.test(isCaller(array.subarray($("args"),n.add($("at"),n.integer(1))))))) {
+	$ = $("nu",console.log($("arg")));
+	return array.append($("pre"),n.map(n.seq(n.pair(n.string("name"),n.string("core:call")),n.pair(n.string("args"),n.array(n.seq(n.call($("arg"),n.string("name")),n.map(n.seq(n.pair(n.string("name"),n.string("")),n.pair(n.string("args"),n.call($("arg"),n.string("args")))))))))));
+	} else {
+	return ($ => {
+	if($.test($.test(n.eq(n.call($("arg"),n.string("name")),n.string(""))) && $.test(n.ggt($("s"),n.integer(1))))) {
+	$ = $("last",n.call($("pre"),$("s")));
+	$ = $("nu",console.log($("arg")));
+	return ($ => {
+	if($.test($.test(n.instanceOf($("last"),n.map())) && $.test(n.eq(n.call($("last"),n.string("name")),n.string("core:call"))))) {
+	return a.put($("pre"),$("s"),n.map(n.seq(n.pair(n.string("name"),n.string("core:call")),n.pair(n.string("args"),n.array(n.seq($("last"),n.map(n.seq(n.pair(n.string("name"),n.string("")),n.pair(n.string("args"),n.call($("arg"),n.string("args")))))))))));
+} else {
+	return array.append($("pre"),processValue($("arg"),$("frame")));
+}
+	})($.frame());
+	} else {
+	return array.append($("pre"),processValue($("arg"),$("frame")));
+}
+	})($.frame());
+}
+	})($.frame());
+	} else {
+	return ($ => {
+	if($.test(n.eq($("arg"),n.string(".")))) {
+	return array.append($("pre"),n.string("$_0"));
+} else {
+	return ($ => {
+	if($.test(n.eq($("arg"),n.string("$")))) {
+	return array.append($("pre"),$("frame"));
+} else {
+	return ($ => {
+	if($.test(fn.matches($("arg"),n.concat(n.concat(n.string("^\\$["),rdl.ncname),n.string("]+$"))))) {
+	return array.append($("pre"),($ => {
+	if($.test(fn.matches($("arg"),n.string("^\\$\\p{N}")))) {
+	return fn.replace($("arg"),n.string("^\\$"),n.string("\\$_"));
+} else {
+	return serialize($("arg"),$("frame"));
+}
+	})($.frame()));
+} else {
+	return ($ => {
+	if($.test($.test(n.seq($.test(n.seq($.test($("isDefn")) || $.test($("isTypegen")))) && $.test(n.eq($("at"),n.integer(2))))) || $.test(n.seq($.test($("isInterop")) && $.test(n.eq($("at"),n.integer(1))))))) {
+	return array.append($("pre"),$("arg"));
+} else {
+	return ($ => {
+	if($.test(fn.matches($("arg"),n.concat(n.concat(n.string("^_["),rdl.suffix),n.string("]?$"))))) {
+	return array.append($("pre"),fn.replace($("arg"),n.string("^_"),n.concat(n.string("_"),n.call($("frame"),n.string("$at")))));
+} else {
+	return array.append($("pre"),serialize($("arg"),$("frame")));
+}
+	})($.frame());
+}
+	})($.frame());
+}
+	})($.frame());
+}
+	})($.frame());
+}
+	})($.frame());
+}
+	})($.frame());
+}
+	})($.frame());
+
+});
+	}
+	})($.frame());
+
 }
 
-export function _init(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
+export function native$2(...$_a) {
+	var $ = n.frame($_a)
+		.item("op")
+		.item("a");
+	return fn.concat(n.string("n."),rdl.camelCase($("op")),n.string("("),$("a"),n.string(")"));
 
-    if ($_l == 2) {
-        $.init($.item("name"), $.item("a"));
-        return n.item($.test(n.instanceOf($.get("a"), n.string())) ?
-            (fn.concat(n.string("_init("), $.get("name"), n.string(","), $.get("a"), n.string(")"))) :
-            ($.item("private", fn.false()),
-
-                $.item("parts", fn.tokenize(rdl.clip($.get("name")), n.string(":"))),
-
-                $.item("fname", rdl.camelCase(n.filter($.get("parts"), function($_0) {
-                    return n.geq(fn.position($_0), fn.last($_0));
-                }))),
-
-                fn.concat($.test($.get("private")) ?
-                    (n.string("")) :
-                    (n.string("export ")), n.string("function "), $.get("fname"), n.string("(...$_a) {&#13;&#9;"), n.string("var $_l = $_a.length,&#13;&#9;&#9;"), n.string("$ = n.frame($_a);&#13;&#9;"), fn.stringJoin(array.flatten($.get("a")), n.string("&#13;")), n.string("&#13;&#9;"), n.string("return n.error("), $.get("fname"), n.string(",$_l);&#13;}"))));
-    }
-    return n.error(_init, $_l);
 }
 
-export function init(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
+export function native$3(...$_a) {
+	var $ = n.frame($_a)
+		.item("op")
+		.item("a")
+		.item("b");
+	return fn.concat(n.string("n."),rdl.camelCase($("op")),n.string("("),$("a"),n.string(","),$("b"),n.string(")"));
 
-    if ($_l == 2) {
-        $.init($.item("name"), $.item("a"));
-        return n.item(_init($.get("name"), n.array(n.seq($.get("a")))));
-    }
-
-    if ($_l == 3) {
-        $.init($.item("name"), $.item("a"), $.item("b"));
-        return n.item(_init($.get("name"), n.array(n.seq($.get("a"), $.get("b")))));
-    }
-
-    if ($_l == 4) {
-        $.init($.item("name"), $.item("a"), $.item("b"), $.item("c"));
-        return n.item(_init($.get("name"), n.array(n.seq($.get("a"), $.get("b"), $.get("c")))));
-    }
-
-    if ($_l == 5) {
-        $.init($.item("name"), $.item("a"), $.item("b"), $.item("c"), $.item("d"));
-        return n.item(_init($.get("name"), n.array(n.seq($.get("a"), $.get("b"), $.get("c"), $.get("d")))));
-    }
-
-    if ($_l == 6) {
-        $.init($.item("name"), $.item("a"), $.item("b"), $.item("c"), $.item("d"), $.item("e"));
-        return n.item(_init($.get("name"), n.array(n.seq($.get("a"), $.get("b"), $.get("c"), $.get("d"), $.get("e")))));
-    }
-
-    if ($_l == 7) {
-        $.init($.item("name"), $.item("a"), $.item("b"), $.item("c"), $.item("d"), $.item("e"), $.item("f"));
-        return n.item(_init($.get("name"), n.array(n.seq($.get("a"), $.get("b"), $.get("c"), $.get("d"), $.get("e"), $.get("f")))));
-    }
-    return n.error(init, $_l);
 }
 
-export function transpile(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
+export function pair$2(...$_a) {
+	var $ = n.frame($_a)
+		.item("key")
+		.item("val");
+	return fn.concat(n.string("n.pair("),$("key"),n.string(","),$("val"),n.string(")"));
 
-    if ($_l == 2) {
-        $.init($.item("value"), $.item("frame"));
-        return ($.item("frame", map.put($.get("frame"), n.string("$tree"), $.get("value"))),
-            $.item("distinct", a.foldLeftAt($.get("value"), n.map(n.seq()), function(...$_a) {
-                var $_l = $_a.length;
-                $ = n.frame($, $_a);
-                if ($_l == 3) {
-                    $.init($.item("pre"), $.item("cur"), $.item("i"));
-                    return n.item($.test(n.geq(n.call($.get("cur"), n.string("name")), n.seq(n.string("core:define"), n.string("core:define-private")))) ?
-                        ($.item("name", n.call(n.call(n.string("core:call"), n.seq($.get("cur"), n.seq(n.string("args")))), n.seq(n.integer(2)))),
-
-                            $.test(map.contains($.get("pre"), $.get("name"))) ?
-                            ($.get("pre")) :
-                            (map.put($.get("pre"), $.get("name"), $.get("i")))) :
-                        ($.get("pre")));
-                }
-                return n.error($_l);
-            })),
-            $.item("value", array.filter(a.foldLeftAt($.get("value"), n.array(n.seq()), function(...$_a) {
-                var $_l = $_a.length;
-                $ = n.frame($, $_a);
-                if ($_l == 3) {
-                    $.init($.item("pre"), $.item("cur"), $.item("i"));
-                    return n.item($.test(n.geq(n.call($.get("cur"), n.string("name")), n.seq(n.string("core:define"), n.string("core:define-private")))) ?
-                        ($.item("name", n.call(n.call(n.string("core:call"), n.seq($.get("cur"), n.seq(n.string("args")))), n.seq(n.integer(2)))),
-
-                            $.item("index", n.call($.get("distinct"), $.get("name"))),
-
-                            $.test(n.eq($.get("index"), $.get("i"))) ?
-                            (array.append($.get("pre"), n.map(n.seq(n.pair(n.string("name"), n.string("core:init")), n.pair(n.string("args"), n.array(n.seq($.get("name"), $.get("cur")))), n.pair(n.string("suffix"), n.string("")))))) :
-                            ($.item("last", n.call($.get("pre"), $.get("index"))),
-
-                                a.put(array.append($.get("pre"), n.seq()), $.get("index"), n.map(n.seq(n.pair(n.string("name"), n.string("core:init")), n.pair(n.string("args"), array.append(n.call($.get("last"), n.string("args")), $.get("cur"))), n.pair(n.string("suffix"), n.string(""))))))) :
-                        (array.append($.get("pre"), $.get("cur"))));
-                }
-                return n.error($_l);
-            }), function(...$_a) {
-                var $_l = $_a.length;
-                $ = n.frame($, $_a);
-                if ($_l == 1) {
-                    $.init($.item("a"));
-                    return n.item(fn.exists($.get("a")));
-                }
-                return n.error($_l);
-            })),
-            n.item(processTree($.get("value"), $.get("frame"), fn.true())));
-    }
-    return n.error(transpile, $_l);
 }
 
-export function processTree(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
+export function interop$2(...$_a) {
+	var $ = n.frame($_a)
+		.item("name")
+		.item("arities");
+	return ($ => {
+	if($.test(n.instanceOf($("arities"),n.string()))) {
+	return fn.concat(n.string("n.init("),$("name"),n.string(","),$("arities"),n.string(")"));
+} else {
+	$ = $("parts",fn.tokenize(rdl.clip($("name")),n.string(":")));
+	$ = $("fname",rdl.camelCase(n.filter($("parts"),function($_0) {
+	return n.geq(fn.position($_0),fn.last($_0));
+})));
+	return fn.concat(n.string("export function "),$("fname"),n.string("(...$_a) {&#13;&#9;"),n.string("var $_l = $_a.length;&#13;&#9;"),fn.stringJoin(fn.forEach(array.flatten($("arities")),function (...$_a) {
+	$ = $.frame($_a)
+		.item("a");
+	return fn.concat(n.string("if($_l==="),$("a"),n.string("){&#13;&#9;&#9;"),n.string("return "),$("fname"),n.string("$"),$("a"),n.string(".apply(this,$_a);&#13;&#9;"),n.string("}&#13;&#9;"));
 
-    if ($_l == 2) {
-        $.init($.item("tree"), $.item("frame"));
-        return n.item($.test(n.instanceOf($.get("tree"), n.string())) ?
-            (fn.concat(n.string("processTree("), $.get("tree"), n.string(","), $.get("frame"), n.string(")"))) :
-            (processTree($.get("tree"), $.get("frame"), fn.false())));
-    }
+}),n.string("&#13;")),n.string("&#13;&#9;"),n.string("return n.error("),$("fname"),n.string(",$_l);&#13;}"));
+	}
+	})($.frame());
 
-    if ($_l == 3) {
-        $.init($.item("tree"), $.item("frame"), $.item("top"));
-        return n.item($.test(n.instanceOf($.get("tree"), n.string())) ?
-            (fn.concat(n.string("processTree("), $.get("tree"), n.string(","), $.get("frame"), n.string(","), $.get("top"), n.string(")"))) :
-            (processTree($.get("tree"), $.get("frame"), $.get("top"), n.string(""), n.integer(1), n.seq())));
-    }
-
-    if ($_l == 5) {
-        $.init($.item("tree"), $.item("frame"), $.item("top"), $.item("ret"), $.item("at"));
-        return n.item($.test(n.instanceOf($.get("tree"), n.string())) ?
-            (fn.concat(n.string("processTree("), $.get("tree"), n.string(","), $.get("frame"), n.string(","), $.get("top"), n.string(","), $.get("ret"), n.string(","), $.get("at"), n.string(")"))) :
-            (processTree($.get("tree"), $.get("frame"), $.get("top"), $.get("ret"), $.get("at"), n.seq())));
-    }
-
-    if ($_l == 6) {
-        $.init($.item("tree"), $.item("frame"), $.item("top"), $.item("ret"), $.item("at"), $.item("seqtype"));
-        return n.item($.test(n.instanceOf($.get("tree"), n.string())) ?
-            (fn.concat(n.string("processTree("), $.get("tree"), n.string(","), $.get("frame"), n.string(","), $.get("top"), n.string(","), $.get("ret"), n.string(","), $.get("at"), n.string(","), $.get("seqtype"), n.string(")"))) :
-            ($.test(n.ggt(array.size($.get("tree")), n.integer(0))) ?
-                ($.item("frame", map.put($.get("frame"), n.string("$at"), $.get("at"))),
-
-                    $.item("head", array.head($.get("tree"))),
-
-                    $.item("frame", $.test(n.and(n.instanceOf($.get("head"), n.map()), n.eq(n.call($.get("head"), n.string("name")), n.string("core:module")))) ?
-                        (map.put($.get("frame"), n.string("$prefix"), n.call(n.call(n.string("core:call"), n.seq($.get("head"), n.seq(n.string("args")))), n.seq(n.integer(2))))) :
-                        ($.get("frame"))),
-
-                    $.item("val", processValue($.get("head"), $.get("frame"))),
-
-                    $.item("isBody", n.or(n.seq(n.geq(n.call($.get("frame"), n.string("$caller")), n.seq(n.string("core:define#6"), n.string("core:define-private#6")))), n.seq(n.geq(n.call($.get("frame"), n.string("$caller")), n.string("core:anon#4"))))),
-
-                    $.item("isSeq", n.instanceOf($.get("val"), n.array(n.item()))),
-
-                    $.item("val", $.test($.get("isSeq")) ?
-                        ($.item("s", array.size($.get("val"))),
-
-                            fn.concat(n.string("("), a.foldLeftAt($.get("val"), n.string(""), function(...$_a) {
-                                var $_l = $_a.length;
-                                $ = n.frame($, $_a);
-                                if ($_l == 3) {
-                                    $.init($.item("pre"), $.item("cur"), $.item("at"));
-                                    return n.item(fn.concat($.get("pre"), $.test(n.and($.get("seqtype"), n.eq($.get("at"), $.get("s")))) ?
-                                        (fn.concat(n.string(",&#13;"), fn.substring($.get("seqtype"), n.integer(1), n.subtract(fn.stringLength($.get("seqtype")), n.integer(1))), $.get("cur"), n.string(")"))) :
-                                        (fn.concat($.test(n.ggt($.get("at"), n.integer(1))) ?
-                                            (n.string(",&#13;")) :
-                                            (n.string("")), $.get("cur")))));
-                                }
-                                return n.error($_l);
-                            }), n.string(")"))) :
-                        ($.test(n.and(n.eq($.get("top"), fn.false()), $.get("isBody"))) ?
-                            ($.test($.get("seqtype")) ?
-                                (fn.concat(fn.substring($.get("seqtype"), n.integer(1), n.subtract(fn.stringLength($.get("seqtype")), n.integer(1))), $.get("val"), n.string(")"))) :
-                                ($.get("val"))) :
-                            ($.get("val")))),
-
-                    $.item("ret", fn.concat($.get("ret"), $.test(n.and(n.and(n.ne($.get("ret"), n.string("")), n.ggt($.get("at"), n.integer(1))), n.geq($.get("isBody"), fn.false()))) ?
-                        ($.test($.get("top")) ?
-                            (n.string("&#10;&#13;")) :
-                            (n.string(",&#10;&#13;"))) :
-                        (n.string("")), $.get("val"))),
-
-                    processTree(array.tail($.get("tree")), $.get("frame"), $.get("top"), $.get("ret"), n.add($.get("at"), n.integer(1)), n.seq())) :
-                ($.test(n.geq($.get("at"), n.integer(1))) ?
-                    (n.string("n.seq()")) :
-                    ($.get("ret")))));
-    }
-    return n.error(processTree, $_l);
 }
 
-export function resolveModule(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
+export function transpile$2(...$_a) {
+	var $ = n.frame($_a)
+		.item("value")
+		.item("frame");
+	$ = $("frame",map.put($("frame"),n.string("$tree"),$("value")));
+	$ = $("distinct",array.foldLeft($("value"),n.map(n.seq()),function (...$_a) {
+	$ = $.frame($_a)
+		.item("pre")
+		.item("cur");
+	return ($ => {
+	if($.test(n.geq(n.call($("cur"),n.string("name")),n.seq(n.string("core:define"),n.string("core:define-private"))))) {
+	$ = $("name",n.call(n.call($("cur"),n.seq(n.string("args"))),n.seq(n.integer(2))));
+	$ = $("args",n.call(n.call($("cur"),n.seq(n.string("args"))),n.seq(n.integer(4))));
+	return ($ => {
+	if($.test(map.contains($("pre"),$("name")))) {
+	return map.put($("pre"),$("name"),array.append(n.call($("pre"),$("name")),array.size($("args"))));
+} else {
+	return map.put($("pre"),$("name"),n.array(n.seq(array.size($("args")))));
+}
+	})($.frame());
+	} else {
+	return $("pre");
+}
+	})($.frame());
 
-    if ($_l == 2) {
-        $.init($.item("tree"), $.item("name"));
-        return $.test(n.instanceOf($.get("tree"), n.map())) ?
-            ($.test(n.and(n.eq(n.call($.get("tree"), n.string("name")), n.string("core:define")), n.call($.get("tree"), n.string("args")))) ?
-                (n.eq(n.seq(n.integer(2)), $.get("name"))) :
-                ($.get("tree"))) :
-            ($.test(n.instanceOf($.get("tree"), n.array(n.item()))) ?
-                (array.flatten(array.forEach($.get("tree"), function(...$_a) {
-                    var $_l = $_a.length;
-                    $ = n.frame($, $_a);
-                    if ($_l == 1) {
-                        $.init($.item("arg"));
-                        return n.item();
-                    }
-                    return n.error($_l);
-                }))) :
-                (n.seq()));
-    }
-    return n.error(resolveModule, $_l);
+}));
+	$ = $("value",array.join(n.seq($("value"),n.array(n.seq(map.forEachEntry($("distinct"),function (...$_a) {
+	$ = $.frame($_a)
+		.item("name")
+		.item("arities");
+	return n.map(n.seq(n.pair(n.string("name"),n.string("core:interop")),n.pair(n.string("args"),n.array(n.seq($("name"),$("arities")))),n.pair(n.string("suffix"),n.string(""))));
+
+}))))));
+	return processTree($("value"),$("frame"),fn.true());
+
 }
 
-export function call(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
+export function processTree$2(...$_a) {
+	var $ = n.frame($_a)
+		.item("tree")
+		.item("frame");
+	return ($ => {
+	if($.test(n.instanceOf($("tree"),n.string()))) {
+	return fn.concat(n.string("processTree("),$("tree"),n.string(","),$("frame"),n.string(")"));
+} else {
+	return processTree($("tree"),$("frame"),fn.false());
+}
+	})($.frame());
 
-    if ($_l == 2) {
-        $.init($.item("a"), $.item("b"));
-        return n.item(fn.concat(n.string("n.call("), $.get("a"), n.string(","), $.get("b"), n.string(")")));
-    }
-    return n.error(call, $_l);
 }
 
-export function processValue(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
+export function processTree$3(...$_a) {
+	var $ = n.frame($_a)
+		.item("tree")
+		.item("frame")
+		.item("top");
+	return ($ => {
+	if($.test(n.instanceOf($("tree"),n.string()))) {
+	return fn.concat(n.string("processTree("),$("tree"),n.string(","),$("frame"),n.string(","),$("top"),n.string(")"));
+} else {
+	return processTree($("tree"),$("frame"),$("top"),n.string(""));
+}
+	})($.frame());
 
-    if ($_l == 2) {
-        $.init($.item("value"), $.item("frame"));
-        return n.item($.test(n.instanceOf($.get("frame"), n.string())) ?
-            (fn.concat(n.string("processValue("), $.get("value"), n.string(","), $.get("frame"), n.string(")"))) :
-            ($.test(n.instanceOf($.get("value"), n.map())) ?
-                ($.item("name", n.call($.get("value"), n.string("name"))),
-
-                    $.item("args", n.call($.get("value"), n.string("args"))),
-
-                    $.item("s", $.test(map.contains($.get("value"), n.string("args"))) ?
-                        (array.size($.get("args"))) :
-                        (n.integer(0))),
-
-                    $.test(map.contains($.get("value"), n.string("$tree"))) ?
-                    (n.string("")) :
-                    ($.test(fn.matches($.get("name"), n.concat(n.concat(n.string("^core:["), rdl.ncname), n.string("]+$")))) ?
-                        ($.item("local", fn.replace($.get("name"), n.string("^core:"), n.string(""))),
-
-                            $.item("isType", n.geq($.get("local"), map.keys(typemap))),
-
-                            $.item("isNative", n.geq(nativeOps, $.get("local"))),
-
-                            $.item("s", $.test(n.or($.get("isType"), $.get("isNative"))) ?
-                                (n.add($.get("s"), n.integer(1))) :
-                                ($.get("s"))),
-
-                            $.item("isDefn", n.geq($.get("local"), n.seq(n.string("define"), n.string("define-private")))),
-
-                            $.item("isFn", n.or(n.seq(n.and($.get("isDefn"), n.eq($.get("s"), n.integer(6)))), n.seq(n.and(n.eq($.get("local"), n.string("anon")), n.eq($.get("s"), n.integer(4)))))),
-
-                            $.item("frame", map.put($.get("frame"), n.string("$caller"), fn.concat($.get("name"), n.string("#"), $.get("s")))),
-
-                            $.item("args", processArgs($.get("frame"), $.get("args"))),
-
-                            $.item("args", $.test(n.or($.get("isType"), $.get("isNative"))) ?
-                                (array.insertBefore($.get("args"), n.integer(1), $.get("local"))) :
-                                ($.get("args"))),
-
-                            $.item("args", a.forEach($.get("args"), function(...$_a) {
-                                var $_l = $_a.length;
-                                $ = n.frame($, $_a);
-                                if ($_l == 1) {
-                                    $.init($.item("_"));
-                                    return n.item($.test(n.and(n.instanceOf($.get("_"), n.array(n.item())), fn.not($.get("isFn")))) ?
-                                        (fn.concat(n.string("n.seq("), fn.stringJoin(array.flatten($.get("_")), n.string(",")), n.string(")"))) :
-                                        ($.test(n.and(n.instanceOf($.get("_"), n.map()), n.eq(n.call($.get("_"), n.string("name")), n.string("core:call")))) ?
-                                            (processValue($.get("_"), $.get("frame"))) :
-                                            ($.get("_"))));
-                                }
-                                return n.error($_l);
-                            })),
-
-                            $.item("s", array.size($.get("args"))),
-
-                            $.item("fn", $.test($.get("isType")) ?
-                                ($.item("a", n.call(typemap, $.get("local"))),
-
-                                    $.item("f", fn.concat(n.string("core:typegen"), $.test(n.ggt($.get("a"), n.integer(0))) ?
-                                        ($.get("a")) :
-                                        (n.string("")))),
-
-                                    fn.functionLookup(fn.QName(n.string("http://raddle.org/javascript"), $.get("f")), $.get("s"))) :
-                                ($.test($.get("isNative")) ?
-                                    (fn.functionLookup(fn.QName(n.string("http://raddle.org/javascript"), n.string("core:native")), $.get("s"))) :
-                                    (fn.functionLookup(fn.QName(n.string("http://raddle.org/javascript"), $.get("name")), $.get("s"))))),
-
-                            $.item("n", $.test(fn.empty($.get("fn"))) ?
-                                (console.log(n.seq($.get("name"), n.string("#"), array.size($.get("args")), n.string(","), $.get("args")))) :
-                                (n.seq())),
-
-                            fn.apply($.get("fn"), $.get("args"))) :
-                        ($.test(n.eq($.get("name"), n.string(""))) ?
-                            ($.item("args", processArgs(map.put($.get("frame"), n.string("$caller"), n.string("")), $.get("args"))),
-
-                                a.forEach($.get("args"), function(...$_a) {
-                                    var $_l = $_a.length;
-                                    $ = n.frame($, $_a);
-                                    if ($_l == 1) {
-                                        $.init($.item("_"));
-                                        return n.item($.test(n.instanceOf($.get("_"), n.array(n.item()))) ?
-                                            (fn.concat(n.string("n.seq("), fn.stringJoin(array.flatten($.get("_")), n.string(",")), n.string(")"))) :
-                                            ($.test(n.and(n.instanceOf($.get("_"), n.map()), n.eq(n.call($.get("_"), n.string("name")), n.string("core:call")))) ?
-                                                (processValue($.get("_"), $.get("frame"))) :
-                                                ($.get("_"))));
-                                    }
-                                    return n.error($_l);
-                                })) :
-                            ($.item("frame", map.put($.get("frame"), n.string("$caller"), fn.concat($.get("name"), n.string("#"), $.get("s")))),
-
-                                $.item("args", processArgs($.get("frame"), $.get("args"))),
-
-                                $.item("ret", a.foldLeftAt($.get("args"), n.string(""), function(...$_a) {
-                                    var $_l = $_a.length;
-                                    $ = n.frame($, $_a);
-                                    if ($_l == 3) {
-                                        $.init($.item("pre"), $.item("cur"), $.item("at"));
-                                        return n.item(fn.concat($.get("pre"), $.test(n.ggt($.get("at"), n.integer(1))) ?
-                                            (n.string(",")) :
-                                            (n.string("")), $.test(n.instanceOf($.get("cur"), n.array(n.item()))) ?
-                                            (fn.concat(n.string("n.seq("), fn.stringJoin(array.flatten($.get("cur")), n.string(",")), n.string(")"))) :
-                                            ($.test(n.instanceOf($.get("cur"), n.map())) ?
-                                                (processValue($.get("cur"), $.get("frame"))) :
-                                                ($.get("cur")))));
-                                    }
-                                    return n.error($_l);
-                                })),
-
-                                $.test(fn.matches($.get("name"), n.string("^(\\$.*)$|^([^#]+#[0-9]+)$"))) ?
-                                (fn.concat(n.string("n.call("), convert($.get("name"), $.get("frame")), n.string(","), $.get("ret"), n.string(")"))) :
-                                (fn.concat(anonName($.get("frame"), $.get("name"), $.get("s"), n.string("fn")), n.string("("), $.get("ret"), n.string(")"))))))) :
-                ($.test(n.instanceOf($.get("value"), n.array(n.item()))) ?
-                    (fn.concat(n.string("n.seq("), processTree($.get("value"), $.get("frame")), n.string(")"))) :
-                    ($.test(fn.matches($.get("value"), n.concat(n.concat(n.string("^_["), rdl.suffix), n.string("]?$")))) ?
-                        (fn.replace($.get("value"), n.string("^_"), n.concat(n.string("\\$_"), n.call($.get("frame"), n.string("$at"))))) :
-                        (serialize(n.array(n.seq($.get("value"), $.get("frame")))))))));
-    }
-    return n.error(processValue, $_l);
 }
 
-export function isCurrentModule(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
+export function processTree$4(...$_a) {
+	var $ = n.frame($_a)
+		.item("tree")
+		.item("frame")
+		.item("top")
+		.item("ret");
+	return ($ => {
+	if($.test(n.instanceOf($("tree"),n.string()))) {
+	return fn.concat(n.string("processTree("),$("tree"),n.string(","),$("frame"),n.string(","),$("top"),n.string(","),$("ret"),n.string(")"));
+} else {
+	return processTree($("tree"),$("frame"),$("top"),$("ret"),n.integer(1));
+}
+	})($.frame());
 
-    if ($_l == 2) {
-        $.init($.item("frame"), $.item("name"));
-        return n.item(fn.concat(n.string("isCurrentModule("), $.get("frame"), n.string(","), $.get("name"), n.string(")")));
-    }
-    return n.error(isCurrentModule, $_l);
 }
 
-export function convert(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
+export function processTree$5(...$_a) {
+	var $ = n.frame($_a)
+		.item("tree")
+		.item("frame")
+		.item("top")
+		.item("ret")
+		.item("at");
+	return ($ => {
+	if($.test(n.instanceOf($("frame"),n.string()))) {
+	return fn.concat(n.string("processTree("),$("tree"),n.string(","),$("frame"),n.string(","),$("top"),n.string(","),$("ret"),n.string(","),$("at"),n.string(")"));
+} else {
+	return ($ => {
+	if($.test(n.gt(array.size($("tree")),n.integer(0)))) {
+	$ = $("head",array.head($("tree")));
+	$ = $("frame",($ => {
+	if($.test($.test(n.instanceOf($("head"),n.map())) && $.test(n.eq(n.call($("head"),n.string("name")),n.string("core:module"))))) {
+	return map.put($("frame"),n.string("$prefix"),n.call(n.call($("head"),n.seq(n.string("args"))),n.seq(n.integer(2))));
+} else {
+	return $("frame");
+}
+	})($.frame()));
+	$ = $("val",processValue($("head"),$("frame"),$("at")));
+	$ = $("isSeq",n.instanceOf($("val"),n.array(n.item())));
+	$ = $("val",($ => {
+	if($.test($("isSeq"))) {
+	return fn.concat(n.string("n.seq("),fn.stringJoin(array.flatten($("val")),n.string(",")),n.string(")"));
+} else {
+	return $("val");
+}
+	})($.frame()));
+	$ = $("ret",fn.concat($("ret"),($ => {
+	if($.test($.test(n.ne($("ret"),n.string(""))) && $.test(n.ggt($("at"),n.integer(1))))) {
+	return ($ => {
+	if($.test($("top"))) {
+	return n.string("&#10;&#13;");
+} else {
+	return n.string(",&#13;");
+}
+	})($.frame());
+} else {
+	return n.string("");
+}
+	})($.frame()),$("val")));
+	return processTree(array.tail($("tree")),$("frame"),$("top"),$("ret"),n.add($("at"),n.integer(1)));
+	} else {
+	return ($ => {
+	if($.test(n.geq($("at"),n.integer(1)))) {
+	return n.string("n.seq()");
+} else {
+	return $("ret");
+}
+	})($.frame());
+}
+	})($.frame());
+}
+	})($.frame());
 
-    if ($_l == 2) {
-        $.init($.item("string"), $.item("frame"));
-        return n.item($.test(n.instanceOf($.get("frame"), n.string())) ?
-            (fn.concat(n.string("convert("), $.get("string"), n.string(","), $.get("frame"), n.string(")"))) :
-            ($.test(fn.matches($.get("string"), n.string("^n\\.call"))) ?
-                ($.get("string")) :
-                ($.test(fn.matches($.get("string"), n.string("^(\\$.*)$|^([^#]+#[0-9]+)$"))) ?
-                    ($.item("parts", fn.tokenize(rdl.camelCase(fn.replace($.get("string"), n.string("#\\p{N}+$"), n.string(""))), n.string(":"))),
-
-                        $.test(n.eq(fn.count($.get("parts")), n.integer(1))) ?
-                        (fn.concat(n.string("$.get(&quot;"), fn.replace($.get("parts"), n.string("^\\$"), n.string("")), n.string("&quot;)"))) :
-                        ($.test(fn.matches(n.filter($.get("parts"), function($_0) {
-                                return n.geq(fn.position($_0), n.integer(1));
-                            }), fn.concat(n.string("^\\$?"), n.call($.get("frame"), n.string("$prefix"))))) ?
-                            (fn.replace(n.filter($.get("parts"), function($_0) {
-                                return n.geq(fn.position($_0), fn.last($_0));
-                            }), n.string("\\$"), n.string(""))) :
-                            (fn.concat(fn.replace(n.filter($.get("parts"), function($_0) {
-                                return n.geq(fn.position($_0), n.integer(1));
-                            }), n.string("\\$"), n.string("")), n.string("."), n.filter($.get("parts"), function($_0) {
-                                return n.geq(fn.position($_0), n.integer(2));
-                            }))))) :
-                    ($.test(fn.matches($.get("string"), n.string("^(&quot;[^&quot;]*&quot;)$"))) ?
-                        (fn.concat(n.string("n.string("), fn.replace($.get("string"), n.string("\\\\"), n.string("\\\\\\\\")), n.string(")"))) :
-                        ($.test(map.contains(autoConverted, $.get("string"))) ?
-                            (n.call(autoConverted, $.get("string"))) :
-                            ($.test(n.geq(fn.string(fn.number($.get("string"))), n.string("NaN"))) ?
-                                (fn.concat(n.string("n.string(&quot;"), fn.replace($.get("string"), n.string("\\\\"), n.string("\\\\\\\\")), n.string("&quot;)"))) :
-                                ($.test(fn.matches($.get("string"), n.string("\\."))) ?
-                                    (fn.concat(n.string("n.decimal("), $.get("string"), n.string(")"))) :
-                                    (fn.concat(n.string("n.integer("), $.get("string"), n.string(")"))))))))));
-    }
-    return n.error(convert, $_l);
 }
 
-export function serialize(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
+export function resolveModule$2(...$_a) {
+	var $ = n.frame($_a)
+		.item("tree")
+		.item("name");
+	return ($ => {
+	if($.test(n.instanceOf($("tree"),n.map()))) {
+	return ($ => {
+	if($.test($.test(n.eq(n.call($("tree"),n.string("name")),n.string("core:define"))) && $.test(n.call($("tree"),n.string("args"))))) {
+	return n.eq(n.seq(n.integer(2)),$("name"));
+} else {
+	return $("tree");
+}
+	})($.frame());
+} else {
+	return ($ => {
+	if($.test(n.instanceOf($("tree"),n.array(n.item())))) {
+	return array.flatten(array.forEach($("tree"),function (...$_a) {
+	$ = $.frame($_a)
+		.item("arg");
+	return ;
 
-    if ($_l == 1) {
-        $.init($.item("args"));
-        return n.item($.test(n.instanceOf($.get("args"), n.string())) ?
-            (fn.concat(n.string("serialize("), $.get("args"), n.string(")"))) :
-            ($.item("value", n.call($.get("args"), n.integer(1))),
+}));
+} else {
+	return n.seq();
+}
+	})($.frame());
+}
+	})($.frame());
 
-                $.item("params", n.call($.get("args"), n.integer(2))),
-
-                $.test(n.instanceOf($.get("value"), n.map())) ?
-                (fn.concat(n.call($.get("value"), n.string("name")), $.test(map.contains($.get("value"), n.string("args"))) ?
-                    (serialize(n.array(n.seq(n.call($.get("value"), n.string("args")), $.get("params"))))) :
-                    (n.string("()")), $.test(map.contains($.get("value"), n.string("suffix"))) ?
-                    (n.call($.get("value"), n.string("suffix"))) :
-                    (n.string("")))) :
-                ($.test(n.instanceOf($.get("value"), n.array(n.item()))) ?
-                    (fn.concat(n.string("("), a.foldLeftAt($.get("value"), n.string(""), function(...$_a) {
-                        var $_l = $_a.length;
-                        $ = n.frame($, $_a);
-                        if ($_l == 3) {
-                            $.init($.item("pre"), $.item("cur"), $.item("at"));
-                            return ($.item("isSeq", n.seq(n.and(n.instanceOf($.get("cur"), n.map()), n.eq(n.call($.get("cur"), n.string("name")), n.string(""))))),
-                                n.item(fn.concat($.get("pre"), $.test(n.and(n.ggt($.get("at"), n.integer(1)), n.geq($.get("isSeq"), fn.false()))) ?
-                                    (n.string(",")) :
-                                    (n.string("")), serialize(n.array(n.seq($.get("cur"), $.get("params")))))));
-                        }
-                        return n.error($_l);
-                    }), n.string(")"))) :
-                    (convert($.get("value"), $.get("params"))))));
-    }
-    return n.error(serialize, $_l);
 }
 
-export function resolveFunction(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
+export function call$2(...$_a) {
+	var $ = n.frame($_a)
+		.item("a")
+		.item("b");
+	return fn.concat(n.string("n.call("),$("a"),n.string(","),$("b"),n.string(")"));
 
-    if ($_l == 2) {
-        $.init($.item("frame"), $.item("name"));
-        return n.item(fn.concat(n.string("resolveFunction("), $.get("frame"), n.string(","), $.get("name"), n.string(")")));
-    }
-
-    if ($_l == 3) {
-        $.init($.item("frame"), $.item("name"), $.item("self"));
-        return n.item(fn.concat(n.string("resolveFunction("), $.get("frame"), n.string(","), $.get("name"), n.string(","), $.get("self"), n.string(")")));
-    }
-    return n.error(resolveFunction, $_l);
 }
 
-export function module(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
+export function processValue$2(...$_a) {
+	var $ = n.frame($_a)
+		.item("value")
+		.item("frame");
+	return ($ => {
+	if($.test(n.instanceOf($("frame"),n.string()))) {
+	return fn.concat(n.string("processValue("),$("value"),n.string(","),$("frame"),n.string(")"));
+} else {
+	return processValue($("value"),$("frame"),n.integer(0));
+}
+	})($.frame());
 
-    if ($_l == 4) {
-        $.init($.item("frame"), $.item("prefix"), $.item("ns"), $.item("desc"));
-        return n.item(fn.concat(n.string("/*module namespace "), rdl.clip($.get("prefix")), n.string("="), $.get("ns"), n.string(";&#10;&#13;"), $.get("desc"), n.string("*/")));
-    }
-    return n.error(module, $_l);
+}
+
+export function processValue$3(...$_a) {
+	var $ = n.frame($_a)
+		.item("value")
+		.item("frame")
+		.item("at");
+	return ($ => {
+	if($.test(n.instanceOf($("frame"),n.string()))) {
+	return fn.concat(n.string("processValue("),$("value"),n.string(","),$("frame"),n.string(","),$("at"),n.string(")"));
+} else {
+	return ($ => {
+	if($.test(n.instanceOf($("value"),n.map()))) {
+	$ = $("name",n.call($("value"),n.string("name")));
+	$ = $("args",n.call($("value"),n.string("args")));
+	$ = $("s",($ => {
+	if($.test(map.contains($("value"),n.string("args")))) {
+	return array.size($("args"));
+} else {
+	return n.integer(0);
+}
+	})($.frame()));
+	return ($ => {
+	if($.test(map.contains($("value"),n.string("$tree")))) {
+	return n.string("");
+} else {
+	return ($ => {
+	if($.test(fn.matches($("name"),n.concat(n.concat(n.string("^core:["),rdl.ncname),n.string("]+$"))))) {
+	$ = $("local",fn.replace($("name"),n.string("^core:"),n.string("")));
+	$ = $("isType",n.geq($("local"),map.keys(typemap)));
+	$ = $("isNative",n.geq(nativeOps,$("local")));
+	$ = $("s",($ => {
+	if($.test($.test($("isType")) || $.test($("isNative")))) {
+	return n.add($("s"),n.integer(1));
+} else {
+	return $("s");
+}
+	})($.frame()));
+	$ = $("isDefn",n.geq($("local"),n.seq(n.string("define"),n.string("define-private"),n.string("anon"))));
+	$ = $("isFn",$.test($.test($.test(n.seq($.test($("isDefn")) && $.test(n.eq($("s"),n.integer(6))))) || $.test(n.seq($.test(n.eq($("local"),n.string("anon"))) && $.test(n.eq($("s"),n.integer(4)))))) || $.test(n.seq(n.eq($("local"),n.string("interop"))))) || $.test(n.seq(n.eq($("local"),n.string("iff")))));
+	$ = $("args",processArgs($("frame"),$("args"),fn.concat($("name"),n.string("#"),$("s"))));
+	$ = $("args",($ => {
+	if($.test($.test($("isType")) || $.test($("isNative")))) {
+	return array.insertBefore($("args"),n.integer(1),$("local"));
+} else {
+	return $("args");
+}
+	})($.frame()));
+	$ = $("args",a.forEachAt($("args"),function (...$_a) {
+	$ = $.frame($_a)
+		.item("_")
+		.item("i");
+	return ($ => {
+	if($.test($.test(n.instanceOf($("_"),n.array(n.item()))) && $.test(fn.not($("isFn"))))) {
+	return fn.concat(n.string("n.seq("),fn.stringJoin(array.flatten($("_")),n.string(",")),n.string(")"));
+} else {
+	return ($ => {
+	if($.test($.test(n.instanceOf($("_"),n.map())) && $.test(n.eq(n.call($("_"),n.string("name")),n.string("core:call"))))) {
+	return processValue($("_"),$("frame"));
+} else {
+	return $("_");
+}
+	})($.frame());
+}
+	})($.frame());
+
+}));
+	$ = $("s",array.size($("args")));
+	$ = $("fn",($ => {
+	if($.test($("isType"))) {
+	$ = $("a",n.call(typemap,$("local")));
+	$ = $("f",fn.concat(n.string("core:typegen"),($ => {
+	if($.test(n.ggt($("a"),n.integer(0)))) {
+	return $("a");
+} else {
+	return n.string("");
+}
+	})($.frame())));
+	return fn.functionLookup(fn.QName(n.string("http://raddle.org/javascript"),$("f")),$("s"));
+	} else {
+	return ($ => {
+	if($.test($("isNative"))) {
+	return fn.functionLookup(fn.QName(n.string("http://raddle.org/javascript"),n.string("core:native")),$("s"));
+} else {
+	return fn.functionLookup(fn.QName(n.string("http://raddle.org/javascript"),$("name")),$("s"));
+}
+	})($.frame());
+}
+	})($.frame()));
+	$ = $("n",($ => {
+	if($.test(fn.empty($("fn")))) {
+	return console.log(n.seq($("name"),n.string("#"),array.size($("args")),n.string(","),$("args")));
+} else {
+	return n.seq();
+}
+	})($.frame()));
+	return fn.apply($("fn"),$("args"));
+	} else {
+	return ($ => {
+	if($.test(n.eq($("name"),n.string("")))) {
+	$ = $("args",processArgs($("frame"),$("args"),n.string("")));
+	return a.forEach($("args"),function (...$_a) {
+	$ = $.frame($_a)
+		.item("_");
+	return ($ => {
+	if($.test(n.instanceOf($("_"),n.array(n.item())))) {
+	return fn.concat(n.string("n.seq("),fn.stringJoin(array.flatten($("_")),n.string(",")),n.string(")"));
+} else {
+	return ($ => {
+	if($.test($.test(n.instanceOf($("_"),n.map())) && $.test(n.eq(n.call($("_"),n.string("name")),n.string("core:call"))))) {
+	return processValue($("_"),$("frame"));
+} else {
+	return $("_");
+}
+	})($.frame());
+}
+	})($.frame());
+
+});
+	} else {
+	$ = $("args",processArgs($("frame"),$("args"),fn.concat($("name"),n.string("#"),$("s"))));
+	$ = $("ret",a.foldLeftAt($("args"),n.string(""),function (...$_a) {
+	$ = $.frame($_a)
+		.item("pre")
+		.item("cur")
+		.item("at");
+	return fn.concat($("pre"),($ => {
+	if($.test(n.ggt($("at"),n.integer(1)))) {
+	return n.string(",");
+} else {
+	return n.string("");
+}
+	})($.frame()),($ => {
+	if($.test(n.instanceOf($("cur"),n.array(n.item())))) {
+	return fn.concat(n.string("n.seq("),fn.stringJoin(array.flatten($("cur")),n.string(",")),n.string(")"));
+} else {
+	return ($ => {
+	if($.test(n.instanceOf($("cur"),n.map()))) {
+	return processValue($("cur"),$("frame"));
+} else {
+	return $("cur");
+}
+	})($.frame());
+}
+	})($.frame()));
+
+}));
+	return ($ => {
+	if($.test(fn.matches($("name"),n.string("^(\\$.*)$|^([^#]+#[0-9]+)$")))) {
+	return fn.concat(n.string("n.call("),convert($("name"),$("frame")),n.string(","),$("ret"),n.string(")"));
+} else {
+	return fn.concat(anonName($("frame"),$("name"),$("s"),n.string("fn")),n.string("("),$("ret"),n.string(")"));
+}
+	})($.frame());
+	}
+	})($.frame());
+}
+	})($.frame());
+}
+	})($.frame());
+	} else {
+	return ($ => {
+	if($.test(n.instanceOf($("value"),n.array(n.item())))) {
+	return fn.concat(n.string("n.seq("),processTree($("value"),$("frame")),n.string(")"));
+} else {
+	return ($ => {
+	if($.test(fn.matches($("value"),n.concat(n.concat(n.string("^_["),rdl.suffix),n.string("]?$"))))) {
+	return fn.replace($("value"),n.string("^_"),n.concat(n.string("\\$_"),$("at")));
+} else {
+	return serialize($("value"),$("frame"));
+}
+	})($.frame());
+}
+	})($.frame());
+}
+	})($.frame());
+}
+	})($.frame());
+
+}
+
+function isCurrentModule$2(...$_a) {
+	var $ = n.frame($_a)
+		.item("frame")
+		.item("name");
+	return fn.concat(n.string("isCurrentModule("),$("frame"),n.string(","),$("name"),n.string(")"));
+
+}
+
+export function convert$2(...$_a) {
+	var $ = n.frame($_a)
+		.item("string")
+		.item("frame");
+	return ($ => {
+	if($.test(n.instanceOf($("frame"),n.string()))) {
+	return fn.concat(n.string("convert("),$("string"),n.string(","),$("frame"),n.string(")"));
+} else {
+	return ($ => {
+	if($.test(fn.matches($("string"),n.string("^n\\.call")))) {
+	return $("string");
+} else {
+	return ($ => {
+	if($.test(fn.matches($("string"),n.string("^(\\$.*)$|^([^#]+#[0-9]+)$")))) {
+	$ = $("parts",fn.tokenize(rdl.camelCase(fn.replace($("string"),n.string("#\\p{N}+$"),n.string(""))),n.string(":")));
+	return ($ => {
+	if($.test(n.eq(fn.count($("parts")),n.integer(1)))) {
+	return fn.concat(n.string("$(&quot;"),fn.replace($("parts"),n.string("^\\$"),n.string("")),n.string("&quot;)"));
+} else {
+	return ($ => {
+	if($.test(fn.matches(n.filter($("parts"),function($_0) {
+	return n.geq(fn.position($_0),n.integer(1));
+}),fn.concat(n.string("^\\$?"),n.call($("frame"),n.string("$prefix")))))) {
+	return fn.replace(n.filter($("parts"),function($_0) {
+	return n.geq(fn.position($_0),fn.last($_0));
+}),n.string("\\$"),n.string(""));
+} else {
+	return fn.concat(fn.replace(n.filter($("parts"),function($_0) {
+	return n.geq(fn.position($_0),n.integer(1));
+}),n.string("\\$"),n.string("")),n.string("."),n.filter($("parts"),function($_0) {
+	return n.geq(fn.position($_0),n.integer(2));
+}));
+}
+	})($.frame());
+}
+	})($.frame());
+	} else {
+	return ($ => {
+	if($.test(fn.matches($("string"),n.string("^(&quot;[^&quot;]*&quot;)$")))) {
+	return fn.concat(n.string("n.string("),fn.replace($("string"),n.string("\\\\"),n.string("\\\\\\\\")),n.string(")"));
+} else {
+	return ($ => {
+	if($.test(map.contains(autoConverted,$("string")))) {
+	return n.call(autoConverted,$("string"));
+} else {
+	return ($ => {
+	if($.test(n.geq(fn.string(fn.number($("string"))),n.string("NaN")))) {
+	return fn.concat(n.string("n.string(&quot;"),fn.replace($("string"),n.string("\\\\"),n.string("\\\\\\\\")),n.string("&quot;)"));
+} else {
+	return ($ => {
+	if($.test(fn.matches($("string"),n.string("\\.")))) {
+	return fn.concat(n.string("n.decimal("),$("string"),n.string(")"));
+} else {
+	return fn.concat(n.string("n.integer("),$("string"),n.string(")"));
+}
+	})($.frame());
+}
+	})($.frame());
+}
+	})($.frame());
+}
+	})($.frame());
+}
+	})($.frame());
+}
+	})($.frame());
+}
+	})($.frame());
+
+}
+
+export function serialize$2(...$_a) {
+	var $ = n.frame($_a)
+		.item("value")
+		.item("params");
+	return ($ => {
+	if($.test(n.instanceOf($("params"),n.string()))) {
+	return fn.concat(n.string("serialize("),$("value"),n.string(","),$("params"),n.string(")"));
+} else {
+	return ($ => {
+	if($.test(n.instanceOf($("value"),n.map()))) {
+	return fn.concat(n.call($("value"),n.string("name")),($ => {
+	if($.test(map.contains($("value"),n.string("args")))) {
+	return serialize(n.call($("value"),n.string("args")),$("params"));
+} else {
+	return n.string("()");
+}
+	})($.frame()),($ => {
+	if($.test(map.contains($("value"),n.string("suffix")))) {
+	return n.call($("value"),n.string("suffix"));
+} else {
+	return n.string("");
+}
+	})($.frame()));
+} else {
+	return ($ => {
+	if($.test(n.instanceOf($("value"),n.array(n.item())))) {
+	return fn.concat(n.string("("),a.foldLeftAt($("value"),n.string(""),function (...$_a) {
+	$ = $.frame($_a)
+		.item("pre")
+		.item("cur")
+		.item("at");
+	$ = $("isSeq",n.seq($.test(n.instanceOf($("cur"),n.map())) && $.test(n.eq(n.call($("cur"),n.string("name")),n.string("")))));
+	return fn.concat($("pre"),($ => {
+	if($.test($.test(n.ggt($("at"),n.integer(1))) && $.test(n.geq($("isSeq"),fn.false())))) {
+	return n.string(",");
+} else {
+	return n.string("");
+}
+	})($.frame()),serialize($("cur"),$("params")));
+
+}),n.string(")"));
+} else {
+	return convert($("value"),$("params"));
+}
+	})($.frame());
+}
+	})($.frame());
+}
+	})($.frame());
+
+}
+
+export function resolveFunction$2(...$_a) {
+	var $ = n.frame($_a)
+		.item("frame")
+		.item("name");
+	return fn.concat(n.string("resolveFunction("),$("frame"),n.string(","),$("name"),n.string(")"));
+
+}
+
+export function resolveFunction$3(...$_a) {
+	var $ = n.frame($_a)
+		.item("frame")
+		.item("name")
+		.item("self");
+	return fn.concat(n.string("resolveFunction("),$("frame"),n.string(","),$("name"),n.string(","),$("self"),n.string(")"));
+
+}
+
+export function module$4(...$_a) {
+	var $ = n.frame($_a)
+		.item("frame")
+		.item("prefix")
+		.item("ns")
+		.item("desc");
+	return fn.concat(n.string("/*module namespace "),rdl.clip($("prefix")),n.string("="),$("ns"),n.string(";&#10;&#13;"),$("desc"),n.string("*/"));
+
+}
+
+export function namespace$3(...$_a) {
+	var $ = n.frame($_a)
+		.item("frame")
+		.item("prefix")
+		.item("ns");
+	return ($ => {
+	if($.test(n.instanceOf($("frame"),n.string()))) {
+	return fn.concat(n.string("namespace("),$("frame"),n.string(","),$("prefix"),n.string(","),$("ns"),n.string(")"));
+} else {
+	return fn.concat(n.string("//declare namespace "),rdl.clip($("prefix")),n.string(" = "),$("ns"));
+}
+	})($.frame());
+
+}
+
+export function ximport$3(...$_a) {
+	var $ = n.frame($_a)
+		.item("frame")
+		.item("prefix")
+		.item("ns");
+	return ($ => {
+	if($.test(n.instanceOf($("frame"),n.string()))) {
+	return fn.concat(n.string("ximport("),$("frame"),n.string(","),$("prefix"),n.string(","),$("ns"),n.string(")"));
+} else {
+	return fn.concat(n.string("import * as "),rdl.clip($("prefix")),n.string(" from "),$("ns"));
+}
+	})($.frame());
+
+}
+
+export function ximport$4(...$_a) {
+	var $ = n.frame($_a)
+		.item("frame")
+		.item("prefix")
+		.item("ns")
+		.item("loc");
+	return ($ => {
+	if($.test(n.instanceOf($("frame"),n.string()))) {
+	return fn.concat(n.string("ximport("),$("frame"),n.string(","),$("prefix"),n.string(","),$("ns"),n.string(","),$("loc"),n.string(")"));
+} else {
+	return fn.concat(n.string("import * as "),rdl.clip($("prefix")),n.string(" from "),fn.replace($("loc"),n.string("(\\.xql|\\.rdl)&quot;$"),n.string(".js&quot;")),n.string(""));
+}
+	})($.frame());
+
+}
+
+export function anonName$4(...$_a) {
+	var $ = n.frame($_a)
+		.item("frame")
+		.item("name")
+		.item("arity")
+		.item("default-prefix");
+	return ($ => {
+	if($.test(n.instanceOf($("frame"),n.string()))) {
+	return fn.concat(n.string("anonName("),$("frame"),n.string(","),$("name"),n.string(","),$("arity"),n.string(","),$("defaultPrefix"),n.string(")"));
+} else {
+	$ = $("prefix",n.call($("frame"),n.string("$prefix")));
+	$ = $("p",fn.tokenize($("name"),n.string(":")));
+	$ = $("prefix",($ => {
+	if($.test(n.eq(n.filter($("p"),function($_0) {
+	return n.geq(fn.position($_0),n.subtract(fn.last($_0),n.integer(1)));
+}),$("prefix")))) {
+	return n.seq();
+} else {
+	return ($ => {
+	if($.test(n.filter($("p"),function($_0) {
+	return n.geq(fn.position($_0),n.subtract(fn.last($_0),n.integer(1)));
+}))) {
+	return n.filter($("p"),function($_0) {
+	return n.geq(fn.position($_0),n.subtract(fn.last($_0),n.integer(1)));
+});
+} else {
+	return $("defaultPrefix");
+}
+	})($.frame());
+}
+	})($.frame()));
+	return fn.concat(n.string(""),rdl.camelCase($("prefix")),($ => {
+	if($.test($("prefix"))) {
+	return n.string(".");
+} else {
+	return n.string("");
+}
+	})($.frame()),rdl.camelCase(n.filter($("p"),function($_0) {
+	return n.geq(fn.position($_0),fn.last($_0));
+})));
+	}
+	})($.frame());
+
+}
+
+export function xvar$4(...$_a) {
+	var $ = n.frame($_a)
+		.item("frame")
+		.item("name")
+		.item("def")
+		.item("body");
+	return fn.concat(n.string("export const "),$("name"),n.string(" = "),$("body"),n.string(";"));
+
+}
+
+export function define$5(...$_a) {
+	var $ = n.frame($_a)
+		.item("frame")
+		.item("name")
+		.item("def")
+		.item("args")
+		.item("type");
+	return ($ => {
+	if($.test(n.instanceOf($("frame"),n.string()))) {
+	return fn.concat(n.string("define("),$("frame"),n.string(","),$("name"),n.string(","),$("def"),n.string(","),$("args"),n.string(","),$("type"),n.string(")"));
+} else {
+	return define($("frame"),$("name"),$("def"),$("args"),$("type"),n.string(""));
+}
+	})($.frame());
+
+}
+
+export function definePrivate$6(...$_a) {
+	var $ = n.frame($_a)
+		.item("frame")
+		.item("name")
+		.item("def")
+		.item("args")
+		.item("type")
+		.item("body");
+	return ($ => {
+	if($.test(n.instanceOf($("frame"),n.string()))) {
+	return fn.concat(n.string("definePrivate("),$("frame"),n.string(","),$("name"),n.string(","),$("def"),n.string(","),$("args"),n.string(","),$("type"),n.string(","),$("body"),n.string(")"));
+} else {
+	return define($("frame"),$("name"),$("def"),$("args"),$("type"),$("body"),fn.true());
+}
+	})($.frame());
+
+}
+
+export function define$6(...$_a) {
+	var $ = n.frame($_a)
+		.item("frame")
+		.item("name")
+		.item("def")
+		.item("args")
+		.item("type")
+		.item("body");
+	return ($ => {
+	if($.test(n.instanceOf($("frame"),n.string()))) {
+	return fn.concat(n.string("define("),$("frame"),n.string(","),$("name"),n.string(","),$("def"),n.string(","),$("args"),n.string(","),$("type"),n.string(","),$("body"),n.string(")"));
+} else {
+	return define($("frame"),$("name"),$("def"),$("args"),$("type"),$("body"),fn.false());
+}
+	})($.frame());
+
+}
+
+export function cardinality$1(...$_a) {
+	var $ = n.frame($_a)
+		.item("a");
+	return ($ => {
+	if($.test(n.instanceOf($("a"),n.string()))) {
+	return fn.concat(n.string("cardinality("),$("a"),n.string(")"));
+} else {
+	$ = $("s",array.size($("a")));
+	$ = $("param",($ => {
+	if($.test(n.gt($("s"),n.integer(1)))) {
+	return n.filter($("a"),function($_0) {
+	return n.geq(fn.position($_0),n.integer(1));
+});
+} else {
+	return n.string("");
+}
+	})($.frame()));
+	$ = $("suffix",($ => {
+	if($.test(n.gt($("s"),n.integer(1)))) {
+	return n.filter($("a"),function($_0) {
+	return n.geq(fn.position($_0),n.integer(2));
+});
+} else {
+	return n.filter($("a"),function($_0) {
+	return n.geq(fn.position($_0),n.integer(1));
+});
+}
+	})($.frame()));
+	$ = $("card",($ => {
+	if($.test(n.eq($("suffix"),n.string("+")))) {
+	return n.string("oneOrMore");
+} else {
+	return ($ => {
+	if($.test(n.eq($("suffix"),n.string("*")))) {
+	return n.string("zeroOrMore");
+} else {
+	return ($ => {
+	if($.test(n.eq($("suffix"),n.string("?")))) {
+	return n.string("zeroOrOne");
+} else {
+	return n.string("");
+}
+	})($.frame());
+}
+	})($.frame());
+}
+	})($.frame()));
+	return ($ => {
+	if($.test(n.ne($("card"),n.string("")))) {
+	return fn.concat(n.string("$."),$("card"),n.string("("),$("param"),n.string(")"));
+} else {
+	return $("param");
+}
+	})($.frame());
+	}
+	})($.frame());
+
+}
+
+export function define$7(...$_a) {
+	var $ = n.frame($_a)
+		.item("frame")
+		.item("name")
+		.item("def")
+		.item("args")
+		.item("type")
+		.item("body")
+		.item("private");
+	return ($ => {
+	if($.test(n.instanceOf($("frame"),n.string()))) {
+	return fn.concat(n.string("define("),$("frame"),n.string(","),$("name"),n.string(","),$("def"),n.string(","),$("args"),n.string(","),$("type"),n.string(","),$("body"),n.string(","),$("private"),n.string(")"));
+} else {
+	$ = $("init",array.flatten(a.forEach($("args"),function (...$_a) {
+	$ = $.frame($_a)
+		.item("_");
+	return ($ => {
+	if($.test(n.instanceOf($("_"),n.map()))) {
+	$ = $("args",n.call($("_"),n.string("args")));
+	$ = $("param",fn.concat(n.string("&quot;"),n.call($("args"),n.integer(2)),n.string("&quot;")));
+	$ = $("composite",array.flatten(array.subarray($("args"),n.integer(3))));
+	$ = $("suffix",n.call($("_"),n.string("suffix")));
+	return fn.concat(fn.replace(n.call($("_"),n.string("name")),n.string("core:"),n.string("&#9;.")),n.string("("),cardinality(n.array(n.seq($("param"),$("suffix")))),fn.forEach($("composite"),function (...$_a) {
+	$ = $.frame($_a)
+		.item("_");
+	return fn.concat(n.string(","),fn.replace(n.call($("_"),n.string("name")),n.string("core:"),n.string("\\$.")),n.string("("),cardinality(n.array(n.seq(n.call($("_"),n.string("suffix"))))),n.string(")"));
+
+}),n.string(")"));
+	} else {
+	return ($ => {
+	if($.test(n.instanceOf($("_"),n.string()))) {
+	return fn.concat(n.string("$.item("),$("_"),n.string(")"));
+} else {
+	return $("_");
+}
+	})($.frame());
+}
+	})($.frame());
+
+})));
+	$ = $("parts",fn.tokenize(rdl.clip($("name")),n.string(":")));
+	$ = $("fname",fn.concat(rdl.camelCase(n.filter($("parts"),function($_0) {
+	return n.geq(fn.position($_0),fn.last($_0));
+})),n.string("$"),fn.count($("init"))));
+	return fn.concat(($ => {
+	if($.test($("private"))) {
+	return n.string("");
+} else {
+	return n.string("export ");
+}
+	})($.frame()),n.string("function "),$("fname"),n.string("(...$_a) {&#13;&#9;"),n.string("var $ = n.frame($_a)&#13;&#9;"),fn.stringJoin($("init"),n.string("&#13;&#9;")),n.string(";&#13;&#9;"),$("body"),n.string("&#13;}"));
+	}
+	})($.frame());
+
+}
+
+export function describe$5(...$_a) {
+	var $ = n.frame($_a)
+		.item("frame")
+		.item("name")
+		.item("def")
+		.item("args")
+		.item("type");
+	return n.string("n.map()");
+
+}
+
+export function anon$4(...$_a) {
+	var $ = n.frame($_a)
+		.item("frame")
+		.item("args")
+		.item("type")
+		.item("body");
+	return ($ => {
+	if($.test(n.instanceOf($("frame"),n.string()))) {
+	return fn.concat(n.string("anon("),$("args"),n.string(","),$("type"),n.string(","),$("body"),n.string(")"));
+} else {
+	$ = $("init",array.flatten(a.forEach($("args"),function (...$_a) {
+	$ = $.frame($_a)
+		.item("_");
+	return ($ => {
+	if($.test(n.instanceOf($("_"),n.map()))) {
+	$ = $("args",n.call($("_"),n.string("args")));
+	$ = $("param",fn.concat(n.string("&quot;"),n.call($("args"),n.integer(2)),n.string("&quot;")));
+	$ = $("composite",array.flatten(array.subarray($("args"),n.integer(3))));
+	$ = $("suffix",n.call($("_"),n.string("suffix")));
+	return fn.concat(fn.replace(n.call($("_"),n.string("name")),n.string("core:"),n.string("&#9;.")),n.string("("),cardinality(n.array(n.seq($("param"),$("suffix")))),fn.forEach($("composite"),function (...$_a) {
+	$ = $.frame($_a)
+		.item("_");
+	return fn.concat(n.string(","),fn.replace(n.call($("_"),n.string("name")),n.string("core:"),n.string("\\$.")),n.string("("),cardinality(n.array(n.seq(n.call($("_"),n.string("suffix"))))),n.string(")"));
+
+}),n.string(")"));
+	} else {
+	return ($ => {
+	if($.test(n.instanceOf($("_"),n.string()))) {
+	return fn.concat(n.string("$.item("),$("_"),n.string(")"));
+} else {
+	return $("_");
+}
+	})($.frame());
+}
+	})($.frame());
+
+})));
+	return fn.concat(n.string("function (...$_a) {&#13;&#9;"),n.string("$ = $.frame($_a)&#13;&#9;"),fn.stringJoin($("init"),n.string("&#13;&#9;")),n.string(";&#13;&#9;"),$("body"),n.string("&#13;}"));
+	}
+	})($.frame());
+
+}
+
+export function letRet$2(...$_a) {
+	var $ = n.frame($_a)
+		.item("a")
+		.item("seqtype");
+	return ($ => {
+	if($.test(n.instanceOf($("a"),n.string()))) {
+	return fn.concat(n.string("letRet("),$("a"),n.string(","),$("seqtype"),n.string(")"));
+} else {
+	$ = $("size",array.size($("a")));
+	return fn.stringJoin(array.flatten(a.forEachAt($("a"),function (...$_a) {
+	$ = $.frame($_a)
+		.item("_")
+		.item("at");
+	$ = $("_",($ => {
+	if($.test(n.instanceOf($("_"),n.array(n.item())))) {
+	return fn.concat(n.string("n.seq("),fn.stringJoin(array.flatten($("_")),n.string(",")),n.string(")"));
+} else {
+	return $("_");
+}
+	})($.frame()));
+	return ($ => {
+	if($.test(n.lt($("at"),$("size")))) {
+	return fn.concat(n.string("$ = "),$("_"));
+} else {
+	return fn.concat(n.string("return "),($ => {
+	if($.test($("seqtype"))) {
+	return fn.concat(fn.substring($("seqtype"),n.integer(1),n.subtract(fn.stringLength($("seqtype")),n.integer(1))),$("_"),n.string(")"));
+} else {
+	return $("_");
+}
+	})($.frame()),n.string(";&#13;&#9;"));
+}
+	})($.frame());
+
+})),n.string(";&#13;&#9;"));
+	}
+	})($.frame());
+
+}
+
+export function iff$3(...$_a) {
+	var $ = n.frame($_a)
+		.item("a")
+		.item("b")
+		.item("c");
+	$ = $("d",n.string("&#13;&#9;"));
+	return fn.concat(n.string("($ => {"),$("d"),n.string("if($.test("),$("a"),n.string(")) {"),$("d"),($ => {
+	if($.test(fn.matches($("b"),n.string("^return|^\\$ =")))) {
+	return $("b");
+} else {
+	return fn.concat(n.string("return "),$("b"),n.string(";&#13;"));
+}
+	})($.frame()),n.string("} else {"),$("d"),($ => {
+	if($.test(fn.matches($("c"),n.string("^return|^\\$ =")))) {
+	return $("c");
+} else {
+	return fn.concat(n.string("return "),$("c"),n.string(";&#13;"));
+}
+	})($.frame()),n.string("}"),$("d"),n.string("})($.frame())"));
+
+}
+
+export function typegen1$2(...$_a) {
+	var $ = n.frame($_a)
+		.item("type")
+		.item("seq");
+	return fn.concat(n.string("n."),$("type"),n.string("("),$("seq"),n.string(")"));
+
+}
+
+export function typegen1$3(...$_a) {
+	var $ = n.frame($_a)
+		.item("type")
+		.item("name")
+		.item("seq");
+	return fn.concat(n.string("n."),$("type"),n.string("("),$("name"),n.string(","),$("seq"),n.string(")"));
+
+}
+
+export function select$2(...$_a) {
+	var $ = n.frame($_a)
+		.item("a")
+		.item("b");
+	return fn.concat(n.string("n.select("),$("a"),n.string(","),$("b"),n.string(")"));
+
+}
+
+export function selectAttribute$2(...$_a) {
+	var $ = n.frame($_a)
+		.item("a")
+		.item("b");
+	return fn.concat(n.string("n.selectAttribute("),$("a"),n.string(","),$("b"),n.string(")"));
+
+}
+
+export function typegen2$1(...$_a) {
+	var $ = n.frame($_a)
+		.item("type");
+	return $("type");
+
+}
+
+export function typegen2$4(...$_a) {
+	var $ = n.frame($_a)
+		.item("type")
+		.item("keytype")
+		.item("valtype")
+		.item("body");
+	return fn.concat(n.string("n.map("),$("body"),n.string(")"));
+
+}
+
+export function typegen2$3(...$_a) {
+	var $ = n.frame($_a)
+		.item("type")
+		.item("keytype")
+		.item("valtype");
+	return fn.concat(n.string("n."),$("type"),n.string("()"));
+
+}
+
+export function typegen2$2(...$_a) {
+	var $ = n.frame($_a)
+		.item("type")
+		.item("seq");
+	return ($ => {
+	if($.test(n.eq($("type"),n.string("map")))) {
+	return fn.concat(n.string("n.map("),$("seq"),n.string(")"));
+} else {
+	return n.seq();
+}
+	})($.frame());
+
+}
+
+export function _typegen$1(...$_a) {
+	var $ = n.frame($_a)
+		.item("args");
+	return ($ => {
+	if($.test(n.instanceOf($("args"),n.string()))) {
+	return fn.concat(n.string("n._typegen("),$("args"),n.string(")"));
+} else {
+	$ = $("l",array.size($("args")));
+	return ($ => {
+	if($.test(n.eq($("l"),n.integer(2)))) {
+	return fn.concat(n.string("n."),n.call($("args"),n.integer(1)),n.string("("),n.call($("args"),n.integer(2)),n.string(")"));
+} else {
+	$ = $("param",rdl.camelCase(rdl.clip(n.call($("args"),n.integer(2)))));
+	return ($ => {
+	if($.test(n.call($("args"),n.integer(3)))) {
+	return fn.concat(n.string("$(&quot;"),$("param"),n.string("&quot;,"),n.call($("args"),n.integer(3)),n.string(")"));
+} else {
+	return fn.concat(n.string("$(&quot;"),fn.replace($("param"),n.string("^([^\\.]*)(\\.{3})$"),n.string("$2 $1")),n.string("&quot;)"));
+}
+	})($.frame());
+	}
+	})($.frame());
+	}
+	})($.frame());
+
+}
+
+export function typegen$1(...$_a) {
+	var $ = n.frame($_a)
+		.item("type");
+	return n._typegen(n.array(n.seq($("type"),n.string(""))));
+
+}
+
+export function typegen$2(...$_a) {
+	var $ = n.frame($_a)
+		.item("type")
+		.item("val");
+	return n._typegen(n.array(n.seq($("type"),$("val"))));
+
+}
+
+export function typegen$3(...$_a) {
+	var $ = n.frame($_a)
+		.item("type")
+		.item("frame")
+		.item("name");
+	return n._typegen(n.array(n.seq($("type"),$("name"),n.seq(),n.string(""))));
+
+}
+
+export function typegen$4(...$_a) {
+	var $ = n.frame($_a)
+		.item("type")
+		.item("frame")
+		.item("name")
+		.item("val");
+	return n._typegen(n.array(n.seq($("type"),$("name"),$("val"),n.string(""))));
+
+}
+
+export function typegen$5(...$_a) {
+	var $ = n.frame($_a)
+		.item("type")
+		.item("frame")
+		.item("name")
+		.item("val")
+		.item("suffix");
+	return n._typegen(n.array(n.seq($("type"),$("name"),$("val"),$("suffix"))));
+
 }
 
 export function namespace(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
+	var $_l = $_a.length;
+	if($_l===3){
+		return namespace$3.apply(this,$_a);
+	}
 
-    if ($_l == 3) {
-        $.init($.item("frame"), $.item("prefix"), $.item("ns"));
-        return n.item($.test(n.instanceOf($.get("frame"), n.string())) ?
-            (fn.concat(n.string("namespace("), $.get("frame"), n.string(","), $.get("prefix"), n.string(","), $.get("ns"), n.string(")"))) :
-            (fn.concat(n.string("//declare namespace "), rdl.clip($.get("prefix")), n.string(" = "), $.get("ns"))));
-    }
-    return n.error(namespace, $_l);
+	return n.error(namespace,$_l);
 }
 
 export function ximport(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
+	var $_l = $_a.length;
+	if($_l===3){
+		return ximport$3.apply(this,$_a);
+	}
 
-    if ($_l == 3) {
-        $.init($.item("frame"), $.item("prefix"), $.item("ns"));
-        return n.item($.test(n.instanceOf($.get("frame"), n.string())) ?
-            (fn.concat(n.string("ximport("), $.get("frame"), n.string(","), $.get("prefix"), n.string(","), $.get("ns"), n.string(")"))) :
-            (fn.concat(n.string("import * as "), rdl.clip($.get("prefix")), n.string(" from "), $.get("ns"))));
-    }
+if($_l===4){
+		return ximport$4.apply(this,$_a);
+	}
 
-    if ($_l == 4) {
-        $.init($.item("frame"), $.item("prefix"), $.item("ns"), $.item("loc"));
-        return n.item($.test(n.instanceOf($.get("frame"), n.string())) ?
-            (fn.concat(n.string("ximport("), $.get("frame"), n.string(","), $.get("prefix"), n.string(","), $.get("ns"), n.string(","), $.get("loc"), n.string(")"))) :
-            (fn.concat(n.string("import * as "), rdl.clip($.get("prefix")), n.string(" from "), fn.replace($.get("loc"), n.string("(\\.xql|\\.rdl)&quot;$"), n.string(".js&quot;")), n.string(""))));
-    }
-    return n.error(ximport, $_l);
+	return n.error(ximport,$_l);
 }
 
-export function anonName(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
+export function isFnSeq(...$_a) {
+	var $_l = $_a.length;
+	if($_l===1){
+		return isFnSeq$1.apply(this,$_a);
+	}
 
-    if ($_l == 4) {
-        $.init($.item("frame"), $.item("name"), $.item("arity"), $.item("default-prefix"));
-        return n.item($.test(n.instanceOf($.get("frame"), n.string())) ?
-            (fn.concat(n.string("anonName("), $.get("frame"), n.string(","), $.get("name"), n.string(","), $.get("arity"), n.string(","), $.get("defaultPrefix"), n.string(")"))) :
-            ($.item("prefix", n.call($.get("frame"), n.string("$prefix"))),
-
-                $.item("p", fn.tokenize($.get("name"), n.string(":"))),
-
-                $.item("prefix", $.test(n.eq(n.filter($.get("p"), function($_0) {
-                        return n.geq(fn.position($_0), n.subtract(fn.last($_0), n.integer(1)));
-                    }), $.get("prefix"))) ?
-                    (n.seq()) :
-                    ($.test(n.filter($.get("p"), function($_0) {
-                            return n.geq(fn.position($_0), n.subtract(fn.last($_0), n.integer(1)));
-                        })) ?
-                        (n.filter($.get("p"), function($_0) {
-                            return n.geq(fn.position($_0), n.subtract(fn.last($_0), n.integer(1)));
-                        })) :
-                        ($.get("defaultPrefix")))),
-
-                fn.concat(n.string(""), rdl.camelCase($.get("prefix")), $.test($.get("prefix")) ?
-                    (n.string(".")) :
-                    (n.string("")), rdl.camelCase(n.filter($.get("p"), function($_0) {
-                        return n.geq(fn.position($_0), fn.last($_0));
-                    })))));
-    }
-    return n.error(anonName, $_l);
+	return n.error(isFnSeq,$_l);
 }
 
-export function xvar(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
+export function interop(...$_a) {
+	var $_l = $_a.length;
+	if($_l===2){
+		return interop$2.apply(this,$_a);
+	}
 
-    if ($_l == 4) {
-        $.init($.item("frame"), $.item("name"), $.item("def"), $.item("body"));
-        return n.item(fn.concat(n.string("export const "), $.get("name"), n.string(" = "), $.get("body"), n.string(";")));
-    }
-    return n.error(xvar, $_l);
+	return n.error(interop,$_l);
 }
 
-export function define(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
+export function serialize(...$_a) {
+	var $_l = $_a.length;
+	if($_l===2){
+		return serialize$2.apply(this,$_a);
+	}
 
-    if ($_l == 5) {
-        $.init($.item("frame"), $.item("name"), $.item("def"), $.item("args"), $.item("type"));
-        return n.item($.test(n.instanceOf($.get("frame"), n.string())) ?
-            (fn.concat(n.string("define("), $.get("frame"), n.string(","), $.get("name"), n.string(","), $.get("def"), n.string(","), $.get("args"), n.string(","), $.get("type"), n.string(")"))) :
-            (define($.get("frame"), $.get("name"), $.get("def"), $.get("args"), $.get("type"), n.string(""))));
-    }
-
-    if ($_l == 6) {
-        $.init($.item("frame"), $.item("name"), $.item("def"), $.item("args"), $.item("type"), $.item("body"));
-        return n.item($.test(n.instanceOf($.get("frame"), n.string())) ?
-            (fn.concat(n.string("define("), $.get("frame"), n.string(","), $.get("name"), n.string(","), $.get("def"), n.string(","), $.get("args"), n.string(","), $.get("type"), n.string(","), $.get("body"), n.string(")"))) :
-            (define($.get("frame"), $.get("name"), $.get("def"), $.get("args"), $.get("type"), $.get("body"), fn.false())));
-    }
-
-    if ($_l == 7) {
-        $.init($.item("frame"), $.item("name"), $.item("def"), $.item("args"), $.item("type"), $.item("body"), $.item("private"));
-        return n.item($.test(n.instanceOf($.get("frame"), n.string())) ?
-            (fn.concat(n.string("define("), $.get("frame"), n.string(","), $.get("name"), n.string(","), $.get("def"), n.string(","), $.get("args"), n.string(","), $.get("type"), n.string(","), $.get("body"), n.string(","), $.get("private"), n.string(")"))) :
-            ($.item("params", array.flatten(a.forEach($.get("args"), function(...$_a) {
-                    var $_l = $_a.length;
-                    $ = n.frame($, $_a);
-                    if ($_l == 1) {
-                        $.init($.item("_"));
-                        return n.item($.test(n.instanceOf($.get("_"), n.map())) ?
-                            ($.item("args", n.call($.get("_"), n.string("args"))),
-
-                                $.item("param", n.call($.get("args"), n.integer(2))),
-
-                                fn.concat(fn.replace(n.call($.get("_"), n.string("name")), n.string("core:"), n.string("\\$.")), n.string("("), fn.stringJoin(fn.forEach($.get("param"), function(...$_a) {
-                                    var $_l = $_a.length;
-                                    $ = n.frame($, $_a);
-                                    if ($_l == 1) {
-                                        $.init($.item("_"));
-                                        return n.item(fn.concat(n.string("&quot;"), $.get("_"), n.string("&quot;")));
-                                    }
-                                    return n.error($_l);
-                                }), n.string(",")), n.string(")"))) :
-                            ($.test(n.instanceOf($.get("_"), n.string())) ?
-                                (fn.concat(n.string("$.item(&quot;"), fn.replace($.get("_"), n.string("^\\$"), n.string("")), n.string("&quot;)"))) :
-                                (n.seq())));
-                    }
-                    return n.error($_l);
-                }))),
-
-                $.item("parts", fn.tokenize(rdl.clip($.get("name")), n.string(":"))),
-
-                $.item("fname", rdl.camelCase(n.filter($.get("parts"), function($_0) {
-                    return n.geq(fn.position($_0), fn.last($_0));
-                }))),
-
-                fn.concat(n.string("&#13;&#9;if($_l=="), fn.count($.get("params")), n.string("){&#13;&#9;&#9;"), n.string("$.init("), fn.stringJoin($.get("params"), n.string(",")), n.string(");&#13;&#9;&#9;"), n.string("return "), $.get("body"), n.string(";&#13;&#9;}"))));
-    }
-    return n.error(define, $_l);
-}
-
-export function definePrivate(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
-
-    if ($_l == 6) {
-        $.init($.item("frame"), $.item("name"), $.item("def"), $.item("args"), $.item("type"), $.item("body"));
-        return n.item($.test(n.instanceOf($.get("frame"), n.string())) ?
-            (fn.concat(n.string("definePrivate("), $.get("frame"), n.string(","), $.get("name"), n.string(","), $.get("def"), n.string(","), $.get("args"), n.string(","), $.get("type"), n.string(","), $.get("body"), n.string(")"))) :
-            (define($.get("frame"), $.get("name"), $.get("def"), $.get("args"), $.get("type"), $.get("body"), fn.true())));
-    }
-    return n.error(definePrivate, $_l);
+	return n.error(serialize,$_l);
 }
 
 export function describe(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
+	var $_l = $_a.length;
+	if($_l===5){
+		return describe$5.apply(this,$_a);
+	}
 
-    if ($_l == 5) {
-        $.init($.item("frame"), $.item("name"), $.item("def"), $.item("args"), $.item("type"));
-        return n.item(n.string("n.map()"));
-    }
-    return n.error(describe, $_l);
-}
-
-export function anon(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
-
-    if ($_l == 3) {
-        $.init($.item("args"), $.item("type"), $.item("body"));
-        return n.item($.test(n.instanceOf($.get("args"), n.string())) ?
-            (fn.concat(n.string("anon("), $.get("args"), n.string(","), $.get("type"), n.string(","), $.get("body"), n.string(")"))) :
-            ($.item("params", array.flatten(a.forEach($.get("args"), function(...$_a) {
-                    var $_l = $_a.length;
-                    $ = n.frame($, $_a);
-                    if ($_l == 1) {
-                        $.init($.item("_"));
-                        return $.test(n.instanceOf($.get("_"), n.map())) ?
-                            (fn.concat(fn.replace(n.call($.get("_"), n.string("name")), n.string("core:"), n.string("\\$.")), n.string("("), fn.stringJoin(fn.forEach(array.flatten(array.tail(n.call($.get("_"), n.string("args")))), function(...$_a) {
-                                var $_l = $_a.length;
-                                $ = n.frame($, $_a);
-                                if ($_l == 1) {
-                                    $.init($.item("_"));
-                                    return n.item(fn.concat(n.string("&quot;"), $.get("_"), n.string("&quot;")));
-                                }
-                                return n.error($_l);
-                            }), n.string(",")), n.string(")"))) :
-                            ($.test(n.instanceOf($.get("_"), n.string())) ?
-                                (fn.concat(n.string("$.item(&quot;"), fn.replace($.get("_"), n.string("^\\$"), n.string("")), n.string("&quot;)"))) :
-                                (n.seq()));
-                    }
-                    return n.error($_l);
-                }))),
-
-                fn.concat(n.string("function(...$_a){&#13;&#9;"), n.string("var $_l = $_a.length;&#13;&#9;"), n.string("$ = n.frame($,$_a);&#13;"), n.string("if($_l=="), fn.count($.get("params")), n.string("){&#13;&#9;"), n.string("$.init("), fn.stringJoin($.get("params"), n.string(",")), n.string(");&#13;&#9;&#9;"), n.string("return "), $.get("body"), n.string(";&#13;    }&#13;&#9;"), n.string("return n.error($_l);&#13;}"))));
-    }
-    return n.error(anon, $_l);
-}
-
-export function iff(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
-
-    if ($_l == 3) {
-        $.init($.item("a"), $.item("b"), $.item("c"));
-        return n.item(fn.concat(n.string("$.test("), $.get("a"), n.string(") ?&#13; ("), $.get("b"), n.string(") :&#13; ("), $.get("c"), n.string(")")));
-    }
-    return n.error(iff, $_l);
-}
-
-export function typegen1(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
-
-    if ($_l == 2) {
-        $.init($.item("type"), $.item("valtype"));
-        return n.item(fn.concat(n.string("n."), $.get("type"), n.string("()")));
-    }
-
-    if ($_l == 2) {
-        $.init($.item("type"), $.item("seq"));
-        return n.item(fn.concat(n.string("n."), $.get("type"), n.string("("), $.get("seq"), n.string(")")));
-    }
-
-    if ($_l == 3) {
-        $.init($.item("type"), $.item("name"), $.item("seq"));
-        return n.item(fn.concat(n.string("n."), $.get("type"), n.string("("), $.get("name"), n.string(","), $.get("seq"), n.string(")")));
-    }
-    return n.error(typegen1, $_l);
-}
-
-export function select(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
-
-    if ($_l == 2) {
-        $.init($.item("a"), $.item("b"));
-        return n.item(fn.concat(n.string("n.select("), $.get("a"), n.string(","), $.get("b"), n.string(")")));
-    }
-    return n.error(select, $_l);
+	return n.error(describe,$_l);
 }
 
 export function selectAttribute(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
+	var $_l = $_a.length;
+	if($_l===2){
+		return selectAttribute$2.apply(this,$_a);
+	}
 
-    if ($_l == 2) {
-        $.init($.item("a"), $.item("b"));
-        return n.item(fn.concat(n.string("n.selectAttribute("), $.get("a"), n.string(","), $.get("b"), n.string(")")));
-    }
-    return n.error(selectAttribute, $_l);
+	return n.error(selectAttribute,$_l);
 }
 
-export function typegen2(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
+export function anon(...$_a) {
+	var $_l = $_a.length;
+	if($_l===4){
+		return anon$4.apply(this,$_a);
+	}
 
-    if ($_l == 1) {
-        $.init($.item("type"));
-        return n.item($.get("type"));
-    }
+	return n.error(anon,$_l);
+}
 
-    if ($_l == 4) {
-        $.init($.item("type"), $.item("keytype"), $.item("valtype"), $.item("body"));
-        return n.item($.test(n.eq($.get("type"), n.string("map"))) ?
-            (fn.concat(n.string("n.map("), $.get("body"), n.string(")"))) :
-            (anon($.get("keytype"), $.get("valtype"), $.get("body"))));
-    }
+export function module(...$_a) {
+	var $_l = $_a.length;
+	if($_l===4){
+		return module$4.apply(this,$_a);
+	}
 
-    if ($_l == 3) {
-        $.init($.item("type"), $.item("keytype"), $.item("valtype"));
-        return n.item(fn.concat(n.string("n."), $.get("type"), n.string("()")));
-    }
+	return n.error(module,$_l);
+}
 
-    if ($_l == 2) {
-        $.init($.item("type"), $.item("seq"));
-        return n.item($.test(n.eq($.get("type"), n.string("map"))) ?
-            (fn.concat(n.string("n.map("), $.get("seq"), n.string(")"))) :
-            (n.seq()));
-    }
+export function isCurrentModule(...$_a) {
+	var $_l = $_a.length;
+	if($_l===2){
+		return isCurrentModule$2.apply(this,$_a);
+	}
 
-    if ($_l == 4) {
-        $.init($.item("type"), $.item("keytype"), $.item("valtype"), $.item("body"));
-        return n.item($.test(n.eq($.get("type"), n.string("map"))) ?
-            (fn.concat(n.string("n.map("), $.get("body"), n.string(")"))) :
-            (anon($.get("keytype"), $.get("valtype"), $.get("body"))));
-    }
-    return n.error(typegen2, $_l);
+	return n.error(isCurrentModule,$_l);
+}
+
+export function resolveModule(...$_a) {
+	var $_l = $_a.length;
+	if($_l===2){
+		return resolveModule$2.apply(this,$_a);
+	}
+
+	return n.error(resolveModule,$_l);
+}
+
+export function xvar(...$_a) {
+	var $_l = $_a.length;
+	if($_l===4){
+		return xvar$4.apply(this,$_a);
+	}
+
+	return n.error(xvar,$_l);
+}
+
+export function definePrivate(...$_a) {
+	var $_l = $_a.length;
+	if($_l===6){
+		return definePrivate$6.apply(this,$_a);
+	}
+
+	return n.error(definePrivate,$_l);
+}
+
+export function iff(...$_a) {
+	var $_l = $_a.length;
+	if($_l===3){
+		return iff$3.apply(this,$_a);
+	}
+
+	return n.error(iff,$_l);
+}
+
+export function anonName(...$_a) {
+	var $_l = $_a.length;
+	if($_l===4){
+		return anonName$4.apply(this,$_a);
+	}
+
+	return n.error(anonName,$_l);
+}
+
+export function native(...$_a) {
+	var $_l = $_a.length;
+	if($_l===2){
+		return native$2.apply(this,$_a);
+	}
+
+if($_l===3){
+		return native$3.apply(this,$_a);
+	}
+
+	return n.error(native,$_l);
 }
 
 export function _typegen(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
+	var $_l = $_a.length;
+	if($_l===1){
+		return _typegen$1.apply(this,$_a);
+	}
 
-    if ($_l == 1) {
-        $.init($.item("args"));
-        return n.item($.test(n.instanceOf($.get("args"), n.string())) ?
-            (n.string("n._typegen($args)")) :
-            ($.item("l", array.size($.get("args"))),
+	return n.error(_typegen,$_l);
+}
 
-                $.test(n.eq($.get("l"), n.integer(2))) ?
-                (n.concat(n.concat(n.concat(n.concat(n.string("n."), n.call($.get("args"), n.integer(1))), n.string("(")), n.call($.get("args"), n.integer(2))), n.string(")"))) :
-                ($.item("param", fn.replace(rdl.camelCase(rdl.clip(n.call($.get("args"), n.integer(2)))), n.string("\\$"), n.string(""))),
+export function cardinality(...$_a) {
+	var $_l = $_a.length;
+	if($_l===1){
+		return cardinality$1.apply(this,$_a);
+	}
 
-                    $.test(n.call($.get("args"), n.integer(3))) ?
-                    (fn.concat(n.string("$."), n.call($.get("args"), n.integer(1)), n.string("(&quot;"), $.get("param"), n.string("&quot;,"), n.call($.get("args"), n.integer(3)), n.string(")"))) :
-                    (fn.concat(n.string("$"), fn.replace($.get("param"), n.string("^([^\\.]*)(\\.{3})$"), n.string("$2 $1")))))));
-    }
-    return n.error(_typegen, $_l);
+	return n.error(cardinality,$_l);
+}
+
+export function isCaller(...$_a) {
+	var $_l = $_a.length;
+	if($_l===1){
+		return isCaller$1.apply(this,$_a);
+	}
+
+	return n.error(isCaller,$_l);
+}
+
+export function letRet(...$_a) {
+	var $_l = $_a.length;
+	if($_l===2){
+		return letRet$2.apply(this,$_a);
+	}
+
+	return n.error(letRet,$_l);
+}
+
+export function resolveFunction(...$_a) {
+	var $_l = $_a.length;
+	if($_l===2){
+		return resolveFunction$2.apply(this,$_a);
+	}
+
+if($_l===3){
+		return resolveFunction$3.apply(this,$_a);
+	}
+
+	return n.error(resolveFunction,$_l);
+}
+
+export function pair(...$_a) {
+	var $_l = $_a.length;
+	if($_l===2){
+		return pair$2.apply(this,$_a);
+	}
+
+	return n.error(pair,$_l);
+}
+
+export function processArgs(...$_a) {
+	var $_l = $_a.length;
+	if($_l===3){
+		return processArgs$3.apply(this,$_a);
+	}
+
+	return n.error(processArgs,$_l);
+}
+
+export function define(...$_a) {
+	var $_l = $_a.length;
+	if($_l===5){
+		return define$5.apply(this,$_a);
+	}
+
+if($_l===6){
+		return define$6.apply(this,$_a);
+	}
+
+if($_l===7){
+		return define$7.apply(this,$_a);
+	}
+
+	return n.error(define,$_l);
+}
+
+export function typegen1(...$_a) {
+	var $_l = $_a.length;
+	if($_l===2){
+		return typegen1$2.apply(this,$_a);
+	}
+
+if($_l===3){
+		return typegen1$3.apply(this,$_a);
+	}
+
+	return n.error(typegen1,$_l);
+}
+
+export function processTree(...$_a) {
+	var $_l = $_a.length;
+	if($_l===2){
+		return processTree$2.apply(this,$_a);
+	}
+
+if($_l===3){
+		return processTree$3.apply(this,$_a);
+	}
+
+if($_l===4){
+		return processTree$4.apply(this,$_a);
+	}
+
+if($_l===5){
+		return processTree$5.apply(this,$_a);
+	}
+
+	return n.error(processTree,$_l);
+}
+
+export function select(...$_a) {
+	var $_l = $_a.length;
+	if($_l===2){
+		return select$2.apply(this,$_a);
+	}
+
+	return n.error(select,$_l);
+}
+
+export function typegen2(...$_a) {
+	var $_l = $_a.length;
+	if($_l===1){
+		return typegen2$1.apply(this,$_a);
+	}
+
+if($_l===4){
+		return typegen2$4.apply(this,$_a);
+	}
+
+if($_l===3){
+		return typegen2$3.apply(this,$_a);
+	}
+
+if($_l===2){
+		return typegen2$2.apply(this,$_a);
+	}
+
+	return n.error(typegen2,$_l);
+}
+
+export function convert(...$_a) {
+	var $_l = $_a.length;
+	if($_l===2){
+		return convert$2.apply(this,$_a);
+	}
+
+	return n.error(convert,$_l);
+}
+
+export function processValue(...$_a) {
+	var $_l = $_a.length;
+	if($_l===2){
+		return processValue$2.apply(this,$_a);
+	}
+
+if($_l===3){
+		return processValue$3.apply(this,$_a);
+	}
+
+	return n.error(processValue,$_l);
+}
+
+export function call(...$_a) {
+	var $_l = $_a.length;
+	if($_l===2){
+		return call$2.apply(this,$_a);
+	}
+
+	return n.error(call,$_l);
 }
 
 export function typegen(...$_a) {
-    var $_l = $_a.length,
-        $ = n.frame($_a);
+	var $_l = $_a.length;
+	if($_l===1){
+		return typegen$1.apply(this,$_a);
+	}
 
-    if ($_l == 1) {
-        $.init($.item("type"));
-        return n.item(n._typegen($args));
-    }
+if($_l===2){
+		return typegen$2.apply(this,$_a);
+	}
 
-    if ($_l == 2) {
-        $.init($.item("type"), $.item("val"));
-        return n.item(n._typegen($args));
-    }
+if($_l===3){
+		return typegen$3.apply(this,$_a);
+	}
 
-    if ($_l == 3) {
-        $.init($.item("type"), $.item("frame"), $.item("name"));
-        return n.item(n._typegen($args));
-    }
+if($_l===4){
+		return typegen$4.apply(this,$_a);
+	}
 
-    if ($_l == 4) {
-        $.init($.item("type"), $.item("frame"), $.item("name"), $.item("val"));
-        return n.item(n._typegen($args));
-    }
+if($_l===5){
+		return typegen$5.apply(this,$_a);
+	}
 
-    if ($_l == 5) {
-        $.init($.item("type"), $.item("frame"), $.item("name"), $.item("val"), $.item("suffix"));
-        return n.item(n._typegen($args));
-    }
-    return n.error(typegen, $_l);
+	return n.error(typegen,$_l);
+}
+
+export function and(...$_a) {
+	var $_l = $_a.length;
+	if($_l===2){
+		return and$2.apply(this,$_a);
+	}
+
+	return n.error(and,$_l);
+}
+
+export function or(...$_a) {
+	var $_l = $_a.length;
+	if($_l===2){
+		return or$2.apply(this,$_a);
+	}
+
+	return n.error(or,$_l);
+}
+
+export function xqVersion(...$_a) {
+	var $_l = $_a.length;
+	if($_l===2){
+		return xqVersion$2.apply(this,$_a);
+	}
+
+	return n.error(xqVersion,$_l);
+}
+
+export function transpile(...$_a) {
+	var $_l = $_a.length;
+	if($_l===2){
+		return transpile$2.apply(this,$_a);
+	}
+
+	return n.error(transpile,$_l);
 }

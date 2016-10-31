@@ -10,99 +10,195 @@ import * as array from "xvarray";
 
 import * as fn from "xvfn";
 
+var $ = n.frame();
 
-export function put(...$_a) {
-	var $_l = $_a.length,
-		$ = n.frame($_a);
+export function put$3(...$_a) {
+    var $ = n.frame($_a)
+        .array("array", $.item($.zeroOrOne()))
+        .item("position")
+        .item("member");
+    return array.insertBefore(array.remove($("array"), $("position")), $("position"), $("member"));
 
-	if($_l==3){
-		$.init($.array("array"),$.item("position"),$.item("member"));
-		return n.item(array.insertBefore(array.remove($.get("array"),$.get("position")),$.get("position"),$.get("member")));
-	}
-	return n.error(put,$_l);
 }
 
-export function foldLeft(...$_a) {
-	var $_l = $_a.length,
-		$ = n.frame($_a);
+export function foldLeft$3(...$_a) {
+    var $ = n.frame($_a)
+        .array("array", $.item($.zeroOrOne()))
+        .item("zero")
+        .item("function");
+    return ($ => {
+        if ($.test(n.eq(array.size($("array")), n.integer(0)))) {
+            return $("zero");
+        } else {
+            return foldLeft(array.tail($("array")), n.call($("function"), $("zero"), array.head($("array"))), $("function"));
+        }
+    })($.frame());
 
-	if($_l==3){
-		$.init($.array("array"),$.item("zero"),$.item("function"));
-		return n.item($.test(n.eq(array.size($.get("array")),n.integer(0))) ?
- ($.get("zero")) :
- (foldLeft(array.tail($.get("array")),n.call($.get("function"),$.get("zero"),array.head($.get("array"))),$.get("function"))));
-	}
-	return n.error(foldLeft,$_l);
 }
 
-export function foldLeftAt(...$_a) {
-	var $_l = $_a.length,
-		$ = n.frame($_a);
+export function foldLeftAt$3(...$_a) {
+    var $ = n.frame($_a)
+        .array("array", $.item($.zeroOrOne()))
+        .item("zero")
+        .item("function");
+    return foldLeftAt($("array"), $("zero"), $("function"), n.integer(1));
 
-	if($_l==3){
-		$.init($.array("array"),$.item("zero"),$.item("function"));
-		return n.item(foldLeftAt($.get("array"),$.get("zero"),$.get("function"),n.integer(1)));
-	}
-
-	if($_l==4){
-		$.init($.array("array"),$.item("zero"),$.item("function"),$.item("at"));
-		return n.item($.test(n.eq(array.size($.get("array")),n.integer(0))) ?
- ($.get("zero")) :
- (foldLeftAt(array.tail($.get("array")),n.call($.get("function"),$.get("zero"),array.head($.get("array")),$.get("at")),$.get("function"),n.add($.get("at"),n.integer(1)))));
-	}
-	return n.error(foldLeftAt,$_l);
 }
 
-export function foldRightAt(...$_a) {
-	var $_l = $_a.length,
-		$ = n.frame($_a);
+export function foldLeftAt$4(...$_a) {
+    var $ = n.frame($_a)
+        .array("array", $.item($.zeroOrOne()))
+        .item("zero")
+        .item("function")
+        .item("at");
+    return ($ => {
+        if ($.test(n.eq(array.size($("array")), n.integer(0)))) {
+            return $("zero");
+        } else {
+            return foldLeftAt(array.tail($("array")), n.call($("function"), $("zero"), array.head($("array")), $("at")), $("function"), n.add($("at"), n.integer(1)));
+        }
+    })($.frame());
 
-	if($_l==3){
-		$.init($.array("array"),$.item("zero"),$.item("function"));
-		return n.item(foldRightAt($.get("array"),$.get("zero"),$.get("function"),n.integer(1)));
-	}
-
-	if($_l==4){
-		$.init($.array("array"),$.item("zero"),$.item("function"),$.item("at"));
-		return n.item($.test(n.eq(array.size($.get("array")),n.integer(0))) ?
- ($.get("zero")) :
- (n.call($.get("function"),array.head($.get("array")),foldRightAt(array.tail($.get("array")),$.get("zero"),$.get("function"),n.add($.get("at"),n.integer(1))))));
-	}
-	return n.error(foldRightAt,$_l);
 }
 
-export function forEach(...$_a) {
-	var $_l = $_a.length,
-		$ = n.frame($_a);
+export function foldRightAt$3(...$_a) {
+    var $ = n.frame($_a)
+        .array("array", $.item($.zeroOrOne()))
+        .item("zero")
+        .item("function");
+    return foldRightAt($("array"), $("zero"), $("function"), n.integer(1));
 
-	if($_l==2){
-		$.init($.array("array"),$.item("function"));
-		return n.item(forEach($.get("array"),$.get("function"),n.array(n.seq())));
-	}
+}
 
-	if($_l==3){
-		$.init($.array("array"),$.item("function"),$.item("ret"));
-		return n.item($.test(n.eq(array.size($.get("array")),n.integer(0))) ?
- ($.get("ret")) :
- (forEach(array.tail($.get("array")),$.get("function"),array.append($.get("ret"),n.call($.get("function"),array.head($.get("array")))))));
-	}
-	return n.error(forEach,$_l);
+export function foldRightAt$4(...$_a) {
+    var $ = n.frame($_a)
+        .array("array", $.item($.zeroOrOne()))
+        .item("zero")
+        .item("function")
+        .item("at");
+    return ($ => {
+        if ($.test(n.eq(array.size($("array")), n.integer(0)))) {
+            return $("zero");
+        } else {
+            return n.call($("function"), array.head($("array")), foldRightAt(array.tail($("array")), $("zero"), $("function"), n.add($("at"), n.integer(1))));
+        }
+    })($.frame());
+
+}
+
+export function forEach$2(...$_a) {
+    var $ = n.frame($_a)
+        .array("array", $.item($.zeroOrOne()))
+        .item("function");
+    return forEach($("array"), $("function"), n.array(n.seq()));
+
+}
+
+export function forEach$3(...$_a) {
+    var $ = n.frame($_a)
+        .array("array", $.item($.zeroOrOne()))
+        .item("function")
+        .item("ret");
+    return ($ => {
+        if ($.test(n.eq(array.size($("array")), n.integer(0)))) {
+            return $("ret");
+        } else {
+            return forEach(array.tail($("array")), $("function"), array.append($("ret"), n.call($("function"), array.head($("array")))));
+        }
+    })($.frame());
+
+}
+
+export function forEachAt$2(...$_a) {
+    var $ = n.frame($_a)
+        .array("array", $.item($.zeroOrOne()))
+        .item("function");
+    return forEachAt($("array"), $("function"), n.array(n.seq()), n.integer(1));
+
+}
+
+export function forEachAt$4(...$_a) {
+    var $ = n.frame($_a)
+        .array("array", $.item($.zeroOrOne()))
+        .item("function")
+        .item("ret")
+        .item("at");
+    return ($ => {
+        if ($.test(n.eq(array.size($("array")), n.integer(0)))) {
+            return $("ret");
+        } else {
+            return forEachAt(array.tail($("array")), $("function"), array.append($("ret"), n.call($("function"), array.head($("array")), $("at"))), n.add($("at"), n.integer(1)));
+        }
+    })($.frame());
+
 }
 
 export function forEachAt(...$_a) {
-	var $_l = $_a.length,
-		$ = n.frame($_a);
+    var $_l = $_a.length;
+    if ($_l === 2) {
+        return forEachAt$2.apply(this, $_a);
+    }
 
-	if($_l==2){
-		$.init($.array("array"),$.item("function"));
-		return n.item(forEachAt($.get("array"),$.get("function"),n.array(n.seq()),n.integer(1)));
-	}
+    if ($_l === 4) {
+        return forEachAt$4.apply(this, $_a);
+    }
 
-	if($_l==4){
-		$.init($.array("array"),$.item("function"),$.item("ret"),$.item("at"));
-		return n.item($.test(n.eq(array.size($.get("array")),n.integer(0))) ?
- ($.get("ret")) :
- (forEachAt(array.tail($.get("array")),$.get("function"),array.append($.get("ret"),n.call($.get("function"),array.head($.get("array")),$.get("at"))),n.add($.get("at"),n.integer(1)))));
-	}
-	return n.error(forEachAt,$_l);
+    return n.error(forEachAt, $_l);
+}
+
+export function foldLeftAt(...$_a) {
+    var $_l = $_a.length;
+    if ($_l === 3) {
+        return foldLeftAt$3.apply(this, $_a);
+    }
+
+    if ($_l === 4) {
+        return foldLeftAt$4.apply(this, $_a);
+    }
+
+    return n.error(foldLeftAt, $_l);
+}
+
+export function put(...$_a) {
+    var $_l = $_a.length;
+    if ($_l === 3) {
+        return put$3.apply(this, $_a);
+    }
+
+    return n.error(put, $_l);
+}
+
+export function foldRightAt(...$_a) {
+    var $_l = $_a.length;
+    if ($_l === 3) {
+        return foldRightAt$3.apply(this, $_a);
+    }
+
+    if ($_l === 4) {
+        return foldRightAt$4.apply(this, $_a);
+    }
+
+    return n.error(foldRightAt, $_l);
+}
+
+export function foldLeft(...$_a) {
+    var $_l = $_a.length;
+    if ($_l === 3) {
+        return foldLeft$3.apply(this, $_a);
+    }
+
+    return n.error(foldLeft, $_l);
+}
+
+export function forEach(...$_a) {
+    var $_l = $_a.length;
+    if ($_l === 2) {
+        return forEach$2.apply(this, $_a);
+    }
+
+    if ($_l === 3) {
+        return forEach$3.apply(this, $_a);
+    }
+
+    return n.error(forEach, $_l);
 }

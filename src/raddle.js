@@ -317,7 +317,7 @@ export function wrap$4(...$_a) {
             return n.call($("ret"), n.integer(1));
         } else {
             $ = $("group", n.select(fn.head($("match")), n.string("fn:group")));
-            $ = $("nu", console.log($("group")));
+            //$ = $("nu", console.log($("group")));
             $ = $("rest", fn.tail($("match")));
             $ = $("separator", n.select(n.filter($("group"), $_0 => n.geq(n.select($_0, n.string("@nr")), n.integer(2))), $_0 => fn.string($_0)));
             $ = $("value", valueFromStrings(n.select(n.filter($("group"), $_0 => n.geq(n.select($_0, n.string("@nr")), n.integer(3))), $_0 => fn.string($_0)), $("strings")));

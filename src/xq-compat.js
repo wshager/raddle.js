@@ -7,25 +7,25 @@ for (var k in fn.booleans) fn[k] = fn.booleans[k];
 import * as map from "xvmap";
 
 import * as array from "xvarray";
+
+var $ = n.frame();
 /* xquery version n.string("3.1") */
 
 /*module namespace n.string("xqc")=n.string("http://raddle.org/xquery-compat");
 
-n.seq()*/
-var module = n.module({
-    "uri": "http://raddle.org/xquery-compat",
-    "prefix": "xqc"
-});
+n.seq()
+.sort(function(a, b) {
+    return a.gt(b) ? 1 : a.lt(b) ? -1 : 0;
+})
+*/
 
-var $ = n.frame();
+export const ncname = n.string("\\p{L}\\p{N}\\-_\\.@");
 
-export const ncname = n.string("\\p{L}\\p{N}\\-_\\.");
-
-export const qname = n.concat(n.concat(n.concat(n.concat(n.concat(n.string("["), ncname), n.string("]*:?")), n.string("[")), ncname), n.string("]+"));
+export const qname = n.concat(n.concat(n.concat(n.concat(n.concat(n.string("^(\\p{L}|@)["), ncname), n.string("]*:?")), n.string("[")), ncname), n.string("]*"));
 
 export const operatorRegexp = n.string("=#\\p{N}+#?\\p{N}*=");
 
-export const operators = n.map(n.seq(n.pair(n.integer(1), n.string(",")), n.pair(n.decimal(2.01), n.string("some")), n.pair(n.decimal(2.02), n.string("every")), n.pair(n.decimal(2.03), n.string("switch")), n.pair(n.decimal(2.04), n.string("typeswitch")), n.pair(n.decimal(2.05), n.string("try")), n.pair(n.decimal(2.06), n.string("if")), n.pair(n.decimal(2.07), n.string("then")), n.pair(n.decimal(2.08), n.string("else")), n.pair(n.decimal(2.09), n.string("let")), n.pair(n.decimal(2.10), n.string(":=")), n.pair(n.decimal(2.11), n.string("return")), n.pair(n.decimal(2.12), n.string("case")), n.pair(n.decimal(2.13), n.string("default")), n.pair(n.decimal(2.14), n.string("xquery")), n.pair(n.decimal(2.15), n.string("version")), n.pair(n.decimal(2.16), n.string("module")), n.pair(n.decimal(2.17), n.string("declare")), n.pair(n.decimal(2.18), n.string("variable")), n.pair(n.decimal(2.19), n.string("import")), n.pair(n.integer(3), n.string("or")), n.pair(n.integer(4), n.string("and")), n.pair(n.decimal(5.01), n.string("eq")), n.pair(n.decimal(5.02), n.string("ne")), n.pair(n.decimal(5.03), n.string("lt")), n.pair(n.decimal(5.04), n.string("le")), n.pair(n.decimal(5.05), n.string("gt")), n.pair(n.decimal(5.06), n.string("ge")), n.pair(n.decimal(5.07), n.string("=")), n.pair(n.decimal(5.08), n.string("!=")), n.pair(n.decimal(5.09), n.string("<=")), n.pair(n.decimal(5.10), n.string(">=")), n.pair(n.decimal(5.11), n.string("<<")), n.pair(n.decimal(5.12), n.string(">>")), n.pair(n.decimal(5.13), n.string("<")), n.pair(n.decimal(5.14), n.string(">")), n.pair(n.decimal(5.15), n.string("is")), n.pair(n.integer(6), n.string("||")), n.pair(n.integer(7), n.string("to")), n.pair(n.decimal(8.01), n.string("+")), n.pair(n.decimal(8.02), n.string("-")), n.pair(n.decimal(9.01), n.string("*")), n.pair(n.decimal(9.02), n.string("idiv")), n.pair(n.decimal(9.03), n.string("div")), n.pair(n.decimal(9.04), n.string("mod")), n.pair(n.decimal(10.01), n.string("union")), n.pair(n.decimal(10.02), n.string("|")), n.pair(n.decimal(11.01), n.string("intersect")), n.pair(n.decimal(11.02), n.string("except")), n.pair(n.integer(12), n.string("instance of")), n.pair(n.integer(13), n.string("treat as")), n.pair(n.integer(14), n.string("castable as")), n.pair(n.integer(15), n.string("cast as")), n.pair(n.integer(16), n.string("=>")), n.pair(n.decimal(17.01), n.string("+")), n.pair(n.decimal(17.02), n.string("-")), n.pair(n.integer(18), n.string("!")), n.pair(n.decimal(19.01), n.string("/")), n.pair(n.decimal(19.02), n.string("//")), n.pair(n.decimal(19.03), n.string("/*")), n.pair(n.decimal(20.01), n.string("[")), n.pair(n.decimal(20.02), n.string("]")), n.pair(n.decimal(20.03), n.string("?")), n.pair(n.decimal(20.04), n.string("[")), n.pair(n.decimal(20.06), n.string("{")), n.pair(n.decimal(20.07), n.string("}")), n.pair(n.decimal(20.08), n.string("@")), n.pair(n.decimal(21.01), n.string("array")), n.pair(n.decimal(21.02), n.string("attribute")), n.pair(n.decimal(21.03), n.string("comment")), n.pair(n.decimal(21.04), n.string("document")), n.pair(n.decimal(21.05), n.string("element")), n.pair(n.decimal(21.06), n.string("function")), n.pair(n.decimal(21.07), n.string("map")), n.pair(n.decimal(21.08), n.string("namespace")), n.pair(n.decimal(21.09), n.string("processing-instruction")), n.pair(n.decimal(21.10), n.string("text")), n.pair(n.decimal(22.01), n.string("array")), n.pair(n.decimal(22.02), n.string("attribute")), n.pair(n.decimal(22.03), n.string("comment")), n.pair(n.decimal(22.04), n.string("document-node")), n.pair(n.decimal(22.05), n.string("element")), n.pair(n.decimal(22.06), n.string("empty-sequence")), n.pair(n.decimal(22.07), n.string("function")), n.pair(n.decimal(22.08), n.string("item")), n.pair(n.decimal(22.09), n.string("map")), n.pair(n.decimal(22.10), n.string("namespace-node")), n.pair(n.decimal(22.11), n.string("node")), n.pair(n.decimal(22.12), n.string("processing-instruction")), n.pair(n.decimal(22.13), n.string("schema-attribute")), n.pair(n.decimal(22.14), n.string("schema-element")), n.pair(n.decimal(22.15), n.string("text")), n.pair(n.integer(24), n.string("as")), n.pair(n.decimal(25.01), n.string("(:")), n.pair(n.decimal(25.02), n.string(":)")), n.pair(n.integer(26), n.string(":"))));
+export const operators = n.map(n.seq(n.pair(n.integer(1), n.string(",")), n.pair(n.decimal(2.01), n.string("some")), n.pair(n.decimal(2.02), n.string("every")), n.pair(n.decimal(2.03), n.string("switch")), n.pair(n.decimal(2.04), n.string("typeswitch")), n.pair(n.decimal(2.05), n.string("try")), n.pair(n.decimal(2.06), n.string("if")), n.pair(n.decimal(2.07), n.string("then")), n.pair(n.decimal(2.08), n.string("else")), n.pair(n.decimal(2.09), n.string("let")), n.pair(n.decimal(2.10), n.string(":=")), n.pair(n.decimal(2.11), n.string("return")), n.pair(n.decimal(2.12), n.string("case")), n.pair(n.decimal(2.13), n.string("default")), n.pair(n.decimal(2.14), n.string("xquery")), n.pair(n.decimal(2.15), n.string("version")), n.pair(n.decimal(2.16), n.string("module")), n.pair(n.decimal(2.17), n.string("declare")), n.pair(n.decimal(2.18), n.string("variable")), n.pair(n.decimal(2.19), n.string("import")), n.pair(n.integer(3), n.string("or")), n.pair(n.integer(4), n.string("and")), n.pair(n.decimal(5.01), n.string("eq")), n.pair(n.decimal(5.02), n.string("ne")), n.pair(n.decimal(5.03), n.string("lt")), n.pair(n.decimal(5.04), n.string("le")), n.pair(n.decimal(5.05), n.string("gt")), n.pair(n.decimal(5.06), n.string("ge")), n.pair(n.decimal(5.07), n.string("=")), n.pair(n.decimal(5.08), n.string("!=")), n.pair(n.decimal(5.09), n.string("<=")), n.pair(n.decimal(5.10), n.string(">=")), n.pair(n.decimal(5.11), n.string("<<")), n.pair(n.decimal(5.12), n.string(">>")), n.pair(n.decimal(5.13), n.string("<")), n.pair(n.decimal(5.14), n.string(">")), n.pair(n.decimal(5.15), n.string("is")), n.pair(n.integer(6), n.string("||")), n.pair(n.integer(7), n.string("to")), n.pair(n.decimal(8.01), n.string("+")), n.pair(n.decimal(8.02), n.string("-")), n.pair(n.decimal(9.01), n.string("*")), n.pair(n.decimal(9.02), n.string("idiv")), n.pair(n.decimal(9.03), n.string("div")), n.pair(n.decimal(9.04), n.string("mod")), n.pair(n.decimal(10.01), n.string("union")), n.pair(n.decimal(10.02), n.string("|")), n.pair(n.decimal(11.01), n.string("intersect")), n.pair(n.decimal(11.02), n.string("except")), n.pair(n.integer(12), n.string("instance of")), n.pair(n.integer(13), n.string("treat as")), n.pair(n.integer(14), n.string("castable as")), n.pair(n.integer(15), n.string("cast as")), n.pair(n.integer(16), n.string("=>")), n.pair(n.decimal(17.01), n.string("+")), n.pair(n.decimal(17.02), n.string("-")), n.pair(n.integer(18), n.string("!")), n.pair(n.decimal(19.01), n.string("/")), n.pair(n.decimal(20.01), n.string("[")), n.pair(n.decimal(20.02), n.string("]")), n.pair(n.decimal(20.03), n.string("?")), n.pair(n.decimal(20.04), n.string("[")), n.pair(n.decimal(20.06), n.string("{")), n.pair(n.decimal(20.07), n.string("}")), n.pair(n.decimal(21.01), n.string("array")), n.pair(n.decimal(21.02), n.string("attribute")), n.pair(n.decimal(21.03), n.string("comment")), n.pair(n.decimal(21.04), n.string("document")), n.pair(n.decimal(21.05), n.string("element")), n.pair(n.decimal(21.06), n.string("function")), n.pair(n.decimal(21.07), n.string("map")), n.pair(n.decimal(21.08), n.string("namespace")), n.pair(n.decimal(21.09), n.string("processing-instruction")), n.pair(n.decimal(21.10), n.string("text")), n.pair(n.decimal(22.01), n.string("array")), n.pair(n.decimal(22.02), n.string("attribute")), n.pair(n.decimal(22.03), n.string("comment")), n.pair(n.decimal(22.04), n.string("document-node")), n.pair(n.decimal(22.05), n.string("element")), n.pair(n.decimal(22.06), n.string("empty-sequence")), n.pair(n.decimal(22.07), n.string("function")), n.pair(n.decimal(22.08), n.string("item")), n.pair(n.decimal(22.09), n.string("map")), n.pair(n.decimal(22.10), n.string("namespace-node")), n.pair(n.decimal(22.11), n.string("node")), n.pair(n.decimal(22.12), n.string("processing-instruction")), n.pair(n.decimal(22.13), n.string("schema-attribute")), n.pair(n.decimal(22.14), n.string("schema-element")), n.pair(n.decimal(22.15), n.string("text")), n.pair(n.integer(24), n.string("as")), n.pair(n.decimal(25.01), n.string("(:")), n.pair(n.decimal(25.02), n.string(":)")), n.pair(n.integer(26), n.string(":"))));
 
 export const operatorsI = fn.foldLeft(map.keys(operators), n.map(n.seq()), function(...$_a) {
     $ = $.frame($_a)
@@ -37,21 +37,21 @@ export const operatorsI = fn.foldLeft(map.keys(operators), n.map(n.seq()), funct
 
 export const types = n.seq(n.string("untypedAtomic"), n.string("dateTime"), n.string("dateTimeStamp"), n.string("date"), n.string("time"), n.string("duration"), n.string("yearMonthDuration"), n.string("dayTimeDuration"), n.string("float"), n.string("double"), n.string("decimal"), n.string("integer"), n.string("nonPositiveInteger"), n.string("negativeInteger"), n.string("long"), n.string("int"), n.string("short"), n.string("byte"), n.string("nonNegativeInteger"), n.string("unsignedLong"), n.string("unsignedInt"), n.string("unsignedShort"), n.string("unsignedByte"), n.string("positiveInteger"), n.string("gYearMonth"), n.string("gYear"), n.string("gMonthDay"), n.string("gDay"), n.string("gMonth"), n.string("string"), n.string("normalizedString"), n.string("token"), n.string("language"), n.string("NMTOKEN"), n.string("Name"), n.string("NCName"), n.string("ID"), n.string("IDREF"), n.string("ENTITY"), n.string("boolean"), n.string("base64Binary"), n.string("hexBinary"), n.string("anyURI"), n.string("QName"), n.string("NOTATION"));
 
-export const operatorMap = n.map(n.seq(n.pair(n.decimal(2.06), n.string("iff")), n.pair(n.decimal(2.09), n.string("item")), n.pair(n.decimal(5.01), n.string("eq")), n.pair(n.decimal(5.02), n.string("ne")), n.pair(n.decimal(5.03), n.string("lt")), n.pair(n.decimal(5.04), n.string("le")), n.pair(n.decimal(5.05), n.string("gt")), n.pair(n.decimal(5.06), n.string("ge")), n.pair(n.decimal(5.07), n.string("geq")), n.pair(n.decimal(5.08), n.string("gne")), n.pair(n.decimal(5.09), n.string("gle")), n.pair(n.decimal(5.10), n.string("gge")), n.pair(n.decimal(5.11), n.string("precedes")), n.pair(n.decimal(5.12), n.string("follows")), n.pair(n.decimal(5.13), n.string("glt")), n.pair(n.decimal(5.14), n.string("ggt")), n.pair(n.integer(6), n.string("concat")), n.pair(n.decimal(8.01), n.string("add")), n.pair(n.decimal(8.02), n.string("subtract")), n.pair(n.decimal(9.01), n.string("multiply")), n.pair(n.decimal(10.02), n.string("union")), n.pair(n.decimal(17.01), n.string("plus")), n.pair(n.decimal(17.02), n.string("minus")), n.pair(n.integer(18), n.string("for-each")), n.pair(n.decimal(19.01), n.string("select")), n.pair(n.decimal(19.02), n.string("select-all")), n.pair(n.decimal(20.01), n.string("filter")), n.pair(n.decimal(20.03), n.string("lookup")), n.pair(n.decimal(20.04), n.string("array")), n.pair(n.decimal(20.08), n.string("select-attribute")), n.pair(n.decimal(27.01), n.string("pair"))));
+export const operatorMap = n.map(n.seq(n.pair(n.decimal(2.06), n.string("iff")), n.pair(n.decimal(2.09), n.string("item")), n.pair(n.decimal(5.01), n.string("eq")), n.pair(n.decimal(5.02), n.string("ne")), n.pair(n.decimal(5.03), n.string("lt")), n.pair(n.decimal(5.04), n.string("le")), n.pair(n.decimal(5.05), n.string("gt")), n.pair(n.decimal(5.06), n.string("ge")), n.pair(n.decimal(5.07), n.string("geq")), n.pair(n.decimal(5.08), n.string("gne")), n.pair(n.decimal(5.09), n.string("gle")), n.pair(n.decimal(5.10), n.string("gge")), n.pair(n.decimal(5.11), n.string("precedes")), n.pair(n.decimal(5.12), n.string("follows")), n.pair(n.decimal(5.13), n.string("glt")), n.pair(n.decimal(5.14), n.string("ggt")), n.pair(n.integer(6), n.string("concat")), n.pair(n.decimal(8.01), n.string("add")), n.pair(n.decimal(8.02), n.string("subtract")), n.pair(n.decimal(9.01), n.string("multiply")), n.pair(n.decimal(10.02), n.string("union")), n.pair(n.decimal(17.01), n.string("plus")), n.pair(n.decimal(17.02), n.string("minus")), n.pair(n.integer(18), n.string("for-each")), n.pair(n.decimal(19.01), n.string("select")), n.pair(n.decimal(20.01), n.string("filter")), n.pair(n.decimal(20.03), n.string("lookup")), n.pair(n.decimal(20.04), n.string("array")), n.pair(n.decimal(27.01), n.string("pair"))));
+
+export const lrOp = n.seq(n.integer(3), n.integer(4), n.decimal(5.01), n.decimal(5.02), n.decimal(5.03), n.decimal(5.04), n.decimal(5.05), n.decimal(5.06), n.decimal(5.07), n.decimal(5.08), n.decimal(5.09), n.decimal(5.10), n.decimal(5.11), n.decimal(5.12), n.decimal(5.13), n.decimal(5.14), n.decimal(5.15), n.integer(6), n.integer(7), n.decimal(8.01), n.decimal(8.02), n.decimal(9.01), n.decimal(9.02), n.decimal(9.03), n.decimal(9.04), n.decimal(10.01), n.decimal(10.02), n.decimal(11.01), n.decimal(11.02), n.integer(12), n.integer(13), n.integer(14), n.integer(15), n.integer(18), n.decimal(19.01), n.decimal(20.03), n.integer(24));
 
 export const fns = n.seq(n.string("position"), n.string("last"), n.string("name"), n.string("node-name"), n.string("nilled"), n.string("string"), n.string("data"), n.string("base-uri"), n.string("document-uri"), n.string("number"), n.string("string-length"), n.string("normalize-space"));
 
 export function normalizeQuery$2(...$_a) {
     var $ = n.frame($_a)
-        .string("query")
+        .string("query", n.zeroOrOne)
         .item("params");
     $ = $("query", fn.replace(fn.replace(fn.replace(fn.replace($("query"), n.string("%3E"), n.string(">")), n.string("%3C"), n.string("<")), n.string("%2C"), n.string(",")), n.string("%3A"), n.string(":")));
     $ = $("query", fn.replace($("query"), n.string("([\\*\\+\\?])\\s+([,\\)\\{])"), n.string("$1$2")));
     $ = $("query", fn.foldLeft(n.filter(map.keys(operators).sort(function(a, b) {
         return a.gt(b) ? 1 : a.lt(b) ? -1 : 0;
-    }), function($_0) {
-        return $.test(n.ne($_0, n.decimal(5.07))) && $.test(n.ne($_0, n.integer(1)));
-    }), $("query"), function(...$_a) {
+    }), $_0 => $.test(n.ne($_0, n.decimal(5.07))) && $.test(n.ne($_0, n.integer(1)))), $("query"), function(...$_a) {
         $ = $.frame($_a)
             .item("cur")
             .item("next");
@@ -78,13 +78,11 @@ export function normalizeQuery$2(...$_a) {
     $ = $("query", fn.replace($("query"), n.string("%3D"), n.string("=")));
     $ = $("query", fn.replace($("query"), n.concat(n.concat(n.string("("), operatorRegexp), n.string(")")), n.string(" $1 ")));
     $ = $("query", fn.replace($("query"), n.string("\\s+"), n.string(" ")));
-    $ = $("query", fn.replace($("query"), n.string("=#19#01=\\s*=#20#08="), n.string("=#20#08=")));
+    $ = $("query", fn.replace($("query"), n.string("=#19#01=\\s*=#19#01="), n.string("=#19#01= descendant::")));
     $ = $("query", fn.stringJoin(fn.forEach(fn.tokenize($("query"), n.string(";")), function(...$_a) {
         $ = $.frame($_a)
             .item("cur");
-        $ = $("parts", n.filter(n.select(fn.analyzeString($("cur"), n.string("([^\\s\\(\\),\\.]+)")), n.seq(n.string("*"))), function($_0) {
-            return $.test(n.geq(fn.name($_0), n.string("fn:match"))) || $.test(n.geq(fn.matches(fn.string($_0), n.string("^\\s*$")), fn.false()));
-        }));
+        $ = $("parts", n.select(fn.analyzeString($("cur"), n.string("([^\\s\\(\\),\\.]+)")), n.string("*"), $_0 => n.filter($_0, $_0 => $.test(n.geq(fn.name($_0), n.string("fn:match"))) || $.test(n.geq(fn.matches(fn.string(n.string("..")), n.string("^\\s*$")), fn.false())))));
         $ = $("ret", block($("parts"), n.string("")));
         return ($ => {
             if ($.test($("ret"))) {
@@ -105,11 +103,7 @@ export function seqtype$3(...$_a) {
         .item("parts")
         .item("ret")
         .item("lastseen");
-    $ = $("head", n.select(n.filter(n.select(fn.head($("parts")), n.seq(n.string("fn:group"))), function($_0) {
-        return n.geq(n.selectAttribute($_0, n.string("nr")), n.integer(1));
-    }), function($_0) {
-        return fn.string($_0);
-    }));
+    $ = $("head", n.select(n.select(fn.head($("parts")), n.string("fn:group"), $_0 => n.filter($_0, $_0 => n.geq(n.select($_0, n.string("@nr")), n.integer(1)))), $_0 => fn.string($_0)));
     $ = $("maybeSeqtype", ($ => {
         if ($.test(fn.matches($("head"), operatorRegexp))) {
             return opNum($("head"));
@@ -135,14 +129,8 @@ export function as$6(...$_a) {
         .item("lastseen")
         .item("subtype")
         .item("seqtype");
-    $ = $("head", n.select(fn.head($("parts")), function($_0) {
-        return fn.string($_0);
-    }));
-    $ = $("next", n.select(n.filter($("parts"), function($_0) {
-        return n.geq(fn.position($_0), n.integer(2));
-    }), function($_0) {
-        return fn.string($_0);
-    }));
+    $ = $("head", n.select(fn.head($("parts")), $_0 => fn.string($_0)));
+    $ = $("next", n.select(n.filter($("parts"), $_0 => n.geq(fn.position($_0), n.integer(2))), $_0 => fn.string($_0)));
     $ = $("no", ($ => {
         if ($.test(fn.matches($("head"), operatorRegexp))) {
             return opNum($("head"));
@@ -286,14 +274,8 @@ export function params$3(...$_a) {
         .item("parts")
         .item("ret")
         .item("lastseen");
-    $ = $("maybeParam", n.select(fn.head($("parts")), function($_0) {
-        return fn.string($_0);
-    }));
-    $ = $("next", n.select(n.filter($("parts"), function($_0) {
-        return n.geq(fn.position($_0), n.integer(2));
-    }), function($_0) {
-        return fn.string($_0);
-    }));
+    $ = $("maybeParam", n.select(fn.head($("parts")), $_0 => fn.string($_0)));
+    $ = $("next", n.select(n.filter($("parts"), $_0 => n.geq(fn.position($_0), n.integer(2))), $_0 => fn.string($_0)));
     return ($ => {
         if ($.test(fn.matches($("maybeParam"), n.string("^\\(?\\s*\\)")))) {
             return ($ => {
@@ -332,11 +314,7 @@ export function xfn$2(...$_a) {
     var $ = n.frame($_a)
         .item("parts")
         .item("ret");
-    return params(fn.tail($("parts")), fn.concat($("ret"), n.select(n.filter(n.select(fn.head($("parts")), n.seq(n.string("fn:group"))), function($_0) {
-        return n.geq(n.selectAttribute($_0, n.string("nr")), n.integer(1));
-    }), function($_0) {
-        return fn.string($_0);
-    }), n.string(",(),(")), n.seq());
+    return params(fn.tail($("parts")), fn.concat($("ret"), n.select(n.select(fn.head($("parts")), n.string("fn:group"), $_0 => n.filter($_0, $_0 => n.geq(n.select($_0, n.string("@nr")), n.integer(1)))), $_0 => fn.string($_0)), n.string(",(),(")), n.seq());
 
 }
 
@@ -344,9 +322,7 @@ export function ns$2(...$_a) {
     var $ = n.frame($_a)
         .item("parts")
         .item("ret");
-    $ = $("ns", fn.replace(n.select(fn.head($("parts")), function($_0) {
-        return fn.string($_0);
-    }), n.string("\\s"), n.string("")));
+    $ = $("ns", fn.replace(n.select(fn.head($("parts")), $_0 => fn.string($_0)), n.string("\\s"), n.string("")));
     $ = $("rest", fn.tail($("parts")));
     return fn.stringJoin($("rest"));
 
@@ -356,11 +332,7 @@ export function xvar$2(...$_a) {
     var $ = n.frame($_a)
         .item("parts")
         .item("ret");
-    return body(fn.subsequence($("parts"), n.integer(3)), fn.concat($("ret"), n.select(n.filter($("parts"), function($_0) {
-        return n.geq(fn.position($_0), n.integer(1));
-    }), function($_0) {
-        return fn.string($_0);
-    }), n.string(",(),")), n.seq(n.decimal(2.18)));
+    return body(fn.subsequence($("parts"), n.integer(3)), fn.concat($("ret"), n.select(n.filter($("parts"), $_0 => n.geq(fn.position($_0), n.integer(1))), $_0 => fn.string($_0)), n.string(",(),")), n.seq(n.decimal(2.18)));
 
 }
 
@@ -368,11 +340,7 @@ export function xns$2(...$_a) {
     var $ = n.frame($_a)
         .item("parts")
         .item("ret");
-    return block(fn.subsequence($("parts"), n.integer(4)), fn.concat($("ret"), n.string("core:namespace($,"), n.filter($("parts"), function($_0) {
-        return n.geq(fn.position($_0), n.integer(1));
-    }), n.string(","), n.filter($("parts"), function($_0) {
-        return n.geq(fn.position($_0), n.integer(3));
-    }), n.string(")")));
+    return block(fn.subsequence($("parts"), n.integer(4)), fn.concat($("ret"), n.string("core:namespace($,"), n.filter($("parts"), $_0 => n.geq(fn.position($_0), n.integer(1))), n.string(","), n.filter($("parts"), $_0 => n.geq(fn.position($_0), n.integer(3))), n.string(")")));
 
 }
 
@@ -381,11 +349,7 @@ export function annot$3(...$_a) {
         .item("parts")
         .item("ret")
         .item("annot");
-    $ = $("maybeAnnot", n.select(n.filter(n.select(fn.head($("parts")), n.seq(n.string("fn:group"))), function($_0) {
-        return n.geq(n.selectAttribute($_0, n.string("nr")), n.integer(1));
-    }), function($_0) {
-        return fn.string($_0);
-    }));
+    $ = $("maybeAnnot", n.select(n.select(fn.head($("parts")), n.string("fn:group"), $_0 => n.filter($_0, $_0 => n.geq(n.select($_0, n.string("@nr")), n.integer(1)))), $_0 => fn.string($_0)));
     $ = $("rest", fn.tail($("parts")));
     return ($ => {
         if ($.test(fn.matches($("maybeAnnot"), n.string("^%")))) {
@@ -419,11 +383,7 @@ export function xversion$2(...$_a) {
     var $ = n.frame($_a)
         .item("parts")
         .item("ret");
-    return block(fn.subsequence($("parts"), n.integer(3)), fn.concat($("ret"), n.string("core:xq-version($,"), n.select(n.filter($("parts"), function($_0) {
-        return n.geq(fn.position($_0), n.integer(2));
-    }), function($_0) {
-        return fn.string($_0);
-    }), n.string(")")));
+    return block(fn.subsequence($("parts"), n.integer(3)), fn.concat($("ret"), n.string("core:xq-version($,"), n.select(n.filter($("parts"), $_0 => n.geq(fn.position($_0), n.integer(2))), $_0 => fn.string($_0)), n.string(")")));
 
 }
 
@@ -431,23 +391,15 @@ export function xmodule$2(...$_a) {
     var $ = n.frame($_a)
         .item("parts")
         .item("ret");
-    return block(fn.subsequence($("parts"), n.integer(5)), fn.concat($("ret"), n.string("core:module($,"), n.select(n.filter($("parts"), function($_0) {
-        return n.geq(fn.position($_0), n.integer(2));
-    }), function($_0) {
-        return fn.string($_0);
-    }), n.string(","), n.select(n.filter($("parts"), function($_0) {
-        return n.geq(fn.position($_0), n.integer(4));
-    }), function($_0) {
-        return fn.string($_0);
-    }), n.string(",())")));
+    return block(fn.subsequence($("parts"), n.integer(5)), fn.concat($("ret"), n.string("core:module($,"), n.select(n.filter($("parts"), $_0 => n.geq(fn.position($_0), n.integer(2))), $_0 => fn.string($_0)), n.string(","), n.select(n.filter($("parts"), $_0 => n.geq(fn.position($_0), n.integer(4))), $_0 => fn.string($_0)), n.string(",())")));
 
 }
 
 export function close$3(...$_a) {
     var $ = n.frame($_a)
-        .decimal("lastseen")
+        .decimal("lastseen", n.zeroOrMore)
         .decimal("no")
-        .decimal("ret");
+        .decimal("ret", n.zeroOrMore);
     return ($ => {
         if ($.test($.test(fn.empty($("lastseen"))) || $.test(n.eq($("no"), n.integer(0))))) {
             return fn.reverse(n.seq($("ret"), $("lastseen")));
@@ -466,7 +418,7 @@ export function close$3(...$_a) {
 
 export function closer$2(...$_a) {
     var $ = n.frame($_a)
-        .decimal("b")
+        .decimal("b", n.zeroOrMore)
         .integer("c");
     return ($ => {
         if ($.test($.test(fn.exists($("b"))) && $.test(n.geq(fn.head($("b")), n.seq(n.decimal(2.08), n.decimal(2.11)))))) {
@@ -480,16 +432,14 @@ export function closer$2(...$_a) {
 
 export function lastIndexOf$2(...$_a) {
     var $ = n.frame($_a)
-        .decimal("lastseen")
+        .decimal("lastseen", n.zeroOrMore)
         .decimal("a");
     $ = $("id", fn.indexOf($("lastseen"), $("a")));
     return ($ => {
         if ($.test(fn.empty($("id")))) {
             return n.integer(1);
         } else {
-            return n.filter($("id"), function($_0) {
-                return n.geq(fn.position($_0), fn.last($_0));
-            });
+            return n.filter($("id"), $_0 => fn.last($_0));
         }
     })($.frame());
 
@@ -517,9 +467,7 @@ export function comment$3(...$_a) {
         .item("parts")
         .item("ret")
         .item("lastseen");
-    $ = $("head", n.select(fn.head($("parts")), function($_0) {
-        return fn.string($_0);
-    }));
+    $ = $("head", n.select(fn.head($("parts")), $_0 => fn.string($_0)));
     $ = $("rest", fn.tail($("parts")));
     return ($ => {
         if ($.test(n.geq($("head"), n.string("=#25#02=")))) {
@@ -538,32 +486,28 @@ export function bodyOp$5(...$_a) {
         .item("lastseen")
         .item("rest")
         .string("ret");
-    $ = $("llast", n.filter($("lastseen"), function($_0) {
-        return n.geq(fn.position($_0), fn.last($_0));
-    }));
-    $ = $("ret", ($ => {
-        if ($.test(n.eq($("llast"), n.decimal(19.01)))) {
-            return fn.concat($("ret"), n.string(")"));
-        } else {
-            return $("ret");
-        }
-    })($.frame()));
-    $ = $("lastseen", ($ => {
-        if ($.test(n.eq($("llast"), n.decimal(19.01)))) {
-            return pop($("lastseen"));
-        } else {
-            return $("lastseen");
-        }
-    })($.frame()));
     return ($ => {
         if ($.test(n.eq($("no"), n.integer(1)))) {
-            $ = $("old", $("lastseen"));
+            $ = $("llast", n.filter($("lastseen"), $_0 => fn.last($_0)));
+            $ = $("ret", fn.concat($("ret"), ($ => {
+                if ($.test(n.geq($("llast"), n.decimal(19.01)))) {
+                    return n.string(")");
+                } else {
+                    return n.string("");
+                }
+            })($.frame())));
+            $ = $("lastseen", ($ => {
+                if ($.test(n.eq($("llast"), n.decimal(19.01)))) {
+                    return pop($("lastseen"));
+                } else {
+                    return $("lastseen");
+                }
+            })($.frame()));
+            $ = $("llast", n.filter($("lastseen"), $_0 => fn.last($_0)));
             $ = $("closer", closer(fn.reverse($("lastseen")), n.integer(0)));
             $ = $("lastseen", fn.subsequence($("lastseen"), n.integer(1), n.subtract(fn.count($("lastseen")), $("closer"))));
             $ = $("ret", fn.concat($("ret"), fn.stringJoin(n.forEach(n.seq(n.to(n.integer(1), $("closer"))), n.string(")"))), ($ => {
-                if ($.test(n.eq(n.filter($("lastseen"), function($_0) {
-                        return n.geq(fn.position($_0), n.subtract(fn.last($_0), n.integer(1)));
-                    }), n.decimal(21.07)))) {
+                if ($.test(n.eq(n.filter($("lastseen"), $_0 => n.subtract(fn.last($_0), n.integer(1))), n.decimal(21.07)))) {
                     return n.string("),=#27#01=(");
                 } else {
                     return n.string(",");
@@ -606,14 +550,36 @@ export function bodyOp$5(...$_a) {
                                     return body($("rest"), $("ret"), n.seq($("lastseen"), $("no")));
                                 } else {
                                     $ = $("old", $("lastseen"));
-                                    $ = $("llast", n.filter($("lastseen"), function($_0) {
-                                        return n.geq(fn.position($_0), fn.last($_0));
-                                    }));
-                                    $ = $("positional", $.test($.test(n.eq($("no"), n.decimal(20.01))) && $.test($("next"))) && $.test(n.seq($.test(n.seq($.test(fn.matches($("next"), n.concat(n.concat(n.string("^([\\+\\-]?(\\p{N}+))$|^\\$["), ncname), n.string("]+$")))) && $.test(n.eq(n.filter($("rest"), function($_0) {
-                                        return n.geq(fn.position($_0), n.integer(2));
-                                    }), n.string("=#20#02="))))) || $.test(fn.matches($("next"), n.string("(fn:)?last"))))));
+                                    $ = $("llast", n.filter($("lastseen"), $_0 => fn.last($_0)));
+                                    $ = $("ret", fn.concat($("ret"), ($ => {
+                                        if ($.test(n.eq($("llast"), n.decimal(19.01)))) {
+                                            return ($ => {
+                                                if ($.test(n.eq($("no"), n.decimal(20.01)))) {
+                                                    return n.string(",");
+                                                } else {
+                                                    return n.string(")");
+                                                }
+                                            })($.frame());
+                                        } else {
+                                            return n.string("");
+                                        }
+                                    })($.frame())));
+                                    $ = $("lastseen", ($ => {
+                                        if ($.test(n.eq($("llast"), n.decimal(19.01)))) {
+                                            return ($ => {
+                                                if ($.test(n.eq($("no"), n.decimal(20.01)))) {
+                                                    return $("lastseen");
+                                                } else {
+                                                    return pop($("lastseen"));
+                                                }
+                                            })($.frame());
+                                        } else {
+                                            return $("lastseen");
+                                        }
+                                    })($.frame()));
+                                    $ = $("llast", n.filter($("lastseen"), $_0 => fn.last($_0)));
                                     $ = $("hascomma", fn.matches($("ret"), n.string(",$")));
-                                    $ = $("letopener", $.test(n.eq($("no"), n.decimal(2.09))) && $.test(n.seq($.test(fn.not($.test(n.geq($("llast"), n.seq(n.decimal(2.09), n.decimal(2.10)))) || $.test(n.seq($.test(n.eq($("llast"), n.decimal(2.08))) && $.test(n.geq($("hascomma"), fn.false())))))) || $.test(n.seq(n.eq($("llast"), n.decimal(20.06)))))));
+                                    $ = $("letopener", $.test(n.eq($("no"), n.decimal(2.09))) && $.test(n.seq($.test($.test(n.seq($.test(n.eq($("llast"), n.decimal(2.10))) && $.test(n.eq($("hascomma"), fn.true())))) || $.test(fn.not($.test(n.geq($("llast"), n.seq(n.decimal(2.09), n.decimal(2.10)))) || $.test(n.seq($.test(n.eq($("llast"), n.decimal(2.08))) && $.test(n.geq($("hascomma"), fn.false()))))))) || $.test(n.eq($("llast"), n.decimal(20.06))))));
                                     $ = $("elsecloser", ($ => {
                                         if ($.test(n.eq($("no"), n.decimal(2.08)))) {
                                             return lastIndexOf($("lastseen"), n.decimal(2.07));
@@ -630,7 +596,7 @@ export function bodyOp$5(...$_a) {
                                     })($.frame()));
                                     $ = $("letclose", $.test($.test(n.eq($("no"), n.decimal(2.09))) && $.test(fn.not($.test(n.eq($("llast"), n.decimal(20.06))) || $.test(fn.empty($("lastseen")))))) && $.test(n.geq($("hascomma"), fn.false())));
                                     $ = $("letcloser", ($ => {
-                                        if ($.test($.test($("letclose")) && $.test(n.geq($("llast"), n.seq(n.decimal(2.08), n.decimal(2.11)))))) {
+                                        if ($.test($.test($("letclose")) && $.test(n.geq($("llast"), n.seq(n.decimal(2.08), n.decimal(2.11), n.decimal(19.01)))))) {
                                             return closer(fn.reverse($("lastseen")), n.integer(0));
                                         } else {
                                             return n.integer(0);
@@ -641,9 +607,7 @@ export function bodyOp$5(...$_a) {
                                             return fn.concat(($ => {
                                                 if ($.test($("letclose"))) {
                                                     return fn.concat(fn.stringJoin(n.forEach(n.seq(n.to(n.integer(1), $("letcloser"))), n.string(")"))), ($ => {
-                                                        if ($.test(n.eq(n.filter($("lastseen"), function($_0) {
-                                                                return n.geq(fn.position($_0), n.subtract(fn.last($_0), $("letcloser")));
-                                                            }), n.decimal(2.10)))) {
+                                                        if ($.test(n.eq(n.filter($("lastseen"), $_0 => n.subtract(fn.last($_0), $("letcloser"))), n.decimal(2.10)))) {
                                                             return n.string(")");
                                                         } else {
                                                             return n.string("");
@@ -682,19 +646,7 @@ export function bodyOp$5(...$_a) {
                                                 } else {
                                                     return ($ => {
                                                         if ($.test(n.eq($("no"), n.decimal(20.01)))) {
-                                                            return fn.concat(($ => {
-                                                                if ($.test(fn.matches($("next"), n.string("#20#08")))) {
-                                                                    return n.string(".");
-                                                                } else {
-                                                                    return ($ => {
-                                                                        if ($.test($("positional"))) {
-                                                                            return n.string("position(.)=#5#07=");
-                                                                        } else {
-                                                                            return n.string("");
-                                                                        }
-                                                                    })($.frame());
-                                                                }
-                                                            })($.frame()), $("next"));
+                                                            return $("next");
                                                         } else {
                                                             return n.string("");
                                                         }
@@ -703,17 +655,13 @@ export function bodyOp$5(...$_a) {
                                             })($.frame()));
                                         } else {
                                             return ($ => {
-                                                if ($.test($.test(n.eq($("no"), n.integer(26))) || $.test(n.seq($.test(n.eq($("no"), n.decimal(2.10))) && $.test(n.eq(n.filter($("lastseen"), function($_0) {
-                                                        return n.geq(fn.position($_0), n.subtract(fn.last($_0), n.integer(1)));
-                                                    }), n.decimal(21.07))))))) {
+                                                if ($.test($.test(n.eq($("no"), n.integer(26))) || $.test($.test(n.eq($("no"), n.decimal(2.10))) && $.test(n.eq(n.filter($("lastseen"), $_0 => n.subtract(fn.last($_0), n.integer(1))), n.decimal(21.07)))))) {
                                                     return n.string(",");
                                                 } else {
                                                     return ($ => {
                                                         if ($.test(n.eq($("no"), n.decimal(20.07)))) {
                                                             $ = $("lastindex", lastIndexOf($("lastseen"), n.decimal(20.06)));
-                                                            $ = $("closes", n.filter(fn.subsequence($("lastseen"), $("lastindex"), fn.count($("lastseen"))), function($_0) {
-                                                                return n.geq($_0, n.seq(n.decimal(2.08), n.decimal(2.11)));
-                                                            }));
+                                                            $ = $("closes", n.filter(fn.subsequence($("lastseen"), $("lastindex"), fn.count($("lastseen"))), $_0 => n.geq($_0, n.seq(n.decimal(2.08), n.decimal(2.11)))));
                                                             $ = $("closes", ($ => {
                                                                 if ($.test(n.eq($("next"), n.string("=#20#06=")))) {
                                                                     return $("closes");
@@ -721,9 +669,7 @@ export function bodyOp$5(...$_a) {
                                                                     return n.seq($("closes"), n.decimal(2.11));
                                                                 }
                                                             })($.frame()));
-                                                            $ = $("llast", n.filter($("lastseen"), function($_0) {
-                                                                return n.geq(fn.position($_0), n.subtract($("lastindex"), n.integer(1)));
-                                                            }));
+                                                            $ = $("llast", n.filter($("lastseen"), $_0 => n.geq(fn.position($_0), n.subtract($("lastindex"), n.integer(1)))));
                                                             return fn.concat(($ => {
                                                                 if ($.test(n.eq(fn.round($("llast")), n.integer(21)))) {
                                                                     return n.string(")");
@@ -765,7 +711,7 @@ export function bodyOp$5(...$_a) {
                                                                                     return ($ => {
                                                                                         if ($.test(n.eq($("no"), n.decimal(20.02)))) {
                                                                                             return ($ => {
-                                                                                                if ($.test(n.eq($("llast"), n.decimal(20.04)))) {
+                                                                                                if ($.test($.test(n.geq($("llast"), n.seq(n.decimal(19.01), n.decimal(20.04)))) || $.test(n.seq($.test(n.eq($("llast"), n.decimal(20.01))) && $.test(n.eq(n.filter($("lastseen"), n.subtract(fn.count($("lastseen")), n.integer(1))), n.decimal(19.01))))))) {
                                                                                                     return n.string("))");
                                                                                                 } else {
                                                                                                     return n.string(")");
@@ -789,8 +735,14 @@ export function bodyOp$5(...$_a) {
                                                                                                     })($.frame());
                                                                                                 } else {
                                                                                                     return ($ => {
-                                                                                                        if ($.test(n.eq($("no"), n.decimal(19.01)))) {
-                                                                                                            return n.concat(opStr($("no")), n.string("("));
+                                                                                                        if ($.test(n.geq($("no"), n.decimal(19.01)))) {
+                                                                                                            return ($ => {
+                                                                                                                if ($.test(n.eq($("llast"), n.decimal(19.01)))) {
+                                                                                                                    return n.string(",");
+                                                                                                                } else {
+                                                                                                                    return n.concat(opStr($("no")), n.string("("));
+                                                                                                                }
+                                                                                                            })($.frame());
                                                                                                         } else {
                                                                                                             return opStr($("no"));
                                                                                                         }
@@ -816,10 +768,8 @@ export function bodyOp$5(...$_a) {
                                             return $("rest");
                                         } else {
                                             return ($ => {
-                                                if ($.test($.test(n.geq($("next"), fns)) && $.test(fn.matches(n.filter($("rest"), function($_0) {
-                                                        return n.geq(fn.position($_0), n.integer(2));
-                                                    }), n.string("\\)"))))) {
-                                                    return fn.insertBefore(fn.remove(fn.tail($("rest")), n.integer(1)), n.integer(1), n.element(n.string("fn:match"), n.seq(n.element(n.string("fn:group"), n.seq(n.attribute(n.string("nr"), n.seq(n.integer(1))), n.string("(.)"))))));
+                                                if ($.test($.test(n.geq($("next"), fns)) && $.test(fn.matches(n.filter($("rest"), $_0 => n.geq(fn.position($_0), n.integer(2))), n.string("[^\\.]\\)"))))) {
+                                                    return fn.insertBefore(fn.subsequence($("rest"), n.integer(3)), n.integer(1), n.element(n.string("fn:match"), n.seq(n.element(n.string("fn:group"), n.seq(n.attribute(n.string("nr"), n.seq(n.integer(1))), fn.replace(n.filter($("rest"), $_0 => n.geq(fn.position($_0), n.integer(2))), n.string("^([^\\)]*)\\)"), n.string("$1.)")))))));
                                                 } else {
                                                     return fn.tail($("rest"));
                                                 }
@@ -836,9 +786,7 @@ export function bodyOp$5(...$_a) {
                                                 }
                                             })($.frame()));
                                             $ = $("lastseen", ($ => {
-                                                if ($.test($.test($("letclose")) && $.test(n.eq(n.filter($("lastseen"), function($_0) {
-                                                        return n.geq(fn.position($_0), fn.last($_0));
-                                                    }), n.decimal(2.10))))) {
+                                                if ($.test($.test($("letclose")) && $.test(n.eq(n.filter($("lastseen"), fn.last($_0)), n.decimal(2.10))))) {
                                                     return pop($("lastseen"));
                                                 } else {
                                                     return $("lastseen");
@@ -847,18 +795,14 @@ export function bodyOp$5(...$_a) {
                                             return n.seq($("lastseen"), $("no"));
                                         } else {
                                             return ($ => {
-                                                if ($.test($.test(n.eq($("no"), n.integer(26))) || $.test(n.seq($.test(n.eq($("no"), n.decimal(2.10))) && $.test(n.eq(n.filter($("lastseen"), function($_0) {
-                                                        return n.geq(fn.position($_0), n.subtract(fn.last($_0), n.integer(1)));
-                                                    }), n.decimal(21.07))))))) {
+                                                if ($.test($.test(n.eq($("no"), n.integer(26))) || $.test($_0 => $.test(n.eq($("no"), n.decimal(2.10))) && $.test(n.eq(n.filter($("lastseen"), n.subtract(fn.last($_0), n.integer(1))), n.decimal(21.07)))))) {
                                                     return $("lastseen");
                                                 } else {
                                                     return ($ => {
                                                         if ($.test(n.geq($("no"), n.decimal(20.07)))) {
                                                             $ = $("lastseen", fn.subsequence($("lastseen"), n.integer(1), n.subtract(lastIndexOf($("lastseen"), n.decimal(20.06)), n.integer(1))));
                                                             return ($ => {
-                                                                if ($.test($.test(n.eq(fn.round(n.filter($("lastseen"), function($_0) {
-                                                                        return n.geq(fn.position($_0), fn.last($_0));
-                                                                    })), n.integer(21))) && $.test(n.eq($("next"), n.string("=#20#06="))))) {
+                                                                if ($.test($.test(n.eq(fn.round(n.filter($("lastseen"), $_0 => fn.last($_0))), n.integer(21))) && $.test(n.eq($("next"), n.string("=#20#06="))))) {
                                                                     return $("lastseen");
                                                                 } else {
                                                                     return pop($("lastseen"));
@@ -874,10 +818,14 @@ export function bodyOp$5(...$_a) {
                                                                             return $("lastseen");
                                                                         }
                                                                     })($.frame()));
-                                                                    $ = $("last", n.filter(fn.indexOf($("lastseen"), n.subtract($("no"), n.decimal(n.decimal(0.01)))), function($_0) {
-                                                                        return n.geq(fn.position($_0), fn.last($_0));
-                                                                    }));
-                                                                    return n.seq(fn.remove($("lastseen"), $("last")), $("no"));
+                                                                    $ = $("last", n.filter(fn.indexOf($("lastseen"), n.subtract($("no"), n.decimal(n.decimal(0.01)))), $_0 => fn.last($_0)));
+                                                                    return ($ => {
+                                                                        if ($.test($("last"))) {
+                                                                            return n.seq(fn.remove($("lastseen"), $("last")), $("no"));
+                                                                        } else {
+                                                                            return $("lastseen");
+                                                                        }
+                                                                    })($.frame());
                                                                 } else {
                                                                     return ($ => {
                                                                         if ($.test(n.eq($("no"), n.decimal(2.08)))) {
@@ -890,14 +838,38 @@ export function bodyOp$5(...$_a) {
                                                                                     return n.seq($("lastseen"), $("no"));
                                                                                 } else {
                                                                                     return ($ => {
-                                                                                        if ($.test($.test($.test(n.eq($("no"), n.decimal(20.06))) || $.test(n.eq(fn.round($("no")), n.integer(21)))) || $.test(n.eq($("no"), n.decimal(19.01))))) {
+                                                                                        if ($.test($.test(n.eq($("no"), n.decimal(20.06))) || $.test(n.geq(fn.round($("no")), n.integer(21))))) {
                                                                                             return n.seq($("lastseen"), $("no"));
                                                                                         } else {
                                                                                             return ($ => {
-                                                                                                if ($.test(n.eq($("no"), n.decimal(20.02)))) {
-                                                                                                    return pop($("lastseen"));
+                                                                                                if ($.test(n.geq($("no"), n.seq(n.decimal(19.01))))) {
+                                                                                                    return ($ => {
+                                                                                                        if ($.test(n.geq($("llast"), n.decimal(19.01)))) {
+                                                                                                            return $("lastseen");
+                                                                                                        } else {
+                                                                                                            return n.seq($("lastseen"), $("no"));
+                                                                                                        }
+                                                                                                    })($.frame());
                                                                                                 } else {
-                                                                                                    return $("lastseen");
+                                                                                                    return ($ => {
+                                                                                                        if ($.test(n.eq($("no"), n.decimal(20.01)))) {
+                                                                                                            return n.seq($("lastseen"), $("no"));
+                                                                                                        } else {
+                                                                                                            return ($ => {
+                                                                                                                if ($.test(n.eq($("no"), n.decimal(20.02)))) {
+                                                                                                                    return ($ => {
+                                                                                                                        if ($.test($.test(n.geq($("llast"), n.decimal(19.01))) || $.test(n.seq($.test(n.eq($("llast"), n.decimal(20.01))) && $.test(n.eq(n.filter($("lastseen"), n.subtract(fn.count($("lastseen")), n.integer(1))), n.decimal(19.01))))))) {
+                                                                                                                            return pop(pop($("lastseen")));
+                                                                                                                        } else {
+                                                                                                                            return pop($("lastseen"));
+                                                                                                                        }
+                                                                                                                    })($.frame());
+                                                                                                                } else {
+                                                                                                                    return $("lastseen");
+                                                                                                                }
+                                                                                                            })($.frame());
+                                                                                                        }
+                                                                                                    })($.frame());
                                                                                                 }
                                                                                             })($.frame());
                                                                                         }
@@ -914,6 +886,7 @@ export function bodyOp$5(...$_a) {
                                             })($.frame());
                                         }
                                     })($.frame()));
+                                    console.log(n.seq($("no"), n.string(" | "), $("llast"), n.string(" :: "), fn.stringJoin($("old"), n.string(",")), n.string("->"), fn.stringJoin($("lastseen"), n.string(",")), n.string(" || "), fn.replace(fn.replace($("ret"), n.string("=#2#06="), n.string("if")), n.string("=#2#09="), n.string("let"))));
                                     return body($("rest"), $("ret"), $("lastseen"));
                                 }
                             })($.frame());
@@ -931,7 +904,7 @@ export function isArray$3(...$_a) {
         .item("head")
         .item("non")
         .item("next");
-    return $.test($.test(n.eq($("non"), n.decimal(20.01))) && $.test(n.geq(fn.matches($("head"), n.string("\\)\\s*$")), fn.false()))) && $.test(fn.matches($("head"), n.concat(n.concat(n.string("^(\\s|\\(|,|"), operatorRegexp), n.string(")"))));
+    return $.test($.test($.test(n.eq($("non"), n.decimal(20.01))) && $.test(n.ne($("head"), n.string("=#20#02=")))) && $.test(n.geq(fn.matches($("head"), n.string("\\)\\s*$")), fn.false()))) && $.test(fn.matches($("head"), n.concat(n.concat(n.string("^(\\s|\\(|,|"), operatorRegexp), n.string(")"))));
 
 }
 
@@ -943,12 +916,14 @@ export function parenCloser$2(...$_a) {
         if ($.test(fn.matches($("head"), n.string("[\\(\\)]+")))) {
             $ = $("cp", fn.stringToCodepoints($("head")));
             $ = $("old", $("lastseen"));
-            $ = $("lastseen", n.seq($("lastseen"), n.forEach(n.filter($("cp"), function($_0) {
-                return n.eq($_0, n.integer(40));
-            }), n.decimal(0.01))));
-            return close(fn.reverse($("lastseen")), fn.count(n.filter($("cp"), function($_0) {
-                return n.eq($_0, n.integer(41));
-            })), n.seq());
+            $ = $("lastseen", n.seq($("lastseen"), n.forEach(n.filter($("cp"), $_0 => n.eq($_0, n.integer(40))), n.decimal(0.01))));
+            return ($ => {
+                if ($.test(n.geq($("lastseen"), n.decimal(0.01)))) {
+                    return close(fn.reverse($("lastseen")), fn.count(n.filter($("cp"), $_0 => n.eq($_0, n.integer(41)))), n.seq());
+                } else {
+                    return $("lastseen");
+                }
+            })($.frame());
         } else {
             return $("lastseen");
         }
@@ -963,14 +938,18 @@ export function body$3(...$_a) {
         .item("lastseen");
     return ($ => {
         if ($.test(fn.empty($("parts")))) {
-            return fn.concat($("ret"), fn.stringJoin(n.forEach(n.filter($("lastseen"), function($_0) {
-                return n.geq($_0, n.seq(n.decimal(2.08), n.decimal(2.11), n.decimal(20.07), n.decimal(2.18)));
-            }), n.string(")"))));
+            return fn.concat($("ret"), fn.stringJoin(n.forEach(n.filter($("lastseen"), $_0 => n.geq($_0, n.seq(n.decimal(2.08), n.decimal(2.11), n.decimal(20.07), n.decimal(2.18), n.decimal(19.01)))), n.string(")"))));
         } else {
-            $ = $("head", n.select(fn.head($("parts")), function($_0) {
-                return fn.string($_0);
-            }));
+            $ = $("head", n.select(fn.head($("parts")), $_0 => fn.string($_0)));
             $ = $("rest", fn.tail($("parts")));
+            $ = $("llast", n.filter($("lastseen"), $_0 => fn.last($_0)));
+            $ = $("lastseen", ($ => {
+                if ($.test(n.eq($("llast"), n.integer(0)))) {
+                    return pop($("lastseen"));
+                } else {
+                    return $("lastseen");
+                }
+            })($.frame()));
             $ = $("lastseen", parenCloser($("head"), $("lastseen")));
             return ($ => {
                 if ($.test(n.geq($("head"), n.string("=#25#01=")))) {
@@ -984,9 +963,7 @@ export function body$3(...$_a) {
                                 if ($.test(fn.empty($("rest")))) {
                                     return n.seq();
                                 } else {
-                                    return n.select(fn.head($("rest")), function($_0) {
-                                        return fn.string($_0);
-                                    });
+                                    return n.select(fn.head($("rest")), $_0 => fn.string($_0));
                                 }
                             })($.frame()));
                             $ = $("non", ($ => {
@@ -997,20 +974,14 @@ export function body$3(...$_a) {
                                 }
                             })($.frame()));
                             $ = $("rest", ($ => {
-                                if ($.test(isArray($("head"), $("non"), $("next")))) {
-                                    return fn.insertBefore(fn.tail($("rest")), n.integer(1), n.element(n.string("fn:match"), n.seq(n.element(n.string("fn:group"), n.seq(n.attribute(n.string("nr"), n.seq(n.integer(1))), opStr(n.decimal(20.04)))))));
+                                if ($.test($.test(n.geq($("head"), fns)) && $.test(fn.matches($("next"), n.string("\\)"))))) {
+                                    return fn.insertBefore(fn.tail($("rest")), n.integer(1), n.element(n.string("fn:match"), n.seq(n.element(n.string("fn:group"), n.seq(n.attribute(n.string("nr"), n.seq(n.integer(1))), fn.replace($("next"), n.string("^([^\\)]*)\\)"), n.string("$1.)")))))));
                                 } else {
-                                    return ($ => {
-                                        if ($.test($.test(n.geq($("head"), fns)) && $.test(fn.matches($("next"), n.string("\\)"))))) {
-                                            return fn.insertBefore(fn.tail($("rest")), n.integer(1), n.element(n.string("fn:match"), n.seq(n.element(n.string("fn:group"), n.seq(n.attribute(n.string("nr"), n.seq(n.integer(1))), n.string("(.)"))))));
-                                        } else {
-                                            return $("rest");
-                                        }
-                                    })($.frame());
+                                    return $("rest");
                                 }
                             })($.frame()));
                             $ = $("head", ($ => {
-                                if ($.test($.test(n.eq($("head"), n.string("=#20#01="))) && $.test(n.geq($("ret"), n.string(""))))) {
+                                if ($.test($.test(n.eq($("head"), n.string("=#20#01="))) && $.test(n.ne($("llast"), n.integer(0))))) {
                                     return n.string("=#20#04=");
                                 } else {
                                     return $("head");
@@ -1020,7 +991,13 @@ export function body$3(...$_a) {
                                 if ($.test(fn.matches($("head"), operatorRegexp))) {
                                     return bodyOp(opNum($("head")), $("next"), $("lastseen"), $("rest"), $("ret"));
                                 } else {
-                                    return body($("rest"), fn.concat($("ret"), $("head")), $("lastseen"));
+                                    return body($("rest"), fn.concat($("ret"), $("head")), ($ => {
+                                        if ($.test(fn.matches($("head"), n.string("\\(")))) {
+                                            return $("lastseen");
+                                        } else {
+                                            return n.seq($("lastseen"), n.integer(0));
+                                        }
+                                    })($.frame()));
                                 }
                             })($.frame());
                         }
@@ -1037,34 +1014,12 @@ export function ximport$2(...$_a) {
         .item("parts")
         .item("ret");
     $ = $("rest", fn.subsequence($("parts"), n.integer(6)));
-    $ = $("maybeAt", n.select(fn.head($("rest")), function($_0) {
-        return fn.string($_0);
-    }));
+    $ = $("maybeAt", n.select(fn.head($("rest")), $_0 => fn.string($_0)));
     return ($ => {
         if ($.test(fn.matches($("maybeAt"), n.string("at")))) {
-            return block(fn.subsequence($("rest"), n.integer(3)), fn.concat($("ret"), n.string("core:ximport($,"), n.select(n.filter($("parts"), function($_0) {
-                return n.geq(fn.position($_0), n.integer(3));
-            }), function($_0) {
-                return fn.string($_0);
-            }), n.string(","), n.select(n.filter($("parts"), function($_0) {
-                return n.geq(fn.position($_0), n.integer(5));
-            }), function($_0) {
-                return fn.string($_0);
-            }), n.string(","), n.select(n.filter($("rest"), function($_0) {
-                return n.geq(fn.position($_0), n.integer(2));
-            }), function($_0) {
-                return fn.string($_0);
-            }), n.string(")")));
+            return block(fn.subsequence($("rest"), n.integer(3)), fn.concat($("ret"), n.string("core:ximport($,"), n.select(n.filter($("parts"), $_0 => n.geq(fn.position($_0), n.integer(3))), $_0 => fn.string($_0)), n.string(","), n.select(n.filter($("parts"), $_0 => n.geq(fn.position($_0), n.integer(5))), $_0 => fn.string($_0)), n.string(","), n.select(n.filter($("rest"), $_0 => n.geq(fn.position($_0), n.integer(2))), $_0 => fn.string($_0)), n.string(")")));
         } else {
-            return block($("rest"), fn.concat($("ret"), n.string("core:ximport($,"), n.select(n.filter($("parts"), function($_0) {
-                return n.geq(fn.position($_0), n.integer(3));
-            }), function($_0) {
-                return fn.string($_0);
-            }), n.string(","), n.select(n.filter($("parts"), function($_0) {
-                return n.geq(fn.position($_0), n.integer(5));
-            }), function($_0) {
-                return fn.string($_0);
-            }), n.string(")")));
+            return block($("rest"), fn.concat($("ret"), n.string("core:ximport($,"), n.select(n.filter($("parts"), $_0 => n.geq(fn.position($_0), n.integer(3))), $_0 => fn.string($_0)), n.string(","), n.select(n.filter($("parts"), $_0 => n.geq(fn.position($_0), n.integer(5))), $_0 => fn.string($_0)), n.string(")")));
         }
     })($.frame());
 
@@ -1078,9 +1033,7 @@ export function block$2(...$_a) {
         if ($.test(fn.empty($("parts")))) {
             return $("ret");
         } else {
-            $ = $("val", n.select(fn.head($("parts")), function($_0) {
-                return fn.string($_0);
-            }));
+            $ = $("val", n.select(fn.head($("parts")), $_0 => fn.string($_0)));
             $ = $("rest", fn.tail($("parts")));
             return ($ => {
                 if ($.test(fn.matches($("val"), operatorRegexp))) {
@@ -1148,37 +1101,8 @@ export function fromOp$1(...$_a) {
     var $ = n.frame($_a)
         .item("op");
     $ = $("k", map.keys(operatorsI));
-    $ = $("i", n.filter(fn.indexOf($("k"), fn.replace($("op"), n.string("^core:"), n.string(""))), function($_0) {
-        return n.geq(fn.position($_0), n.integer(1));
-    }));
-    return n.decimal(n.call(operatorsI, n.filter($("k"), function($_0) {
-        return n.geq(fn.position($_0), $("i"));
-    })));
-
-}
-
-export function rename$2(...$_a) {
-    var $ = n.frame($_a)
-        .item("a")
-        .item("fn");
-    return array.forEach($("a"), function(...$_a) {
-        $ = $.frame($_a)
-            .item("t");
-        return ($ => {
-            if ($.test(n.instanceOf($("t"), n.map()))) {
-                return n.map(n.seq(n.pair(n.string("name"), n.call($("fn"), n.call($("t"), n.string("name")))), n.pair(n.string("args"), rename(n.call($("t"), n.string("args")), $("fn"))), n.pair(n.string("suffix"), n.call($("t"), n.string("suffix")))));
-            } else {
-                return ($ => {
-                    if ($.test(n.instanceOf($("t"), n.array(n.item())))) {
-                        return rename($("t"), $("fn"));
-                    } else {
-                        return $("t");
-                    }
-                })($.frame());
-            }
-        })($.frame());
-
-    });
+    $ = $("i", n.filter(fn.indexOf($("k"), fn.replace($("op"), n.string("^core:"), n.string(""))), $_0 => n.geq(fn.position($_0), n.integer(1))));
+    return n.decimal(n.call(operatorsI, n.filter($("k"), $_0 => n.geq(fn.position($_0), $("i")))));
 
 }
 
@@ -1244,7 +1168,7 @@ export function escapeForRegex$1(...$_a) {
                         } else {
                             return ($ => {
                                 if ($.test(n.geq($("key"), n.seq(n.decimal(8.02), n.decimal(17.02))))) {
-                                    return n.concat(n.concat($("pre"), $("arg")), n.string("([\\s\\p{N}])?"));
+                                    return n.concat(n.concat(n.string("(^|\\s|[^\\p{L}\\p{N}]\\p{N}+|[\\(\\)\\.,])"), $("arg")), n.string("([\\s\\p{N}])?"));
                                 } else {
                                     return ($ => {
                                         if ($.test(n.geq($("key"), n.seq(n.decimal(8.01), n.decimal(9.01), n.decimal(20.03))))) {
@@ -1267,7 +1191,13 @@ export function escapeForRegex$1(...$_a) {
 export function unaryOp$1(...$_a) {
     var $ = n.frame($_a)
         .item("op");
-    return opStr(n.add(opNum($("op")), n.integer(9)));
+    return ($ => {
+        if ($.test(n.geq(opInt($("op")), n.integer(17)))) {
+            return $("op");
+        } else {
+            return opStr(n.add(opNum($("op")), n.integer(9)));
+        }
+    })($.frame());
 
 }
 
@@ -1281,7 +1211,13 @@ export function opInt$1(...$_a) {
 export function opNum$1(...$_a) {
     var $ = n.frame($_a)
         .item("op");
-    return n.decimal(fn.replace($("op"), n.string("^=#(\\p{N}+)#?(\\p{N}*)=$"), n.string("$1.$2")));
+    return ($ => {
+        if ($.test(n.ne($("op"), n.string("")))) {
+            return n.decimal(fn.replace($("op"), n.string("^=#(\\p{N}+)#?(\\p{N}*)=$"), n.string("$1.$2")));
+        } else {
+            return n.integer(0);
+        }
+    })($.frame());
 
 }
 
@@ -1289,76 +1225,6 @@ export function opStr$1(...$_a) {
     var $ = n.frame($_a)
         .item("op");
     return fn.concat(n.string("=#"), fn.replace(fn.string($("op")), n.string("\\."), n.string("#")), n.string("="));
-
-}
-
-export function operatorPrecedence$3(...$_a) {
-    var $ = n.frame($_a)
-        .item("val")
-        .item("operator")
-        .item("ret");
-    $ = $("rev", array.reverse($("ret")));
-    $ = $("last", array.head($("rev")));
-    $ = $("hasPrecedingOp", $.test(n.instanceOf($("last"), n.map())) && $.test(fn.matches(n.call($("last"), n.string("name")), operatorRegexp)));
-    $ = $("isUnaryOp", $.test(n.geq(opInt($("operator")), n.integer(8))) && $.test(n.seq($.test(fn.empty($("last"))) || $.test(n.seq($.test($.test($("hasPrecedingOp")) && $.test(n.instanceOf(n.call($("last"), n.string("suffix")), n.boolean()))) && $.test(n.geq(n.call($("last"), n.string("suffix")), fn.false())))))));
-    $ = $("operator", ($ => {
-        if ($.test($("isUnaryOp"))) {
-            return unaryOp($("operator"));
-        } else {
-            return $("operator");
-        }
-    })($.frame()));
-    $ = $("preceeds", $.test($("hasPrecedingOp")) && $.test(n.ggt(opInt($("operator")), opInt(n.call($("last"), n.string("name"))))));
-    $ = $("name", ($ => {
-        if ($.test($("preceeds"))) {
-            return n.call($("last"), n.string("name"));
-        } else {
-            return $("operator");
-        }
-    })($.frame()));
-    $ = $("args", ($ => {
-        if ($.test($("preceeds"))) {
-            $ = $("argsize", array.size(n.call($("last"), n.string("args"))));
-            $ = $("nargs", ($ => {
-                if ($.test($("isUnaryOp"))) {
-                    return n.array(n.seq());
-                } else {
-                    return n.filter(n.call(n.string("core:geq"), n.seq(fn.position($_0), n.call($("last"), n.string("args")))), n.seq(n.integer(2)));
-                }
-            })($.frame()));
-            $ = $("nargs", ($ => {
-                if ($.test($("val"))) {
-                    return array.append($("nargs"), $("val"));
-                } else {
-                    return $("nargs");
-                }
-            })($.frame()));
-            return ($ => {
-                if ($.test($.test(n.ggt($("argsize"), n.integer(1))) && $.test($("isUnaryOp")))) {
-                    $ = $("pre", n.call(n.call(n.string("core:call"), n.seq($("last"), n.seq(n.string("args")))), n.seq(n.integer(2))));
-                    return n.array(n.seq(n.call($("last"), n.seq(n.string("args"))), n.seq(n.integer(1)), n.map(n.seq(n.pair(n.string("name"), n.call($("pre"), n.string("name"))), n.pair(n.string("args"), array.append(n.call($("pre"), n.string("args")), n.map(n.seq(n.pair(n.string("name"), $("operator")), n.pair(n.string("args"), $("nargs")), n.pair(n.string("suffix"), n.string("")))))), n.pair(n.string("suffix"), n.string(""))))));
-                } else {
-                    return n.array(n.seq(n.call($("last"), n.seq(n.string("args"))), n.seq(n.integer(1)), n.map(n.seq(n.pair(n.string("name"), $("operator")), n.pair(n.string("args"), $("nargs")), n.pair(n.string("suffix"), n.string(""))))));
-                }
-            })($.frame());
-        } else {
-            $ = $("nargs", ($ => {
-                if ($.test(fn.empty($("last")))) {
-                    return n.array(n.seq());
-                } else {
-                    return n.array(n.seq($("last")));
-                }
-            })($.frame()));
-            return ($ => {
-                if ($.test($("val"))) {
-                    return array.append($("nargs"), $("val"));
-                } else {
-                    return $("nargs");
-                }
-            })($.frame());
-        }
-    })($.frame()));
-    return array.append(array.reverse(array.tail($("rev"))), n.map(n.seq(n.pair(n.string("name"), $("name")), n.pair(n.string("args"), $("args")), n.pair(n.string("suffix"), fn.exists($("val"))))));
 
 }
 
@@ -1387,15 +1253,6 @@ export function toOp(...$_a) {
     }
 
     return n.error(toOp, $_l);
-}
-
-export function operatorPrecedence(...$_a) {
-    var $_l = $_a.length;
-    if ($_l === 3) {
-        return operatorPrecedence$3.apply(this, $_a);
-    }
-
-    return n.error(operatorPrecedence, $_l);
 }
 
 export function isArray(...$_a) {
@@ -1477,15 +1334,6 @@ export function ximport(...$_a) {
     }
 
     return n.error(ximport, $_l);
-}
-
-export function rename(...$_a) {
-    var $_l = $_a.length;
-    if ($_l === 2) {
-        return rename$2.apply(this, $_a);
-    }
-
-    return n.error(rename, $_l);
 }
 
 export function unaryOp(...$_a) {

@@ -82,7 +82,7 @@ export function normalizeQuery$2(...$_a) {
     $ = $("query", fn.stringJoin(fn.forEach(fn.tokenize($("query"), n.string(";")), function(...$_a) {
         $ = $.frame($_a)
             .item("cur");
-        $ = $("parts", n.select(fn.analyzeString($("cur"), n.string("([^\\s\\(\\),\\.]+)")), n.string("*"), $_0 => n.filter($_0, $_0 => $.test(n.geq(fn.name($_0), n.string("fn:match"))) || $.test(n.geq(fn.matches(fn.string(n.string("..")), n.string("^\\s*$")), fn.false())))));
+        $ = $("parts", n.select(fn.analyzeString($("cur"), n.string("([^\\s\\(\\),\\.]+)")), n.string("*"), $_0 => n.filter($_0, $_0 => $.test(n.geq(fn.name($_0), n.string("fn:match"))) || $.test(n.geq(fn.matches(fn.string($_0), n.string("^\\s*$")), fn.false())))));
         $ = $("ret", block($("parts"), n.string("")));
         return ($ => {
             if ($.test($("ret"))) {

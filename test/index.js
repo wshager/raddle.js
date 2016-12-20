@@ -8,42 +8,74 @@ var xqc = require("../lib/xq-compat");
 
 var a = require("../lib/array-util");
 
-var array =  require("xvarray");
+var array = require("xvarray");
 
 var rdl = require("../lib/raddle");
 
 var js = require("../lib/js");
 
-for(var k in fn.booleans) fn[k] = fn.booleans[k];
+for (var k in fn.booleans) fn[k] = fn.booleans[k];
 
-function x(...a){
+function x(...a) {
     var l = a.length,
         $ = n.frame(a);
-    if(l==2){
-        return $.func(x,$.integer("x"),$.integer("y"),$ => {
-			return $.let("a",$.get("x"))
-				.let("b",$.get("y"))
-				.if($.get("a")
-				.op(">",1))
-				.then($ => $.get("a").op("+",1))
-				.else($ => $.get("b"))
-				.get();
-		});
+    if (l == 2) {
+        return $.func(x, $.integer("x"), $.integer("y"), $ => {
+            return $.let("a", $.get("x"))
+                .let("b", $.get("y"))
+                .if($.get("a")
+                    .op(">", 1))
+                .then($ => $.get("a").op("+", 1))
+                .else($ => $.get("b"))
+                .get();
+        });
     }
 }
 
-function x2(... a) {
-    var l = a.length, $ = n.frame(a);
-    if(l==1){ return $.func(x,$.item("a"),$ => $.stop(n.item($.get("a")))); }
-    if(l==2){ return $.func(x,$.item("a"),$.item("b"),$ => $.stop(n.item(n.add($.get("a"),$.get("b"))))); }
-    return fn.error("err:XPST0017","Function x called with "+l+" arguments doesn't match any of the known signatures.");
+function x2(...a) {
+    var l = a.length,
+        $ = n.frame(a);
+    if (l == 1) {
+        return $.func(x, $.item("a"), $ => $.stop(n.item($.get("a"))));
+    }
+    if (l == 2) {
+        return $.func(x, $.item("a"), $.item("b"), $ => $.stop(n.item(n.add($.get("a"), $.get("b")))));
+    }
+    return fn.error("err:XPST0017", "Function x called with " + l + " arguments doesn't match any of the known signatures.");
 }
 
+function test$0(...$_a) {
+    var $ = n.frame($_a);
+    $ = $("a", n.integer(10));
+    $ = $("p", function(...$_a) {
+        $ = $.frame($_a).item("b");
+        $ = $("a", $("a"));
+        return n.add($("a"), $("b"));
+    });
+    return n.call($("p"), n.integer(1));
+}
+function test(...$_a) {
+    var $_l = $_a.length;
+    if ($_l === 0) {
+        return test$0.apply(this, $_a);
+    }
+    return n.error(test, $_l);
+}
 var params = n.map({
-    "$compat":"xquery"
+    "$compat": "xquery"
 });
-var tree = rdl.parse(`declare function local:test($c){
-    7 + 1
-};`,params);
-console.log(tree);
-//console.log(js.transpile(tree,params));
+var fs = require('fs');
+
+fs.readFile("d:/workspace/raddle.xq/lib/xq-compat.xql",function(err,file){
+    if(err) return console.error(err);
+    var query = file.toString();
+    var tree = rdl.parse("declare function local:test($x) { $x };", params);
+    console.log(js.transpile(tree,params).first());
+/*fs.writeFile("d:/workspace/raddle.js/test/test.js", js.transpile(tree,params).first().replace(/&#9;/g,"\t").replace(/&#10;/g,"\r").replace(/&#13;/g,"\n").replace(/&quot;/g,"\""), function(err) {
+    if(err) {
+        return console.log(err);
+    }
+
+    console.log("The file was saved!");
+});*/
+});

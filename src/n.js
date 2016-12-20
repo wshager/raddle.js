@@ -1,4 +1,4 @@
-import { seq, toSeq, _isSeq, _first, _boolean, text, element, attribute, minus, instanceOf } from "xvtype";
+import { seq, toSeq, _isSeq, _first, _boolean, text, element, attribute, minus, instanceOf, fromJS } from "xvtype";
 
 import * as xverr from "xverr";
 
@@ -127,44 +127,44 @@ class Context {
     frame(args=[]){
         return frame(args,this);
     }
-    check(value,type) {
+    check(value,type,card) {
         // TODO type test
         return value;
     }
-    let(k, type){
+    let(k, type, card = null){
         //if(this._init >= this._arity) return this;
-        this._frame[k] = this.check(this._args[this._init],type);
+        this._frame[k] = this.check(this._args[this._init],type,card);
         this._init++;
         return this;
     }
-    item(k){
-        return this.let(k,item);
+    item(k,card){
+        return this.let(k,item,card);
     }
-    string(k){
-        return this.let(k,string);
+    string(k,card){
+        return this.let(k,string,card);
     }
-    integer(k){
+    integer(k,card){
         return this.let(k,integer);
     }
-    decimal(k){
-        return this.let(k,decimal);
+    decimal(k,card){
+        return this.let(k,decimal,card);
     }
-    double(k){
-        return this.let(k,double);
+    double(k,card){
+        return this.let(k,double,card);
     }
-    number(k){
-        return this.let(k,number);
+    number(k,card){
+        return this.let(k,number,card);
     }
-    array(k, valuetype = null){
-        return this.let(k, valuetype);
+    array(k, valuetype = null,card = null){
+        return this.let(k, valuetype, card);
     }
-    map(k, keytype = null, valuetype = null){
-        return this.let(k, keytype, valuetype);
+    map(k, keytype = null, valuetype = null,card = null){
+        return this.let(k, keytype, valuetype, card);
     }
-    element(k){
+    element(k,card){
         return this.let(k);
     }
-    attribute(k){
+    attribute(k,card){
         return this.let(k);
     }
     get(k){
@@ -212,7 +212,7 @@ export function call($fn,...args){
         return seq(fn.get(_first(args[0])));
     }
     if(_isArray(fn)){
-        return seq(fn.get(_first(args[0])-1));
+        return fn.isEmpty() ? seq() : seq(fn.get(_first(args[0])-1));
     }
     try {
         return seq(fn.apply(null, args));
@@ -232,7 +232,7 @@ export function error(fn,l){
 
 export {
     seq, toSeq, _first, _isSeq, filter, forEach, foldLeft, foldRight, item, string, number, boolean, integer, double, float, decimal, data, to, array, map, concat,
-    element, attribute, text, minus, instanceOf
+    element, attribute, text, minus, instanceOf, fromJS
 };
 
 export * from "xvop";

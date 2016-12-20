@@ -1,10 +1,10 @@
-import * as xqc from "./xq-compat.js";
+import * as xqc from "./xq-compat";
 
-import * as n from "./n.js";
+import * as n from "./n";
 
-import * as a from "./array-util.js";
+import * as a from "./array-util";
 
-import * as console from "./console.js";
+import * as console from "./console";
 
 import * as fn from "xvfn";
 

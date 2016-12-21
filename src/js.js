@@ -255,7 +255,7 @@ export function processArgs$3(...$_a) {
         if ($.test(n.instanceOf($("frame"), n.string()))) {
             return fn.concat(n.string("processArgs("), $("frame"), n.string(","), $("args"), n.string(","), $("caller"), n.string(")"));
         } else {
-            return processArgs($("frame"), $("args"), $("caller"));
+            return processArgs($("frame"), $("args"), $("caller"), n.string("$_0"));
         }
     })($.frame());
 
@@ -269,7 +269,7 @@ export function processArgs$4(...$_a) {
         .item("nest");
     return ($ => {
         if ($.test(n.instanceOf($("frame"), n.string()))) {
-            return fn.concat(n.string("processArgs("), $("frame"), n.string(","), $("args"), n.string(","), $("caller"), n.string(")"));
+            return fn.concat(n.string("processArgs("), $("frame"), n.string(","), $("args"), n.string(","), $("caller"), n.string(","), $("nest"), n.string(")"));
         } else {
             $ = $("isDefn", n.geq($("caller"), n.seq(n.string("core:define-private#6"), n.string("core:define#6"))));
             $ = $("isAnon", n.eq($("caller"), n.string("core:anon#4")));
@@ -292,7 +292,7 @@ export function processArgs$4(...$_a) {
                                 $ = $("isLetRet", n.ggt(fn.count($("letSeq")), n.integer(0)));
                                 return array.append($("pre"), ($ => {
                                     if ($.test($("isThenelse"))) {
-                                        $ = $("val", processArgs($("frame"), $("arg"), n.string("")));
+                                        $ = $("val", processArgs($("frame"), $("arg"), n.string(""), $("nest")));
                                         $ = $("s", array.size($("val")));
                                         $ = $("ret", ($ => {
                                             if ($.test(n.eq($("s"), n.integer(0)))) {
@@ -357,7 +357,7 @@ export function processArgs$4(...$_a) {
                                                         $ = $("args", n.call($("arg"), n.string("args")));
                                                         $ = $("letSeq", findLetSeq($("args")));
                                                         $ = $("isLetRet", n.ggt(fn.count($("letSeq")), n.integer(0)));
-                                                        $ = $("val", processArgs($("frame"), $("args"), n.string("")));
+                                                        $ = $("val", processArgs($("frame"), $("args"), n.string(""), $("nest")));
                                                         $ = $("s", array.size($("val")));
                                                         return ($ => {
                                                             if ($.test(n.eq($("s"), n.integer(0)))) {
@@ -747,7 +747,7 @@ export function processValue$4(...$_a) {
                                             return n.seq();
                                         }
                                     })($.frame()));
-                                    $ = $("args", processArgs($("frame"), $("args"), fn.concat($("name"), n.string("#"), $("s"))));
+                                    $ = $("args", processArgs($("frame"), $("args"), fn.concat($("name"), n.string("#"), $("s")), $("nest")));
                                     $ = $("args", ($ => {
                                         if ($.test($.test($("isType")) || $.test($("isNative")))) {
                                             return array.insertBefore($("args"), n.integer(1), $("local"));
@@ -829,7 +829,7 @@ export function processValue$4(...$_a) {
                                                 }
                                             })($.frame());
                                         } else {
-                                            $ = $("args", processArgs($("frame"), $("args"), fn.concat($("name"), n.string("#"), $("s"))));
+                                            $ = $("args", processArgs($("frame"), $("args"), fn.concat($("name"), n.string("#"), $("s")), $("nest")));
                                             $ = $("ret", a.foldLeftAt($("args"), n.string(""), function(...$_a) {
                                                 $ = $.frame($_a)
                                                     .item("pre")

@@ -308,7 +308,7 @@ export function processArgs$4(...$_a) {
                                                     if ($.test(n.gt($("s"), n.integer(1)))) {
                                                         return ($ => {
                                                             if ($.test($("isLetRet"))) {
-                                                                return letRet($("val"), n.seq());
+                                                                return letRet($("val"), $("letSeq"), n.seq());
                                                             } else {
                                                                 return fn.concat(n.string("return n.seq("), fn.stringJoin(array.flatten($("val")), n.string(",")), n.string(");&#13;"));
                                                             }
@@ -373,7 +373,7 @@ export function processArgs$4(...$_a) {
                                                                     if ($.test(n.gt($("s"), n.integer(1)))) {
                                                                         return ($ => {
                                                                             if ($.test($("isLetRet"))) {
-                                                                                return letRet($("val"), n.seq());
+                                                                                return letRet($("val"), $("letSeq"), n.seq());
                                                                             } else {
                                                                                 return fn.concat(n.string("return n.seq("), fn.stringJoin(array.flatten($("val")), n.string(",")), n.string(");&#13;"));
                                                                             }
@@ -743,7 +743,7 @@ export function processValue$4(...$_a) {
                                         if ($.test($.test($("isType")) && $.test(n.gt($("s"), n.integer(1))))) {
                                             $ = $("_", n.call($("args"), n.subtract($("s"), n.integer(1))));
                                             return ($ => {
-                                                if ($.test($.test(n.instanceOf($("_"), n.map(n.string("*")))) && $.test(n.eq(n.call($("_"), n.string("name")), n.string(""))))) {
+                                                if ($.test($.test(n.instanceOf($("_"), n.map())) && $.test(n.eq(n.call($("_"), n.string("name")), n.string(""))))) {
                                                     return findLetSeq(n.call($("_"), n.string("args")));
                                                 } else {
                                                     return n.seq();
@@ -767,7 +767,7 @@ export function processValue$4(...$_a) {
                                             .item("i");
                                         return ($ => {
                                             if ($.test($.test($.test($("isType")) && $.test(n.eq($("i"), $("s")))) && $.test(n.gt(fn.count($("letRet")), n.integer(0))))) {
-                                                return fn.concat(n.string("($ => {"), letRet($("_"), n.seq()), n.string("})($.frame())"));
+                                                return fn.concat(n.string("($ => {"), letRet($("_"), $("letRet"), n.seq()), n.string("})($.frame())"));
                                             } else {
                                                 return ($ => {
                                                     if ($.test($.test(n.instanceOf($("_"), n.array(n.item()))) && $.test(n.eq($("isFn"), fn.false())))) {
@@ -1352,7 +1352,7 @@ export function letRet$3(...$_a) {
         .item("seqtype");
     return ($ => {
         if ($.test(n.instanceOf($("a"), n.string()))) {
-            return fn.concat(n.string("letRet("), $("a"), n.string(","), $("seqtype"), n.string(")"));
+            return fn.concat(n.string("letRet("), $("a"), n.string(","), $("letSeq"), n.string(","), $("seqtype"), n.string(")"));
         } else {
             $ = $("size", array.size($("a")));
             return fn.stringJoin(array.flatten(a.forEachAt($("a"), function(...$_a) {

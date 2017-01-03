@@ -595,7 +595,7 @@ export function opCloseCurly$3(...$_a) {
     })($.frame())));
     $ = $("lastseen", fn.subsequence($("lastseen"), n.integer(1), n.subtract(lastIndexOf($("lastseen"), n.decimal(20.06)), n.integer(1))));
     $ = $("lastseen", ($ => {
-        if ($.test($.test(n.eq(fn.round(n.filter($("lastseen"), $_0 => n.geq(fn.position($_0), fn.last($_0)))), n.integer(21))) && $.test(n.eq(n.select($_0 => fn.head($("rest"), fn.string($_0))), n.string("=#20#06="))))) {
+        if ($.test($.test(n.eq(fn.round(n.filter($("lastseen"), $_0 => n.geq(fn.position($_0), fn.last($_0)))), n.integer(21))) && $.test(n.eq(n.select(fn.head($("rest")), $_0 => fn.string($_0)), n.string("=#20#06="))))) {
             return $("lastseen");
         } else {
             return pop($("lastseen"));
@@ -1172,19 +1172,12 @@ export function unaryOp$1(...$_a) {
     var $ = n.frame($_a)
         .item("op");
     return ($ => {
-        if ($.test(n.geq(opInt($("op")), n.integer(17)))) {
+        if ($.test(n.eq(fn.round($("op")), n.integer(17)))) {
             return $("op");
         } else {
-            return opStr(n.add(opNum($("op")), n.integer(9)));
+            return n.add($("op"), n.integer(9));
         }
     })($.frame());
-
-}
-
-export function opInt$1(...$_a) {
-    var $ = n.frame($_a)
-        .item("op");
-    return n.decimal(fn.replace($("op"), n.string("^=#(\\p{N}+)#?\\p{N}*=$"), n.string("$1")));
 
 }
 
@@ -1395,15 +1388,6 @@ export function body(...$_a) {
     }
 
     return n.error(body, $_l);
-}
-
-export function opInt(...$_a) {
-    var $_l = $_a.length;
-    if ($_l === 1) {
-        return opInt$1.apply(this, $_a);
-    }
-
-    return n.error(opInt, $_l);
 }
 
 export function xmodule(...$_a) {

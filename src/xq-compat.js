@@ -481,41 +481,341 @@ export function comment$3(...$_a) {
 
 }
 
-export function bodyOp$5(...$_a) {
+export function opLet$4(...$_a) {
     var $ = n.frame($_a)
-        .item("no")
-        .item("next")
-        .item("lastseen")
         .item("rest")
-        .string("ret");
-    return ($ => {
-        if ($.test(n.eq($("no"), n.integer(1)))) {
-            $ = $("llast", n.filter($("lastseen"), $_0 => n.geq(fn.position($_0), fn.last($_0))));
-            $ = $("ret", fn.concat($("ret"), ($ => {
-                if ($.test(n.geq($("llast"), n.decimal(19.01)))) {
+        .item("ret")
+        .item("lastseen")
+        .item("llast");
+    $ = $("hascomma", $.test(n.eq($("llast"), n.decimal(2.07))) || $.test(n.seq($.test(n.eq($("llast"), n.decimal(2.08))) && $.test(fn.matches($("ret"), n.string(",$"))))));
+    $ = $("letopener", $.test(fn.not($.test(n.geq($("llast"), n.seq(n.decimal(2.09), n.decimal(2.10)))) || $.test(n.seq($.test(n.eq($("llast"), n.decimal(2.08))) && $.test(n.geq($("hascomma"), fn.false())))))) || $.test(n.eq($("llast"), n.decimal(20.06))));
+    $ = $("letclose", $.test(fn.not($.test(n.eq($("llast"), n.decimal(20.06))) || $.test(fn.empty($("lastseen"))))) && $.test(n.eq($("hascomma"), fn.false())));
+    $ = $("letcloser", ($ => {
+        if ($.test($.test($("letclose")) && $.test(n.geq($("llast"), n.seq(n.decimal(2.08), n.decimal(2.11), n.decimal(19.01)))))) {
+            return closer(fn.reverse($("lastseen")), n.integer(0));
+        } else {
+            return n.integer(0);
+        }
+    })($.frame()));
+    $ = $("ret", fn.concat($("ret"), ($ => {
+        if ($.test($("letclose"))) {
+            return fn.concat(fn.stringJoin(n.forEach(n.seq(n.to(n.integer(1), $("letcloser"))), n.string(")"))), ($ => {
+                if ($.test(n.eq(n.filter($("lastseen"), $_0 => n.geq(fn.position($_0), n.subtract(fn.last($_0), $("letcloser")))), n.decimal(2.10)))) {
                     return n.string(")");
                 } else {
                     return n.string("");
                 }
-            })($.frame())));
-            $ = $("lastseen", ($ => {
-                if ($.test(n.eq($("llast"), n.decimal(19.01)))) {
-                    return pop($("lastseen"));
-                } else {
-                    return $("lastseen");
-                }
-            })($.frame()));
-            $ = $("llast", n.filter($("lastseen"), $_0 => n.geq(fn.position($_0), fn.last($_0))));
-            $ = $("closer", closer(fn.reverse($("lastseen")), n.integer(0)));
-            $ = $("lastseen", fn.subsequence($("lastseen"), n.integer(1), n.subtract(fn.count($("lastseen")), $("closer"))));
-            $ = $("ret", fn.concat($("ret"), fn.stringJoin(n.forEach(n.seq(n.to(n.integer(1), $("closer"))), n.string(")"))), ($ => {
-                if ($.test(n.eq(n.filter($("lastseen"), $_0 => n.geq(fn.position($_0), n.subtract(fn.last($_0), n.integer(1)))), n.decimal(21.07)))) {
-                    return n.string("),=#27#01=(");
+            })($.frame()), ($ => {
+                if ($.test($("hascomma"))) {
+                    return n.string("");
                 } else {
                     return n.string(",");
                 }
-            })($.frame())));
-            return body($("rest"), $("ret"), $("lastseen"));
+            })($.frame()));
+        } else {
+            return n.string("");
+        }
+    })($.frame()), ($ => {
+        if ($.test($("letopener"))) {
+            return n.string("(");
+        } else {
+            return n.string("");
+        }
+    })($.frame()), n.string("=#2#09="), fn.concat(n.string("($,"), fn.replace(n.select(fn.head($("rest")), $_0 => fn.string($_0)), n.string("^\\$|\\s"), n.string("")))));
+    $ = $("lastseen", ($ => {
+        if ($.test($("letclose"))) {
+            return fn.subsequence($("lastseen"), n.integer(1), n.subtract(fn.count($("lastseen")), $("letcloser")));
+        } else {
+            return $("lastseen");
+        }
+    })($.frame()));
+    $ = $("lastseen", ($ => {
+        if ($.test($.test($("letclose")) && $.test(n.eq(n.filter($("lastseen"), $_0 => n.geq(fn.position($_0), fn.last($_0))), n.decimal(2.10))))) {
+            return pop($("lastseen"));
+        } else {
+            return $("lastseen");
+        }
+    })($.frame()));
+    return body(fn.tail($("rest")), $("ret"), n.seq($("lastseen"), n.decimal(2.09)));
+
+}
+
+export function opComma$3(...$_a) {
+    var $ = n.frame($_a)
+        .item("rest")
+        .item("ret")
+        .item("lastseen");
+    $ = $("closer", closer(fn.reverse($("lastseen")), n.integer(0)));
+    $ = $("lastseen", fn.subsequence($("lastseen"), n.integer(1), n.subtract(fn.count($("lastseen")), $("closer"))));
+    $ = $("ret", fn.concat($("ret"), fn.stringJoin(n.forEach(n.seq(n.to(n.integer(1), $("closer"))), n.string(")"))), ($ => {
+        if ($.test(n.eq(n.filter($("lastseen"), $_0 => n.geq(fn.position($_0), n.subtract(fn.last($_0), n.integer(1)))), n.decimal(21.07)))) {
+            return n.string("),=#27#01=(");
+        } else {
+            return n.string(",");
+        }
+    })($.frame())));
+    return body($("rest"), $("ret"), $("lastseen"));
+
+}
+
+export function opCloseCurly$3(...$_a) {
+    var $ = n.frame($_a)
+        .item("rest")
+        .item("ret")
+        .item("lastseen");
+    $ = $("lastindex", lastIndexOf($("lastseen"), n.decimal(20.06)));
+    $ = $("closes", n.filter(fn.subsequence($("lastseen"), $("lastindex"), fn.count($("lastseen"))), $_0 => n.geq($_0, n.seq(n.decimal(2.08), n.decimal(2.11)))));
+    $ = $("next", n.select(fn.head($("rest")), $_0 => fn.string($_0)));
+    $ = $("closes", ($ => {
+        if ($.test(n.eq($("next"), n.string("=#20#06=")))) {
+            return $("closes");
+        } else {
+            return n.seq($("closes"), n.decimal(2.11));
+        }
+    })($.frame()));
+    $ = $("llast", n.filter($("lastseen"), $_0 => n.geq(fn.position($_0), n.subtract($("lastindex"), n.integer(1)))));
+    $ = $("ret", fn.concat($("ret"), ($ => {
+        if ($.test(n.eq(fn.round($("llast")), n.integer(21)))) {
+            return n.string(")");
+        } else {
+            return n.string("");
+        }
+    })($.frame()), ($ => {
+        if ($.test($.test(n.seq($.test(n.eq($("llast"), n.decimal(21.07))) || $.test(fn.empty($("llast"))))) && $.test(n.geq(fn.matches($("ret"), n.string("\\($")), fn.false())))) {
+            return n.string(")");
+        } else {
+            return n.string("");
+        }
+    })($.frame()), fn.stringJoin(n.forEach($("closes"), n.string(")"))), ($ => {
+        if ($.test(n.eq($("next"), n.string("=#20#06=")))) {
+            return n.string(",");
+        } else {
+            return n.string("");
+        }
+    })($.frame())));
+    $ = $("lastseen", fn.subsequence($("lastseen"), n.integer(1), n.subtract(lastIndexOf($("lastseen"), n.decimal(20.06)), n.integer(1))));
+    $ = $("lastseen", ($ => {
+        if ($.test($.test(n.eq(fn.round(n.filter($("lastseen"), $_0 => n.geq(fn.position($_0), fn.last($_0)))), n.integer(21))) && $.test(n.eq(n.select($_0 => fn.head($("rest"), fn.string($_0))), n.string("=#20#06="))))) {
+            return $("lastseen");
+        } else {
+            return pop($("lastseen"));
+        }
+    })($.frame()));
+    return body($("rest"), $("ret"), $("lastseen"));
+
+}
+
+export function opConstructor$4(...$_a) {
+    var $ = n.frame($_a)
+        .item("no")
+        .item("rest")
+        .item("ret")
+        .item("lastseen");
+    $ = $("ret", fn.concat($("ret"), opStr($("no")), n.string("(")));
+    $ = $("next", n.select(fn.head($("rest")), $_0 => fn.string($_0)));
+    $ = $("qn", ($ => {
+        if ($.test(n.ne($("next"), n.string("=#20#06=")))) {
+            return $("next");
+        } else {
+            return n.seq();
+        }
+    })($.frame()));
+    $ = $("rest", ($ => {
+        if ($.test(fn.exists($("qn")))) {
+            return fn.tail($("rest"));
+        } else {
+            return $("rest");
+        }
+    })($.frame()));
+    $ = $("ret", ($ => {
+        if ($.test(fn.exists($("qn")))) {
+            return fn.concat($("ret"), $("next"), n.string(","));
+        } else {
+            return $("ret");
+        }
+    })($.frame()));
+    return body($("rest"), $("ret"), n.seq($("lastseen"), $("no")));
+
+}
+
+export function opThenAssign$5(...$_a) {
+    var $ = n.frame($_a)
+        .item("no")
+        .item("rest")
+        .item("ret")
+        .item("lastseen")
+        .item("llast");
+    $ = $("ret", fn.concat($("ret"), ($ => {
+        if ($.test(n.eq($("llast"), n.decimal(2.11)))) {
+            return n.string(")");
+        } else {
+            return n.string("");
+        }
+    })($.frame()), n.string(",")));
+    $ = $("lastseen", ($ => {
+        if ($.test($.test(n.eq($("llast"), n.decimal(2.11))) || $.test(n.seq($.test(n.eq($("no"), n.decimal(2.07))) && $.test(n.eq($("llast"), n.decimal(0.01))))))) {
+            return pop($("lastseen"));
+        } else {
+            return $("lastseen");
+        }
+    })($.frame()));
+    $ = $("last", n.filter(fn.indexOf($("lastseen"), n.subtract($("no"), n.decimal(n.decimal(0.01)))), $_0 => n.geq(fn.position($_0), fn.last($_0))));
+    $ = $("lastseen", ($ => {
+        if ($.test($("last"))) {
+            return n.seq(fn.remove($("lastseen"), $("last")), $("no"));
+        } else {
+            return $("lastseen");
+        }
+    })($.frame()));
+    return body($("rest"), $("ret"), $("lastseen"));
+
+}
+
+export function opElseReturn$4(...$_a) {
+    var $ = n.frame($_a)
+        .item("no")
+        .item("rest")
+        .item("ret")
+        .item("lastseen");
+    $ = $("closer", lastIndexOf($("lastseen"), n.subtract($("no"), n.decimal(n.decimal(0.01)))));
+    $ = $("ret", fn.concat($("ret"), fn.stringJoin(n.forEach(fn.subsequence($("lastseen"), n.add($("closer"), n.integer(1))), n.string(")"))), ($ => {
+        if ($.test(n.eq($("no"), n.decimal(2.11)))) {
+            return n.string("),");
+        } else {
+            return n.string(",");
+        }
+    })($.frame())));
+    $ = $("lastseen", fn.subsequence($("lastseen"), n.integer(1), n.subtract($("closer"), n.integer(1))));
+    return body($("rest"), $("ret"), n.seq($("lastseen"), $("no")));
+
+}
+
+export function opCloseSquare$4(...$_a) {
+    var $ = n.frame($_a)
+        .item("rest")
+        .item("ret")
+        .item("lastseen")
+        .item("llast");
+    $ = $("ret", fn.concat($("ret"), ($ => {
+        if ($.test($.test(n.geq($("llast"), n.seq(n.decimal(19.01), n.decimal(20.04)))) || $.test(n.seq($.test(n.eq($("llast"), n.decimal(20.01))) && $.test(n.eq(n.filter($("lastseen"), $_0 => n.geq(fn.position($_0), n.subtract(fn.last($_0), n.integer(1)))), n.decimal(19.01))))))) {
+            return n.string("))");
+        } else {
+            return n.string(")");
+        }
+    })($.frame())));
+    $ = $("lastseen", ($ => {
+        if ($.test($.test(n.geq($("llast"), n.decimal(19.01))) || $.test(n.seq($.test(n.eq($("llast"), n.decimal(20.01))) && $.test(n.eq(n.filter($("lastseen"), $_0 => n.geq(fn.position($_0), n.subtract(fn.last($_0), n.integer(1)))), n.decimal(19.01))))))) {
+            return pop(pop($("lastseen")));
+        } else {
+            return pop($("lastseen"));
+        }
+    })($.frame()));
+    return body($("rest"), $("ret"), $("lastseen"));
+
+}
+
+export function opOpenSquare$4(...$_a) {
+    var $ = n.frame($_a)
+        .item("no")
+        .item("rest")
+        .item("ret")
+        .item("lastseen");
+    $ = $("ret", fn.concat($("ret"), opStr($("no")), ($ => {
+        if ($.test(n.eq($("no"), n.decimal(20.04)))) {
+            return n.string("((");
+        } else {
+            return n.string("(");
+        }
+    })($.frame())));
+    return body($("rest"), $("ret"), n.seq($("lastseen"), $("no")));
+
+}
+
+export function opOpenCurly$4(...$_a) {
+    var $ = n.frame($_a)
+        .item("rest")
+        .item("ret")
+        .item("lastseen")
+        .item("llast");
+    $ = $("ret", fn.concat($("ret"), ($ => {
+        if ($.test($.test(n.eq($("llast"), n.decimal(21.07))) || $.test(n.ne(fn.round($("llast")), n.integer(21))))) {
+            $ = $("next", n.select(fn.head($("rest")), $_0 => fn.string($_0)));
+            return ($ => {
+                if ($.test($.test(fn.empty($("next"))) || $.test(n.eq($("next"), n.string("=#20#07="))))) {
+                    return n.string("(");
+                } else {
+                    return n.string("(=#27#01=(");
+                }
+            })($.frame());
+        } else {
+            return n.string("(");
+        }
+    })($.frame())));
+    return body($("rest"), $("ret"), n.seq($("lastseen"), n.decimal(20.06)));
+
+}
+
+export function opSelect$4(...$_a) {
+    var $ = n.frame($_a)
+        .item("rest")
+        .item("ret")
+        .item("lastseen")
+        .item("llast");
+    $ = $("ret", fn.concat($("ret"), ($ => {
+        if ($.test(n.eq($("llast"), n.decimal(19.01)))) {
+            return n.string(",");
+        } else {
+            return n.string("=#19#01=(");
+        }
+    })($.frame())));
+    $ = $("lastseen", ($ => {
+        if ($.test(n.geq($("llast"), n.decimal(19.01)))) {
+            return $("lastseen");
+        } else {
+            return n.seq($("lastseen"), n.decimal(19.01));
+        }
+    })($.frame()));
+    return body($("rest"), $("ret"), $("lastseen"));
+
+}
+
+export function bodyOp$4(...$_a) {
+    var $ = n.frame($_a)
+        .item("no")
+        .item("rest")
+        .string("ret")
+        .item("lastseen");
+    $ = $("llast", n.filter($("lastseen"), $_0 => n.geq(fn.position($_0), fn.last($_0))));
+    $ = $("ret", fn.concat($("ret"), ($ => {
+        if ($.test(n.eq($("llast"), n.decimal(19.01)))) {
+            return ($ => {
+                if ($.test(n.eq($("no"), n.decimal(20.01)))) {
+                    return n.string(",");
+                } else {
+                    return n.string(")");
+                }
+            })($.frame());
+        } else {
+            return n.string("");
+        }
+    })($.frame())));
+    $ = $("lastseen", ($ => {
+        if ($.test(n.eq($("llast"), n.decimal(19.01)))) {
+            return ($ => {
+                if ($.test(n.eq($("no"), n.decimal(20.01)))) {
+                    return $("lastseen");
+                } else {
+                    return pop($("lastseen"));
+                }
+            })($.frame());
+        } else {
+            return $("lastseen");
+        }
+    })($.frame()));
+    $ = $("llast", n.filter($("lastseen"), $_0 => n.geq(fn.position($_0), fn.last($_0))));
+    return ($ => {
+        if ($.test(n.eq($("no"), n.integer(1)))) {
+            return opComma($("rest"), $("ret"), $("lastseen"));
         } else {
             return ($ => {
                 if ($.test(n.eq($("no"), n.decimal(25.01)))) {
@@ -523,351 +823,53 @@ export function bodyOp$5(...$_a) {
                 } else {
                     return ($ => {
                         if ($.test(n.eq($("no"), n.decimal(21.06)))) {
-                            return anon($("next"), fn.tail($("rest")), $("ret"), $("lastseen"));
+                            return anon(n.select(fn.head($("rest")), $_0 => fn.string($_0)), fn.tail($("rest")), $("ret"), $("lastseen"));
                         } else {
                             return ($ => {
-                                if ($.test(n.eq(fn.round($("no")), n.integer(21)))) {
-                                    $ = $("ret", fn.concat($("ret"), opStr($("no")), n.string("(")));
-                                    $ = $("qn", ($ => {
-                                        if ($.test(n.ne($("next"), n.string("=#20#06=")))) {
-                                            return $("next");
-                                        } else {
-                                            return n.seq();
-                                        }
-                                    })($.frame()));
-                                    $ = $("rest", ($ => {
-                                        if ($.test(fn.exists($("qn")))) {
-                                            return fn.tail($("rest"));
-                                        } else {
-                                            return $("rest");
-                                        }
-                                    })($.frame()));
-                                    $ = $("ret", ($ => {
-                                        if ($.test(fn.exists($("qn")))) {
-                                            return fn.concat($("ret"), $("next"), n.string(","));
-                                        } else {
-                                            return $("ret");
-                                        }
-                                    })($.frame()));
-                                    return body($("rest"), $("ret"), n.seq($("lastseen"), $("no")));
+                                if ($.test(n.eq($("no"), n.decimal(2.09)))) {
+                                    return opLet($("rest"), $("ret"), $("lastseen"), $("llast"));
                                 } else {
-                                    $ = $("old", $("lastseen"));
-                                    $ = $("llast", n.filter($("lastseen"), $_0 => n.geq(fn.position($_0), fn.last($_0))));
-                                    $ = $("ret", fn.concat($("ret"), ($ => {
-                                        if ($.test(n.eq($("llast"), n.decimal(19.01)))) {
-                                            return ($ => {
-                                                if ($.test(n.eq($("no"), n.decimal(20.01)))) {
-                                                    return n.string(",");
-                                                } else {
-                                                    return n.string(")");
-                                                }
-                                            })($.frame());
-                                        } else {
-                                            return n.string("");
-                                        }
-                                    })($.frame())));
-                                    $ = $("lastseen", ($ => {
-                                        if ($.test(n.eq($("llast"), n.decimal(19.01)))) {
-                                            return ($ => {
-                                                if ($.test(n.eq($("no"), n.decimal(20.01)))) {
-                                                    return $("lastseen");
-                                                } else {
-                                                    return pop($("lastseen"));
-                                                }
-                                            })($.frame());
-                                        } else {
-                                            return $("lastseen");
-                                        }
-                                    })($.frame()));
-                                    $ = $("llast", n.filter($("lastseen"), $_0 => n.geq(fn.position($_0), fn.last($_0))));
-                                    $ = $("hascomma", fn.matches($("ret"), n.string(",$")));
-                                    $ = $("letopener", $.test(n.eq($("no"), n.decimal(2.09))) && $.test(n.seq($.test($.test(n.seq($.test(n.eq($("llast"), n.decimal(2.10))) && $.test(n.eq($("hascomma"), fn.true())))) || $.test(fn.not($.test(n.geq($("llast"), n.seq(n.decimal(2.09), n.decimal(2.10)))) || $.test(n.seq($.test(n.eq($("llast"), n.decimal(2.08))) && $.test(n.geq($("hascomma"), fn.false()))))))) || $.test(n.eq($("llast"), n.decimal(20.06))))));
-                                    $ = $("elsecloser", ($ => {
-                                        if ($.test(n.eq($("no"), n.decimal(2.08)))) {
-                                            return lastIndexOf($("lastseen"), n.decimal(2.07));
-                                        } else {
-                                            return n.integer(0);
-                                        }
-                                    })($.frame()));
-                                    $ = $("retncloser", ($ => {
-                                        if ($.test(n.eq($("no"), n.decimal(2.11)))) {
-                                            return lastIndexOf($("lastseen"), n.decimal(2.1));
-                                        } else {
-                                            return n.integer(0);
-                                        }
-                                    })($.frame()));
-                                    $ = $("letclose", $.test($.test(n.eq($("no"), n.decimal(2.09))) && $.test(fn.not($.test(n.eq($("llast"), n.decimal(20.06))) || $.test(fn.empty($("lastseen")))))) && $.test(n.geq($("hascomma"), fn.false())));
-                                    $ = $("letcloser", ($ => {
-                                        if ($.test($.test($("letclose")) && $.test(n.geq($("llast"), n.seq(n.decimal(2.08), n.decimal(2.11), n.decimal(19.01)))))) {
-                                            return closer(fn.reverse($("lastseen")), n.integer(0));
-                                        } else {
-                                            return n.integer(0);
-                                        }
-                                    })($.frame()));
-                                    $ = $("ret", fn.concat($("ret"), ($ => {
-                                        if ($.test(n.geq($("no"), n.seq(n.decimal(2.06), n.decimal(2.09), n.decimal(20.01), n.decimal(20.04))))) {
-                                            return fn.concat(($ => {
-                                                if ($.test($("letclose"))) {
-                                                    return fn.concat(fn.stringJoin(n.forEach(n.seq(n.to(n.integer(1), $("letcloser"))), n.string(")"))), ($ => {
-                                                        if ($.test(n.eq(n.filter($("lastseen"), $_0 => n.geq(fn.position($_0), n.subtract(fn.last($_0), $("letcloser")))), n.decimal(2.10)))) {
-                                                            return n.string(")");
-                                                        } else {
-                                                            return n.string("");
-                                                        }
-                                                    })($.frame()), ($ => {
-                                                        if ($.test($("hascomma"))) {
-                                                            return n.string("");
-                                                        } else {
-                                                            return n.string(",");
-                                                        }
-                                                    })($.frame()));
-                                                } else {
-                                                    return n.string("");
-                                                }
-                                            })($.frame()), ($ => {
-                                                if ($.test($("letopener"))) {
-                                                    return n.string("(");
-                                                } else {
-                                                    return n.string("");
-                                                }
-                                            })($.frame()), opStr($("no")), ($ => {
-                                                if ($.test(n.eq($("no"), n.decimal(20.04)))) {
-                                                    return n.string("(");
-                                                } else {
-                                                    return n.string("");
-                                                }
-                                            })($.frame()), ($ => {
-                                                if ($.test(n.eq($("no"), n.decimal(2.06)))) {
-                                                    return n.string("");
-                                                } else {
-                                                    return n.string("(");
-                                                }
-                                            })($.frame()), ($ => {
-                                                if ($.test(n.eq($("no"), n.decimal(2.09)))) {
-                                                    return fn.concat(n.string("$,"), fn.replace($("next"), n.string("^\\$|\\s"), n.string("")));
-                                                } else {
-                                                    return ($ => {
-                                                        if ($.test(n.eq($("no"), n.decimal(20.01)))) {
-                                                            return $("next");
-                                                        } else {
-                                                            return n.string("");
-                                                        }
-                                                    })($.frame());
-                                                }
-                                            })($.frame()));
+                                    return ($ => {
+                                        if ($.test(n.geq($("no"), n.seq(n.decimal(20.01), n.decimal(20.04))))) {
+                                            return opOpenSquare($("no"), $("rest"), $("ret"), $("lastseen"));
                                         } else {
                                             return ($ => {
                                                 if ($.test($.test(n.eq($("no"), n.integer(26))) || $.test(n.seq($.test(n.eq($("no"), n.decimal(2.10))) && $.test(n.eq(n.filter($("lastseen"), $_0 => n.geq(fn.position($_0), n.subtract(fn.last($_0), n.integer(1)))), n.decimal(21.07))))))) {
-                                                    return n.string(",");
+                                                    return body($("rest"), fn.concat($("ret"), n.string(",")), $("lastseen"));
                                                 } else {
                                                     return ($ => {
                                                         if ($.test(n.eq($("no"), n.decimal(20.07)))) {
-                                                            $ = $("lastindex", lastIndexOf($("lastseen"), n.decimal(20.06)));
-                                                            $ = $("closes", n.filter(fn.subsequence($("lastseen"), $("lastindex"), fn.count($("lastseen"))), $_0 => n.geq($_0, n.seq(n.decimal(2.08), n.decimal(2.11)))));
-                                                            $ = $("closes", ($ => {
-                                                                if ($.test(n.eq($("next"), n.string("=#20#06=")))) {
-                                                                    return $("closes");
-                                                                } else {
-                                                                    return n.seq($("closes"), n.decimal(2.11));
-                                                                }
-                                                            })($.frame()));
-                                                            $ = $("llast", n.filter($("lastseen"), $_0 => n.geq(fn.position($_0), n.subtract($("lastindex"), n.integer(1)))));
-                                                            return fn.concat(($ => {
-                                                                if ($.test(n.eq(fn.round($("llast")), n.integer(21)))) {
-                                                                    return n.string(")");
-                                                                } else {
-                                                                    return n.string("");
-                                                                }
-                                                            })($.frame()), ($ => {
-                                                                if ($.test($.test(n.seq($.test(n.eq($("llast"), n.decimal(21.07))) || $.test(fn.empty($("llast"))))) && $.test(n.geq(fn.matches($("ret"), n.string("\\($")), fn.false())))) {
-                                                                    return n.string(")");
-                                                                } else {
-                                                                    return n.string("");
-                                                                }
-                                                            })($.frame()), fn.stringJoin(n.forEach($("closes"), n.string(")"))), ($ => {
-                                                                if ($.test(n.eq($("next"), n.string("=#20#06=")))) {
-                                                                    return n.string(",");
-                                                                } else {
-                                                                    return n.string("");
-                                                                }
-                                                            })($.frame()));
+                                                            return opCloseCurly($("rest"), $("ret"), $("lastseen"));
                                                         } else {
                                                             return ($ => {
                                                                 if ($.test(n.geq($("no"), n.seq(n.decimal(2.07), n.decimal(2.10))))) {
-                                                                    return fn.concat(($ => {
-                                                                        if ($.test(n.eq($("llast"), n.decimal(2.11)))) {
-                                                                            return n.string(")");
-                                                                        } else {
-                                                                            return n.string("");
-                                                                        }
-                                                                    })($.frame()), n.string(","));
+                                                                    return opThenAssign($("no"), $("rest"), $("ret"), $("lastseen"), $("llast"));
                                                                 } else {
                                                                     return ($ => {
-                                                                        if ($.test(n.eq($("no"), n.decimal(2.08)))) {
-                                                                            return fn.concat(fn.stringJoin(n.forEach(fn.subsequence($("lastseen"), n.add($("elsecloser"), n.integer(1))), n.string(")"))), n.string(","));
+                                                                        if ($.test(n.geq($("no"), n.seq(n.decimal(2.08), n.decimal(2.11))))) {
+                                                                            return opElseReturn($("no"), $("rest"), $("ret"), $("lastseen"));
                                                                         } else {
                                                                             return ($ => {
-                                                                                if ($.test(n.eq($("no"), n.decimal(2.11)))) {
-                                                                                    return fn.concat(fn.stringJoin(n.forEach(fn.subsequence($("lastseen"), n.add($("retncloser"), n.integer(1))), n.string(")"))), n.string("),"));
+                                                                                if ($.test(n.eq($("no"), n.decimal(20.02)))) {
+                                                                                    return opCloseSquare($("rest"), $("ret"), $("lastseen"), $("llast"));
                                                                                 } else {
                                                                                     return ($ => {
-                                                                                        if ($.test(n.eq($("no"), n.decimal(20.02)))) {
-                                                                                            return ($ => {
-                                                                                                if ($.test($.test(n.geq($("llast"), n.seq(n.decimal(19.01), n.decimal(20.04)))) || $.test(n.seq($.test(n.eq($("llast"), n.decimal(20.01))) && $.test(n.eq(n.filter($("lastseen"), $_0 => n.geq(fn.position($_0), n.subtract(fn.count($("lastseen")), n.integer(1)))), n.decimal(19.01))))))) {
-                                                                                                    return n.string("))");
-                                                                                                } else {
-                                                                                                    return n.string(")");
-                                                                                                }
-                                                                                            })($.frame());
+                                                                                        if ($.test(n.eq($("no"), n.decimal(20.06)))) {
+                                                                                            return opOpenCurly($("rest"), $("ret"), $("lastseen"), $("llast"));
                                                                                         } else {
                                                                                             return ($ => {
-                                                                                                if ($.test(n.eq($("no"), n.decimal(20.06)))) {
-                                                                                                    return ($ => {
-                                                                                                        if ($.test($.test(n.eq($("llast"), n.decimal(21.07))) || $.test(n.ne(fn.round($("llast")), n.integer(21))))) {
-                                                                                                            return ($ => {
-                                                                                                                if ($.test($.test(fn.empty($("next"))) || $.test(n.eq($("next"), n.string("=#20#07="))))) {
-                                                                                                                    return n.string("(");
-                                                                                                                } else {
-                                                                                                                    return n.string("(=#27#01=(");
-                                                                                                                }
-                                                                                                            })($.frame());
-                                                                                                        } else {
-                                                                                                            return n.string("(");
-                                                                                                        }
-                                                                                                    })($.frame());
+                                                                                                if ($.test(n.eq($("no"), n.decimal(19.01)))) {
+                                                                                                    return opSelect($("rest"), $("ret"), $("lastseen"), $("llast"));
                                                                                                 } else {
                                                                                                     return ($ => {
-                                                                                                        if ($.test(n.geq($("no"), n.decimal(19.01)))) {
-                                                                                                            return ($ => {
-                                                                                                                if ($.test(n.eq($("llast"), n.decimal(19.01)))) {
-                                                                                                                    return n.string(",");
-                                                                                                                } else {
-                                                                                                                    return n.concat(opStr($("no")), n.string("("));
-                                                                                                                }
-                                                                                                            })($.frame());
-                                                                                                        } else {
-                                                                                                            return opStr($("no"));
-                                                                                                        }
-                                                                                                    })($.frame());
-                                                                                                }
-                                                                                            })($.frame());
-                                                                                        }
-                                                                                    })($.frame());
-                                                                                }
-                                                                            })($.frame());
-                                                                        }
-                                                                    })($.frame());
-                                                                }
-                                                            })($.frame());
-                                                        }
-                                                    })($.frame());
-                                                }
-                                            })($.frame());
-                                        }
-                                    })($.frame())));
-                                    $ = $("rest", ($ => {
-                                        if ($.test($.test(fn.empty($("rest"))) || $.test(fn.not(n.geq($("no"), n.seq(n.decimal(2.09), n.decimal(20.01))))))) {
-                                            return $("rest");
-                                        } else {
-                                            return ($ => {
-                                                if ($.test($.test(n.geq($("next"), fns)) && $.test(fn.matches(n.filter($("rest"), $_0 => n.geq(fn.position($_0), n.integer(2))), n.string("[^\\.]\\)"))))) {
-                                                    return fn.insertBefore(fn.subsequence($("rest"), n.integer(3)), n.integer(1), n.element(n.string("fn:match"), n.seq(n.element(n.string("fn:group"), n.seq(n.attribute(n.string("nr"), n.seq(n.integer(1))), fn.replace(n.filter($("rest"), $_0 => n.geq(fn.position($_0), n.integer(2))), n.string("^([^\\)]*)\\)"), n.string("$1.)")))))));
-                                                } else {
-                                                    return fn.tail($("rest"));
-                                                }
-                                            })($.frame());
-                                        }
-                                    })($.frame()));
-                                    $ = $("lastseen", ($ => {
-                                        if ($.test(n.geq($("no"), n.seq(n.decimal(2.06), n.decimal(2.09), n.decimal(20.01), n.decimal(20.04))))) {
-                                            $ = $("lastseen", ($ => {
-                                                if ($.test($("letclose"))) {
-                                                    return fn.subsequence($("lastseen"), n.integer(1), n.subtract(fn.count($("lastseen")), $("letcloser")));
-                                                } else {
-                                                    return $("lastseen");
-                                                }
-                                            })($.frame()));
-                                            $ = $("lastseen", ($ => {
-                                                if ($.test($.test($("letclose")) && $.test(n.eq(n.filter($("lastseen"), $_0 => n.geq(fn.position($_0), fn.last($_0))), n.decimal(2.10))))) {
-                                                    return pop($("lastseen"));
-                                                } else {
-                                                    return $("lastseen");
-                                                }
-                                            })($.frame()));
-                                            return n.seq($("lastseen"), $("no"));
-                                        } else {
-                                            return ($ => {
-                                                if ($.test($.test(n.eq($("no"), n.integer(26))) || $.test(n.seq($.test(n.eq($("no"), n.decimal(2.10))) && $.test(n.eq(n.filter($("lastseen"), $_0 => n.geq(fn.position($_0), n.subtract(fn.last($_0), n.integer(1)))), n.decimal(21.07))))))) {
-                                                    return $("lastseen");
-                                                } else {
-                                                    return ($ => {
-                                                        if ($.test(n.geq($("no"), n.decimal(20.07)))) {
-                                                            $ = $("lastseen", fn.subsequence($("lastseen"), n.integer(1), n.subtract(lastIndexOf($("lastseen"), n.decimal(20.06)), n.integer(1))));
-                                                            return ($ => {
-                                                                if ($.test($.test(n.eq(fn.round(n.filter($("lastseen"), $_0 => n.geq(fn.position($_0), fn.last($_0)))), n.integer(21))) && $.test(n.eq($("next"), n.string("=#20#06="))))) {
-                                                                    return $("lastseen");
-                                                                } else {
-                                                                    return pop($("lastseen"));
-                                                                }
-                                                            })($.frame());
-                                                        } else {
-                                                            return ($ => {
-                                                                if ($.test(n.geq($("no"), n.seq(n.decimal(2.07), n.decimal(2.10))))) {
-                                                                    $ = $("lastseen", ($ => {
-                                                                        if ($.test($.test(n.eq($("llast"), n.decimal(2.11))) || $.test(n.seq($.test(n.eq($("no"), n.decimal(2.07))) && $.test(n.eq($("llast"), n.decimal(0.01))))))) {
-                                                                            return pop($("lastseen"));
-                                                                        } else {
-                                                                            return $("lastseen");
-                                                                        }
-                                                                    })($.frame()));
-                                                                    $ = $("last", n.filter(fn.indexOf($("lastseen"), n.subtract($("no"), n.decimal(n.decimal(0.01)))), $_0 => n.geq(fn.position($_0), fn.last($_0))));
-                                                                    return ($ => {
-                                                                        if ($.test($("last"))) {
-                                                                            return n.seq(fn.remove($("lastseen"), $("last")), $("no"));
-                                                                        } else {
-                                                                            return $("lastseen");
-                                                                        }
-                                                                    })($.frame());
-                                                                } else {
-                                                                    return ($ => {
-                                                                        if ($.test(n.eq($("no"), n.decimal(2.08)))) {
-                                                                            $ = $("lastseen", fn.subsequence($("lastseen"), n.integer(1), n.subtract($("elsecloser"), n.integer(1))));
-                                                                            return n.seq($("lastseen"), $("no"));
-                                                                        } else {
-                                                                            return ($ => {
-                                                                                if ($.test(n.eq($("no"), n.decimal(2.11)))) {
-                                                                                    $ = $("lastseen", fn.subsequence($("lastseen"), n.integer(1), n.subtract($("retncloser"), n.integer(1))));
-                                                                                    return n.seq($("lastseen"), $("no"));
-                                                                                } else {
-                                                                                    return ($ => {
-                                                                                        if ($.test($.test(n.eq($("no"), n.decimal(20.06))) || $.test(n.geq(fn.round($("no")), n.integer(21))))) {
-                                                                                            return n.seq($("lastseen"), $("no"));
-                                                                                        } else {
-                                                                                            return ($ => {
-                                                                                                if ($.test(n.geq($("no"), n.seq(n.decimal(19.01))))) {
-                                                                                                    return ($ => {
-                                                                                                        if ($.test(n.geq($("llast"), n.decimal(19.01)))) {
-                                                                                                            return $("lastseen");
-                                                                                                        } else {
-                                                                                                            return n.seq($("lastseen"), $("no"));
-                                                                                                        }
-                                                                                                    })($.frame());
-                                                                                                } else {
-                                                                                                    return ($ => {
-                                                                                                        if ($.test(n.eq($("no"), n.decimal(20.01)))) {
-                                                                                                            return n.seq($("lastseen"), $("no"));
+                                                                                                        if ($.test(n.eq(fn.round($("no")), n.integer(21)))) {
+                                                                                                            return opConstructor($("no"), $("rest"), $("ret"), $("lastseen"));
                                                                                                         } else {
                                                                                                             return ($ => {
-                                                                                                                if ($.test(n.eq($("no"), n.decimal(20.02)))) {
-                                                                                                                    return ($ => {
-                                                                                                                        if ($.test($.test(n.geq($("llast"), n.decimal(19.01))) || $.test(n.seq($.test(n.eq($("llast"), n.decimal(20.01))) && $.test(n.eq(n.filter($("lastseen"), $_0 => n.geq(fn.position($_0), n.subtract(fn.count($("lastseen")), n.integer(1)))), n.decimal(19.01))))))) {
-                                                                                                                            return pop(pop($("lastseen")));
-                                                                                                                        } else {
-                                                                                                                            return pop($("lastseen"));
-                                                                                                                        }
-                                                                                                                    })($.frame());
+                                                                                                                if ($.test(n.geq($("no"), n.seq(n.decimal(2.06), n.decimal(20.01))))) {
+                                                                                                                    return body($("rest"), fn.concat($("ret"), opStr($("no"))), n.seq($("lastseen"), $("no")));
                                                                                                                 } else {
-                                                                                                                    return $("lastseen");
+                                                                                                                    return body($("rest"), fn.concat($("ret"), opStr($("no"))), $("lastseen"));
                                                                                                                 }
                                                                                                             })($.frame());
                                                                                                         }
@@ -887,9 +889,7 @@ export function bodyOp$5(...$_a) {
                                                 }
                                             })($.frame());
                                         }
-                                    })($.frame()));
-                                    $ = $("nu", console.log(n.seq($("no"), n.string(" | "), $("llast"), n.string(" :: "), fn.stringJoin($("old"), n.string(",")), n.string("->"), fn.stringJoin($("lastseen"), n.string(",")), n.string(" || "), fn.replace(fn.replace($("ret"), n.string("=#2#06="), n.string("if")), n.string("=#2#09="), n.string("let")))));
-                                    return body($("rest"), $("ret"), $("lastseen"));
+                                    })($.frame());
                                 }
                             })($.frame());
                         }
@@ -898,15 +898,6 @@ export function bodyOp$5(...$_a) {
             })($.frame());
         }
     })($.frame());
-
-}
-
-export function isArray$3(...$_a) {
-    var $ = n.frame($_a)
-        .item("head")
-        .item("non")
-        .item("next");
-    return $.test($.test($.test(n.eq($("non"), n.decimal(20.01))) && $.test(n.ne($("head"), n.string("=#20#02=")))) && $.test(n.geq(fn.matches($("head"), n.string("\\)\\s*$")), fn.false()))) && $.test(fn.matches($("head"), n.concat(n.concat(n.string("^(\\s|\\(|,|"), operatorRegexp), n.string(")"))));
 
 }
 
@@ -961,20 +952,7 @@ export function body$3(...$_a) {
                         if ($.test(fn.matches($("head"), n.string(";")))) {
                             return block($("parts"), $("ret"));
                         } else {
-                            $ = $("next", ($ => {
-                                if ($.test(fn.empty($("rest")))) {
-                                    return n.seq();
-                                } else {
-                                    return n.select(fn.head($("rest")), $_0 => fn.string($_0));
-                                }
-                            })($.frame()));
-                            $ = $("non", ($ => {
-                                if ($.test(fn.matches($("next"), operatorRegexp))) {
-                                    return opNum($("next"));
-                                } else {
-                                    return n.integer(0);
-                                }
-                            })($.frame()));
+                            $ = $("next", n.select(fn.head($("rest")), $_0 => fn.string($_0)));
                             $ = $("rest", ($ => {
                                 if ($.test($.test(n.geq($("head"), fns)) && $.test(fn.matches($("next"), n.string("[^\\.]\\)"))))) {
                                     return fn.insertBefore(fn.tail($("rest")), n.integer(1), n.element(n.string("fn:match"), n.seq(n.element(n.string("fn:group"), n.seq(n.attribute(n.string("nr"), n.seq(n.integer(1))), fn.replace($("next"), n.string("^([^\\)]*)\\)"), n.string("$1.)")))))));
@@ -991,7 +969,7 @@ export function body$3(...$_a) {
                             })($.frame()));
                             return ($ => {
                                 if ($.test(fn.matches($("head"), operatorRegexp))) {
-                                    return bodyOp(opNum($("head")), $("next"), $("lastseen"), $("rest"), $("ret"));
+                                    return bodyOp(opNum($("head")), $("rest"), $("ret"), $("lastseen"));
                                 } else {
                                     return body($("rest"), fn.concat($("ret"), $("head")), ($ => {
                                         if ($.test(fn.matches($("head"), n.string("\\(")))) {
@@ -1248,6 +1226,15 @@ export function as(...$_a) {
     return n.error(as, $_l);
 }
 
+export function opThenAssign(...$_a) {
+    var $_l = $_a.length;
+    if ($_l === 5) {
+        return opThenAssign$5.apply(this, $_a);
+    }
+
+    return n.error(opThenAssign, $_l);
+}
+
 export function toOp(...$_a) {
     var $_l = $_a.length;
     if ($_l === 1) {
@@ -1257,13 +1244,22 @@ export function toOp(...$_a) {
     return n.error(toOp, $_l);
 }
 
-export function isArray(...$_a) {
+export function opOpenSquare(...$_a) {
     var $_l = $_a.length;
-    if ($_l === 3) {
-        return isArray$3.apply(this, $_a);
+    if ($_l === 4) {
+        return opOpenSquare$4.apply(this, $_a);
     }
 
-    return n.error(isArray, $_l);
+    return n.error(opOpenSquare, $_l);
+}
+
+export function opOpenCurly(...$_a) {
+    var $_l = $_a.length;
+    if ($_l === 4) {
+        return opOpenCurly$4.apply(this, $_a);
+    }
+
+    return n.error(opOpenCurly, $_l);
 }
 
 export function escapeForRegex(...$_a) {
@@ -1282,6 +1278,15 @@ export function close(...$_a) {
     }
 
     return n.error(close, $_l);
+}
+
+export function opElseReturn(...$_a) {
+    var $_l = $_a.length;
+    if ($_l === 4) {
+        return opElseReturn$4.apply(this, $_a);
+    }
+
+    return n.error(opElseReturn, $_l);
 }
 
 export function seqtype(...$_a) {
@@ -1336,6 +1341,15 @@ export function ximport(...$_a) {
     }
 
     return n.error(ximport, $_l);
+}
+
+export function opCloseSquare(...$_a) {
+    var $_l = $_a.length;
+    if ($_l === 4) {
+        return opCloseSquare$4.apply(this, $_a);
+    }
+
+    return n.error(opCloseSquare, $_l);
 }
 
 export function unaryOp(...$_a) {
@@ -1455,6 +1469,24 @@ export function normalizeQuery(...$_a) {
     return n.error(normalizeQuery, $_l);
 }
 
+export function opSelect(...$_a) {
+    var $_l = $_a.length;
+    if ($_l === 4) {
+        return opSelect$4.apply(this, $_a);
+    }
+
+    return n.error(opSelect, $_l);
+}
+
+export function opComma(...$_a) {
+    var $_l = $_a.length;
+    if ($_l === 3) {
+        return opComma$3.apply(this, $_a);
+    }
+
+    return n.error(opComma, $_l);
+}
+
 export function lastIndexOf(...$_a) {
     var $_l = $_a.length;
     if ($_l === 2) {
@@ -1464,10 +1496,19 @@ export function lastIndexOf(...$_a) {
     return n.error(lastIndexOf, $_l);
 }
 
+export function opCloseCurly(...$_a) {
+    var $_l = $_a.length;
+    if ($_l === 3) {
+        return opCloseCurly$3.apply(this, $_a);
+    }
+
+    return n.error(opCloseCurly, $_l);
+}
+
 export function bodyOp(...$_a) {
     var $_l = $_a.length;
-    if ($_l === 5) {
-        return bodyOp$5.apply(this, $_a);
+    if ($_l === 4) {
+        return bodyOp$4.apply(this, $_a);
     }
 
     return n.error(bodyOp, $_l);
@@ -1491,6 +1532,15 @@ export function block(...$_a) {
     return n.error(block, $_l);
 }
 
+export function opConstructor(...$_a) {
+    var $_l = $_a.length;
+    if ($_l === 4) {
+        return opConstructor$4.apply(this, $_a);
+    }
+
+    return n.error(opConstructor, $_l);
+}
+
 export function xvar(...$_a) {
     var $_l = $_a.length;
     if ($_l === 2) {
@@ -1498,4 +1548,13 @@ export function xvar(...$_a) {
     }
 
     return n.error(xvar, $_l);
+}
+
+export function opLet(...$_a) {
+    var $_l = $_a.length;
+    if ($_l === 4) {
+        return opLet$4.apply(this, $_a);
+    }
+
+    return n.error(opLet, $_l);
 }

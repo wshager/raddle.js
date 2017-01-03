@@ -63,7 +63,7 @@ export function normalizeQuery$2(...$_a) {
     var $ = n.frame($_a)
         .string("query", n.zeroOrOne)
         .item("params");
-    return fn.replace($("query"), n.string("&#9;|&#10;|&#13;"), n.string(""));
+    return fn.replace($("query"), n.string("\\s"), n.string(""));
 
 }
 
@@ -135,7 +135,7 @@ export function getIndexFromTokens$1(...$_a) {
     return fn.forEach(n.to(n.integer(1), fn.count(fn.indexOf($("tok"), n.integer(1)))), function(...$_a) {
         $ = $.frame($_a)
             .item("i");
-        $ = $("x", n.filter(fn.indexOf(n.subtract($("tok"), n.integer(1))), $_0 => n.geq(fn.position($_0), $("i"))));
+        $ = $("x", n.filter(fn.indexOf($("tok"), n.minus(n.integer(1))), $_0 => n.geq(fn.position($_0), $("i"))));
         $ = $("y", n.filter(fn.indexOf($("tok"), n.integer(1)), $_0 => n.geq(fn.position($_0), $("i"))));
         return ($ => {
             if ($.test($.test(fn.exists($("x"))) && $.test(n.glt($("x"), $("y"))))) {
@@ -281,7 +281,7 @@ export function findContextItem$1(...$_a) {
                         return ($ => {
                             if ($.test(n.instanceOf($("_"), n.map()))) {
                                 return ($ => {
-                                    if ($.test(n.eq(n.call($("_"), n.string("name")), n.string("")))) {
+                                    if ($.test(n.geq(n.call($("_"), n.string("name")), n.seq(n.string(""), n.string("last"), n.string("fn:last"))))) {
                                         return n.seq();
                                     } else {
                                         return ($ => {
@@ -306,23 +306,57 @@ export function findContextItem$1(...$_a) {
 
 }
 
+export function wrap$2(...$_a) {
+    var $ = n.frame($_a)
+        .item("match")
+        .item("strings");
+    return wrap($("match"), $("strings"), n.array(n.seq()));
+
+}
+
+export function wrap$3(...$_a) {
+    var $ = n.frame($_a)
+        .item("match")
+        .item("strings")
+        .item("ret");
+    return wrap($("match"), $("strings"), $("ret"), n.integer(1));
+
+}
+
 export function wrap$4(...$_a) {
     var $ = n.frame($_a)
         .item("match")
         .item("strings")
         .item("ret")
         .item("depth");
+    return wrap($("match"), $("strings"), $("ret"), $("depth"), fn.false());
+
+}
+
+export function wrap$5(...$_a) {
+    var $ = n.frame($_a)
+        .item("match")
+        .item("strings")
+        .item("ret")
+        .item("depth")
+        .item("wasComma");
     return ($ => {
         if ($.test(fn.empty($("match")))) {
             return n.call($("ret"), n.integer(1));
         } else {
             $ = $("group", n.select(fn.head($("match")), n.string("fn:group")));
-            //$ = $("nu", console.log($("group")));
             $ = $("rest", fn.tail($("match")));
             $ = $("separator", n.select(n.filter($("group"), $_0 => n.geq(n.select($_0, n.string("@nr")), n.integer(2))), $_0 => fn.string($_0)));
             $ = $("value", valueFromStrings(n.select(n.filter($("group"), $_0 => n.geq(n.select($_0, n.string("@nr")), n.integer(3))), $_0 => fn.string($_0)), $("strings")));
             $ = $("isComma", fn.matches($("separator"), n.string(",")));
             $ = $("isOp", $.test(n.geq($("isComma"), fn.false())) && $.test(fn.matches($("separator"), n.concat(xqc.operatorRegexp, n.string("+")))));
+            $ = $("op", ($ => {
+                if ($.test($("isOp"))) {
+                    return xqc.opNum($("separator"));
+                } else {
+                    return n.seq();
+                }
+            })($.frame()));
             return ($ => {
                 if ($.test(n.geq(n.select($("group"), n.string("@nr")), n.integer(4)))) {
                     $ = $("ret", ($ => {
@@ -331,15 +365,6 @@ export function wrap$4(...$_a) {
                         } else {
                             return ($ => {
                                 if ($.test($("isOp"))) {
-                                    $ = $("op", xqc.opNum($("separator")));
-                                    $ = $("isUnaryOp", $.test(n.geq(xqc.opInt($("separator")), n.integer(8))) && $.test(n.eq($("value"), n.string(""))));
-                                    $ = $("separator", ($ => {
-                                        if ($.test($("isUnaryOp"))) {
-                                            return xqc.unaryOp($("separator"));
-                                        } else {
-                                            return $("separator");
-                                        }
-                                    })($.frame()));
                                     $ = $("operator", xqc.toOp($("op")));
                                     $ = $("dest", ($ => {
                                         if ($.test(n.lt(array.size($("ret")), $("depth")))) {
@@ -366,7 +391,7 @@ export function wrap$4(...$_a) {
                                             return n.seq();
                                         }
                                     })($.frame()));
-                                    $ = $("selectFilter", $.test(n.instanceOf($("filterContext"), n.map())) && $.test(n.eq(n.call($("filterContext"), n.string("op")), n.string("=#19#01="))));
+                                    $ = $("selectFilter", $.test(n.instanceOf($("filterContext"), n.map())) && $.test(n.eq(n.call($("filterContext"), n.string("op")), n.decimal(19.01))));
                                     return ($ => {
                                         if ($.test($.test(n.geq($("op"), xqc.lrOp)) || $.test(n.seq($.test($("filter")) && $.test(n.eq($("selectFilter"), fn.false())))))) {
                                             $ = $("args", ($ => {
@@ -376,40 +401,55 @@ export function wrap$4(...$_a) {
                                                     return n.array(n.seq(n.map(n.seq(n.pair(n.string("name"), $("value")), n.pair(n.string("args"), n.array(n.seq())), n.pair(n.string("suffix"), n.string(""))))));
                                                 }
                                             })($.frame()));
-                                            $ = $("hasPrecedingOp", $.test(n.instanceOf($("last"), n.map())) && $.test(map.contains($("last"), n.string("op"))));
-                                            $ = $("preceeds", $.test($.test(n.eq($("isUnaryOp"), fn.false())) && $.test($("hasPrecedingOp"))) && $.test(n.ggt(xqc.opInt($("separator")), xqc.opInt(n.call($("last"), n.string("op"))))));
+                                            $ = $("prevOp", ($ => {
+                                                if ($.test($.test(n.instanceOf($("last"), n.map())) && $.test(map.contains($("last"), n.string("op"))))) {
+                                                    return n.call($("last"), n.string("op"));
+                                                } else {
+                                                    return n.seq();
+                                                }
+                                            })($.frame()));
+                                            $ = $("hasPrecedingOp", $.test(fn.exists($("prevOp"))) && $.test(n.geq($("prevOp"), xqc.lrOp)));
+                                            $ = $("isUnaryOp", ($ => {
+                                                if ($.test(n.geq(fn.round($("op")), n.seq(n.integer(8), n.integer(17))))) {
+                                                    return $.test($("wasComma")) || $.test($("hasPrecedingOp"));
+                                                } else {
+                                                    return fn.false();
+                                                }
+                                            })($.frame()));
+                                            $ = $("preceeds", $.test($("hasPrecedingOp")) && $.test(n.gt(fn.round($("op")), fn.round($("prevOp")))));
                                             return ($ => {
-                                                if ($.test($("preceeds"))) {
-                                                    $ = $("s", array.size(n.call($("last"), n.string("args"))));
-                                                    $ = $("args", array.insertBefore($("args"), n.integer(1), n.call(n.call($("last"), n.string("args")), $("s"))));
-                                                    $ = $("last", map.put($("last"), n.string("args"), a.put(n.call($("last"), n.string("args")), $("s"), n.map(n.seq(n.pair(n.string("name"), $("operator")), n.pair(n.string("args"), $("args")), n.pair(n.string("suffix"), n.string("")), n.pair(n.string("op"), $("separator")))))));
-                                                    $ = $("last", map.put($("last"), n.string("nest"), fn.true()));
-                                                    $ = $("dest", a.put($("dest"), $("len"), $("last")));
+                                                if ($.test($("isUnaryOp"))) {
+                                                    $ = $("operator", xqc.toOp(xqc.unaryOp($("op"))));
+                                                    $ = $("dest", ($ => {
+                                                        if ($.test($.test($("preceeds")) && $.test(n.lt(array.size(n.call($("last"), n.string("args"))), n.integer(2))))) {
+                                                            return a.put($("dest"), $("len"), map.put($("last"), n.string("args"), n.array(n.seq(n.call(n.call($("last"), n.string("args")), n.integer(1)), n.map(n.seq(n.pair(n.string("name"), $("operator")), n.pair(n.string("args"), $("args")), n.pair(n.string("suffix"), n.string("")), n.pair(n.string("op"), $("op")), n.pair(n.string("nest"), n.ne($("value"), n.string("")))))))));
+                                                        } else {
+                                                            return array.append($("dest"), n.map(n.seq(n.pair(n.string("name"), $("operator")), n.pair(n.string("args"), $("args")), n.pair(n.string("suffix"), n.string("")), n.pair(n.string("op"), $("op")), n.pair(n.string("nest"), n.ne($("value"), n.string(""))))));
+                                                        }
+                                                    })($.frame()));
                                                     return a.put($("ret"), $("depth"), $("dest"));
                                                 } else {
-                                                    $ = $("args", array.insertBefore($("args"), n.integer(1), $("last")));
-                                                    $ = $("dest", a.put($("dest"), $("len"), n.map(n.seq(n.pair(n.string("name"), $("operator")), n.pair(n.string("args"), $("args")), n.pair(n.string("suffix"), n.string("")), n.pair(n.string("op"), $("separator")), n.pair(n.string("nest"), n.ne($("value"), n.string("")))))));
-                                                    return a.put($("ret"), $("depth"), $("dest"));
+                                                    return ($ => {
+                                                        if ($.test($("preceeds"))) {
+                                                            $ = $("args", array.insertBefore($("args"), n.integer(1), n.call(n.call($("last"), n.string("args")), n.integer(2))));
+                                                            $ = $("dest", a.put($("dest"), $("len"), n.map(n.seq(n.pair(n.string("name"), n.call($("last"), n.string("name"))), n.pair(n.string("args"), n.array(n.seq(n.call(n.call($("last"), n.string("args")), n.integer(1)), n.map(n.seq(n.pair(n.string("name"), $("operator")), n.pair(n.string("args"), $("args")), n.pair(n.string("suffix"), n.string("")), n.pair(n.string("op"), $("op"))))))), n.pair(n.string("nest"), fn.true()), n.pair(n.string("suffix"), n.string("")), n.pair(n.string("op"), $("prevOp"))))));
+                                                            return a.put($("ret"), $("depth"), $("dest"));
+                                                        } else {
+                                                            $ = $("args", array.insertBefore($("args"), n.integer(1), $("last")));
+                                                            $ = $("dest", a.put($("dest"), $("len"), n.map(n.seq(n.pair(n.string("name"), $("operator")), n.pair(n.string("args"), $("args")), n.pair(n.string("suffix"), n.string("")), n.pair(n.string("op"), $("op")), n.pair(n.string("nest"), n.ne($("value"), n.string("")))))));
+                                                            return a.put($("ret"), $("depth"), $("dest"));
+                                                        }
+                                                    })($.frame());
                                                 }
                                             })($.frame());
                                         } else {
                                             return ($ => {
                                                 if ($.test(n.ne($("value"), n.string("")))) {
-                                                    $ = $("dest", ($ => {
-                                                        if ($.test($.test(n.instanceOf($("last"), n.map())) && $.test(n.call($("last"), n.string("nest"))))) {
-                                                            $ = $("s", array.size(n.call($("last"), n.string("args"))));
-                                                            $ = $("next", n.call(n.call($("last"), n.string("args")), $("s")));
-                                                            $ = $("args", n.array(n.seq($("next"), n.map(n.seq(n.pair(n.string("name"), $("value")), n.pair(n.string("args"), n.array(n.seq())), n.pair(n.string("suffix"), n.string("")))))));
-                                                            $ = $("last", map.put($("last"), n.string("args"), a.put(n.call($("last"), n.string("args")), $("s"), n.map(n.seq(n.pair(n.string("name"), $("operator")), n.pair(n.string("args"), $("args")), n.pair(n.string("suffix"), n.string("")), n.pair(n.string("op"), $("separator")))))));
-                                                            return a.put($("dest"), $("len"), $("last"));
-                                                        } else {
-                                                            $ = $("args", n.array(n.seq($("last"), n.map(n.seq(n.pair(n.string("name"), $("value")), n.pair(n.string("args"), n.array(n.seq())), n.pair(n.string("suffix"), n.string("")))))));
-                                                            return a.put($("dest"), $("len"), n.map(n.seq(n.pair(n.string("name"), $("operator")), n.pair(n.string("args"), $("args")), n.pair(n.string("suffix"), n.string("")), n.pair(n.string("op"), $("separator")), n.pair(n.string("nest"), n.ne($("value"), n.string(""))))));
-                                                        }
-                                                    })($.frame()));
+                                                    $ = $("args", n.array(n.seq($("last"), n.map(n.seq(n.pair(n.string("name"), $("value")), n.pair(n.string("args"), n.array(n.seq())), n.pair(n.string("suffix"), n.string("")))))));
+                                                    $ = $("dest", a.put($("dest"), $("len"), n.map(n.seq(n.pair(n.string("name"), $("operator")), n.pair(n.string("args"), $("args")), n.pair(n.string("suffix"), n.string("")), n.pair(n.string("op"), $("op")), n.pair(n.string("nest"), n.ne($("value"), n.string("")))))));
                                                     return a.put($("ret"), $("depth"), $("dest"));
                                                 } else {
-                                                    return upsert($("ret"), $("depth"), n.map(n.seq(n.pair(n.string("name"), $("operator")), n.pair(n.string("args"), n.array(n.seq())), n.pair(n.string("suffix"), n.string("")), n.pair(n.string("op"), $("separator")))));
+                                                    return upsert($("ret"), $("depth"), n.map(n.seq(n.pair(n.string("name"), $("operator")), n.pair(n.string("args"), n.array(n.seq())), n.pair(n.string("suffix"), n.string("")), n.pair(n.string("op"), $("op")))));
                                                 }
                                             })($.frame());
                                         }
@@ -420,7 +460,7 @@ export function wrap$4(...$_a) {
                             })($.frame());
                         }
                     })($.frame()));
-                    return wrap($("rest"), $("strings"), $("ret"), n.add($("depth"), n.integer(1)));
+                    return wrap($("rest"), $("strings"), $("ret"), n.add($("depth"), n.integer(1)), $.test($("isComma")) && $.test(n.eq($("value"), n.string(""))));
                 } else {
                     return ($ => {
                         if ($.test($.test($.test($("value")) || $.test($("isComma"))) || $.test($("isOp")))) {
@@ -428,7 +468,7 @@ export function wrap$4(...$_a) {
                                 if ($.test($("isOp"))) {
                                     return ($ => {
                                         if ($.test(n.lt(array.size($("ret")), $("depth")))) {
-                                            $ = $("separator", xqc.unaryOp($("separator")));
+                                            $ = $("op", xqc.unaryOp($("op")));
                                             $ = $("args", ($ => {
                                                 if ($.test(n.ne($("value"), n.string("")))) {
                                                     return n.array(n.seq($("value")));
@@ -436,59 +476,77 @@ export function wrap$4(...$_a) {
                                                     return n.array(n.seq());
                                                 }
                                             })($.frame()));
-                                            $ = $("operator", xqc.toOp(xqc.opNum($("separator"))));
-                                            return array.append($("ret"), n.array(n.seq(n.map(n.seq(n.pair(n.string("name"), $("operator")), n.pair(n.string("args"), $("args")), n.pair(n.string("suffix"), n.string("")), n.pair(n.string("op"), $("separator")))))));
+                                            $ = $("operator", xqc.toOp($("op")));
+                                            return array.append($("ret"), n.array(n.seq(n.map(n.seq(n.pair(n.string("name"), $("operator")), n.pair(n.string("args"), $("args")), n.pair(n.string("suffix"), n.string("")), n.pair(n.string("op"), $("op")))))));
                                         } else {
                                             $ = $("dest", n.call($("ret"), $("depth")));
                                             $ = $("len", array.size($("dest")));
                                             $ = $("last", n.call($("dest"), $("len")));
-                                            $ = $("isUnaryOp", $.test($.test(n.geq(xqc.opInt($("separator")), n.seq(n.integer(8), n.integer(17)))) && $.test(n.instanceOf($("last"), n.map()))) && $.test(n.geq(xqc.opNum(n.call($("last"), n.string("op"))), xqc.lrOp)));
-                                            $ = $("separator", ($ => {
-                                                if ($.test($("isUnaryOp"))) {
-                                                    return xqc.unaryOp($("separator"));
+                                            $ = $("prevOp", ($ => {
+                                                if ($.test($.test(n.instanceOf($("last"), n.map())) && $.test(map.contains($("last"), n.string("op"))))) {
+                                                    return n.call($("last"), n.string("op"));
                                                 } else {
-                                                    return $("separator");
+                                                    return n.seq();
                                                 }
                                             })($.frame()));
-                                            $ = $("operator", xqc.toOp(xqc.opNum($("separator"))));
+                                            $ = $("hasPrecedingOp", $.test(fn.exists($("prevOp"))) && $.test(n.geq($("prevOp"), xqc.lrOp)));
+                                            $ = $("isUnaryOp", ($ => {
+                                                if ($.test(n.geq(fn.round($("op")), n.seq(n.integer(8), n.integer(17))))) {
+                                                    return $.test($("wasComma")) || $.test($("hasPrecedingOp"));
+                                                } else {
+                                                    return fn.false();
+                                                }
+                                            })($.frame()));
+                                            $ = $("preceeds", $.test($("hasPrecedingOp")) && $.test(n.gt(fn.round($("op")), fn.round($("prevOp")))));
+                                            $ = $("op", ($ => {
+                                                if ($.test($("isUnaryOp"))) {
+                                                    return xqc.unaryOp($("op"));
+                                                } else {
+                                                    return $("op");
+                                                }
+                                            })($.frame()));
+                                            $ = $("operator", xqc.toOp($("op")));
                                             $ = $("dest", ($ => {
-                                                $ = $("hasPrecedingOp", $.test(n.instanceOf($("last"), n.map())) && $.test(map.contains($("last"), n.string("op"))));
-                                                $ = $("preceeds", $.test($.test(n.eq($("isUnaryOp"), fn.false())) && $.test($("hasPrecedingOp"))) && $.test(n.ggt(xqc.opInt($("separator")), xqc.opInt(n.call($("last"), n.string("op"))))));
-                                                return ($ => {
-                                                    if ($.test($("preceeds"))) {
-                                                        $ = $("args", ($ => {
-                                                            if ($.test($("isUnaryOp"))) {
-                                                                return n.array(n.seq());
-                                                            } else {
-                                                                return n.array(n.seq(n.call(n.call($("last"), n.string("args")), n.integer(2))));
-                                                            }
-                                                        })($.frame()));
-                                                        $ = $("args", ($ => {
-                                                            if ($.test(n.ne($("value"), n.string("")))) {
-                                                                return array.append($("args"), $("value"));
-                                                            } else {
-                                                                return $("args");
-                                                            }
-                                                        })($.frame()));
-                                                        $ = $("next", map.put($("last"), n.string("args"), n.array(n.seq(n.call(n.call($("last"), n.string("args")), n.integer(1)), n.map(n.seq(n.pair(n.string("name"), $("operator")), n.pair(n.string("args"), $("args")), n.pair(n.string("suffix"), n.string("")), n.pair(n.string("op"), $("separator"))))))));
-                                                        return a.put($("dest"), $("len"), $("next"));
-                                                    } else {
-                                                        return ($ => {
-                                                            if ($.test($("isUnaryOp"))) {
-                                                                return array.append(a.put($("dest"), $("len"), $("last")), n.map(n.seq(n.pair(n.string("name"), $("operator")), n.pair(n.string("args"), n.array(n.seq($("value")))), n.pair(n.string("suffix"), n.string("")), n.pair(n.string("op"), $("separator")))));
-                                                            } else {
-                                                                $ = $("args", ($ => {
-                                                                    if ($.test(n.ne($("value"), n.string("")))) {
-                                                                        return n.array(n.seq($("last"), $("value")));
-                                                                    } else {
-                                                                        return n.array(n.seq($("last")));
-                                                                    }
-                                                                })($.frame()));
-                                                                return a.put($("dest"), $("len"), n.map(n.seq(n.pair(n.string("name"), $("operator")), n.pair(n.string("args"), $("args")), n.pair(n.string("suffix"), n.string("")), n.pair(n.string("op"), $("separator")))));
-                                                            }
-                                                        })($.frame());
-                                                    }
-                                                })($.frame());
+                                                if ($.test($("isUnaryOp"))) {
+                                                    $ = $("args", ($ => {
+                                                        if ($.test(n.ne($("value"), n.string("")))) {
+                                                            return n.array(n.seq($("value")));
+                                                        } else {
+                                                            return n.array(n.seq());
+                                                        }
+                                                    })($.frame()));
+                                                    return ($ => {
+                                                        if ($.test($.test($("preceeds")) && $.test(n.lt(array.size(n.call($("last"), n.string("args"))), n.integer(2))))) {
+                                                            return a.put($("dest"), $("len"), map.put($("last"), n.string("args"), n.array(n.seq(n.call(n.call($("last"), n.string("args")), n.integer(1)), n.map(n.seq(n.pair(n.string("name"), $("operator")), n.pair(n.string("args"), $("args")), n.pair(n.string("suffix"), n.string("")), n.pair(n.string("op"), $("op"))))))));
+                                                        } else {
+                                                            return array.append($("dest"), n.map(n.seq(n.pair(n.string("name"), $("operator")), n.pair(n.string("args"), $("args")), n.pair(n.string("suffix"), n.string("")), n.pair(n.string("op"), $("op")))));
+                                                        }
+                                                    })($.frame());
+                                                } else {
+                                                    return ($ => {
+                                                        if ($.test($("preceeds"))) {
+                                                            $ = $("args", n.array(n.seq(n.call(n.call($("last"), n.string("args")), n.integer(2)))));
+                                                            $ = $("args", ($ => {
+                                                                if ($.test(n.ne($("value"), n.string("")))) {
+                                                                    return array.append($("args"), $("value"));
+                                                                } else {
+                                                                    return $("args");
+                                                                }
+                                                            })($.frame()));
+                                                            $ = $("next", map.put($("last"), n.string("args"), n.array(n.seq(n.call(n.call($("last"), n.string("args")), n.integer(1)), n.map(n.seq(n.pair(n.string("name"), $("operator")), n.pair(n.string("args"), $("args")), n.pair(n.string("suffix"), n.string("")), n.pair(n.string("op"), $("op"))))))));
+                                                            return a.put($("dest"), $("len"), $("next"));
+                                                        } else {
+                                                            $ = $("args", ($ => {
+                                                                if ($.test(n.ne($("value"), n.string("")))) {
+                                                                    return n.array(n.seq($("last"), $("value")));
+                                                                } else {
+                                                                    return n.array(n.seq($("last")));
+                                                                }
+                                                            })($.frame()));
+                                                            return a.put($("dest"), $("len"), n.map(n.seq(n.pair(n.string("name"), $("operator")), n.pair(n.string("args"), $("args")), n.pair(n.string("suffix"), n.string("")), n.pair(n.string("op"), $("op")))));
+                                                        }
+                                                    })($.frame());
+                                                }
                                             })($.frame()));
                                             return a.put($("ret"), $("depth"), $("dest"));
                                         }
@@ -503,7 +561,7 @@ export function wrap$4(...$_a) {
                                     })($.frame());
                                 }
                             })($.frame()));
-                            return wrap($("rest"), $("strings"), $("ret"), $("depth"));
+                            return wrap($("rest"), $("strings"), $("ret"), $("depth"), $.test($("isComma")) && $.test(n.eq($("value"), n.string(""))));
                         } else {
                             return ($ => {
                                 if ($.test(n.geq(n.select($("group"), n.string("@nr")), n.integer(1)))) {
@@ -525,10 +583,16 @@ export function wrap$4(...$_a) {
                                             })($.frame()));
                                             $ = $("nest", $.test(n.instanceOf($("next"), n.map())) && $.test(n.seq($.test(n.call($("last"), n.string("nest"))) || $.test(n.eq(n.call($("next"), n.string("name")), n.string(""))))));
                                             $ = $("op", ($ => {
-                                                if ($.test(n.instanceOf($("last"), n.map()))) {
-                                                    return n.call($("last"), n.string("op"));
+                                                if ($.test($("nest"))) {
+                                                    return n.call($("next"), n.string("op"));
                                                 } else {
-                                                    return n.seq();
+                                                    return ($ => {
+                                                        if ($.test(n.instanceOf($("last"), n.map()))) {
+                                                            return n.call($("last"), n.string("op"));
+                                                        } else {
+                                                            return n.seq();
+                                                        }
+                                                    })($.frame());
                                                 }
                                             })($.frame()));
                                             $ = $("args", ($ => {
@@ -541,7 +605,7 @@ export function wrap$4(...$_a) {
                                                             return n.seq();
                                                         }
                                                     })($.frame()));
-                                                    $ = $("isSeq", $.test(n.instanceOf($("maybeseq"), n.map())) && $.test(n.eq(map.contains($("maybeseq"), n.string("op")), fn.false())));
+                                                    $ = $("isSeq", $.test($.test(n.instanceOf($("maybeseq"), n.map())) && $.test(n.ne($("op"), n.decimal(19.01)))) && $.test(n.eq(map.contains($("maybeseq"), n.string("op")), fn.false())));
                                                     return ($ => {
                                                         if ($.test($("isSeq"))) {
                                                             return a.put(n.call($("next"), n.string("args")), $("ns"), map.put($("maybeseq"), n.string("args"), array.join(n.seq(n.call($("maybeseq"), n.string("args")), $("args")))));
@@ -554,12 +618,12 @@ export function wrap$4(...$_a) {
                                                 }
                                             })($.frame()));
                                             $ = $("args", ($ => {
-                                                if ($.test(n.eq($("op"), n.string("=#19#01=")))) {
+                                                if ($.test(n.eq($("op"), n.decimal(19.01)))) {
                                                     return array.forEach($("args"), function(...$_a) {
                                                         $ = $.frame($_a)
                                                             .item("_");
                                                         return ($ => {
-                                                            if ($.test(n.instanceOf($("_"), n.map(n.string("*"))))) {
+                                                            if ($.test(n.instanceOf($("_"), n.map()))) {
                                                                 return ($ => {
                                                                     if ($.test(n.eq(n.call($("_"), n.string("name")), n.string("")))) {
                                                                         return $("_");
@@ -581,7 +645,7 @@ export function wrap$4(...$_a) {
                                                     });
                                                 } else {
                                                     return ($ => {
-                                                        if ($.test(n.eq($("op"), n.string("=#20#01=")))) {
+                                                        if ($.test(n.eq($("op"), n.decimal(20.01)))) {
                                                             $ = $("isImplicit", n.eq(array.size($("args")), n.integer(1)));
                                                             $ = $("first", ($ => {
                                                                 if ($.test($("isImplicit"))) {
@@ -651,23 +715,6 @@ export function wrap$4(...$_a) {
 
 }
 
-export function wrap$3(...$_a) {
-    var $ = n.frame($_a)
-        .item("match")
-        .item("strings")
-        .item("ret");
-    return wrap($("match"), $("strings"), $("ret"), n.integer(1));
-
-}
-
-export function wrap$2(...$_a) {
-    var $ = n.frame($_a)
-        .item("match")
-        .item("strings");
-    return wrap($("match"), $("strings"), n.array(n.seq()));
-
-}
-
 export function importModule$2(...$_a) {
     var $ = n.frame($_a)
         .item("name")
@@ -712,8 +759,9 @@ export function stringify$3(...$_a) {
             .item("acc")
             .item("t")
             .item("i");
+        $ = $("isMap", n.instanceOf($("t"), n.map()));
         $ = $("ret", ($ => {
-            if ($.test(n.instanceOf($("t"), n.map()))) {
+            if ($.test($("isMap"))) {
                 return fn.concat(n.call($("t"), n.string("name")), n.string("("), fn.stringJoin(array.flatten(stringify(n.call($("t"), n.string("args")), $("params"), fn.false())), n.string(",")), n.string(")"), ($ => {
                     if ($.test(n.instanceOf(n.call($("t"), n.string("suffix")), n.string()))) {
                         return n.call($("t"), n.string("suffix"));
@@ -732,12 +780,18 @@ export function stringify$3(...$_a) {
             }
         })($.frame()));
         return fn.concat($("acc"), ($ => {
-            if ($.test(n.ggt($("i"), n.integer(1)))) {
+            if ($.test(n.gt($("i"), n.integer(1)))) {
                 return ($ => {
                     if ($.test($("top"))) {
-                        return n.string(",&#10;&#13;");
+                        return n.string(";\r\n");
                     } else {
-                        return n.string(",");
+                        return ($ => {
+                            if ($.test($.test($("isMap")) && $.test(n.call($("t"), n.string("call"))))) {
+                                return n.string("");
+                            } else {
+                                return n.string(",");
+                            }
+                        })($.frame());
                     }
                 })($.frame());
             } else {
@@ -876,16 +930,20 @@ export function normalizeQuery(...$_a) {
 
 export function wrap(...$_a) {
     var $_l = $_a.length;
-    if ($_l === 4) {
-        return wrap$4.apply(this, $_a);
+    if ($_l === 2) {
+        return wrap$2.apply(this, $_a);
     }
 
     if ($_l === 3) {
         return wrap$3.apply(this, $_a);
     }
 
-    if ($_l === 2) {
-        return wrap$2.apply(this, $_a);
+    if ($_l === 4) {
+        return wrap$4.apply(this, $_a);
+    }
+
+    if ($_l === 5) {
+        return wrap$5.apply(this, $_a);
     }
 
     return n.error(wrap, $_l);

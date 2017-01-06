@@ -182,10 +182,6 @@ class Context {
     }
 }
 
-export function context(module){
-    return new Context(module);
-}
-
 export function call($fn,...args){
     let fn = _first($fn);
     if (_isMap(fn)) {
@@ -214,7 +210,7 @@ export function error(fn,l){
 
 export {
     seq, toSeq, _first, _isSeq, filter, forEach, foldLeft, foldRight, item, string, number, boolean, integer, double, float, decimal, data, to, array, map, concat,
-    element, attribute, text, minus, instanceOf, fromJS
+    element, attribute, text, minus, instanceOf, fromJS, module
 };
 
 export * from "xvop";

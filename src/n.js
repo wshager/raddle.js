@@ -5,7 +5,8 @@ import * as xverr from "xverr";
 import {
     concat, forEach, filter, foldLeft, foldRight,
     item, string, number, boolean, integer, double, float, decimal, data, to,
-    doc, collection, parse, name, position, last, not, apply, sort, round, booleans
+    doc, collection, parse, name, position, last, not, apply, sort, round, booleans,
+    module
 } from "xvfn";
 
 import { array, _isArray } from "xvarray";
@@ -66,21 +67,9 @@ let(k,v=null,type=item){
 }
  */
 
-// TODO load from json
-const modules = [{
-    "prefix": "n",
-    "uri":"http://raddle.org/native"
-}];
-
-const global = {
-    modules:{}
-};
-
-function addModuleToGlobal(module){
-    // conflict?
-    if(module.uri in global.modules) return;
-    global.modules[module.uri] = module;
-}
+export const $prefix = "n";
+export const $uri = "http://raddle.org/native";
+export const $module = module(__filename);
 
 export function frame(args=[],cx=null){
     var f = function (key,value) {
@@ -96,6 +85,7 @@ export function frame(args=[],cx=null){
     var closure = cx && cx._frame ? cx._frame : null;
     if(!cx) cx = new Context();
     f._args = args;
+    f._params = [];
     // is this correct?
     f._arity = args.length;
     f._init = 0;
@@ -112,17 +102,6 @@ export function frame(args=[],cx=null){
     return f;
 }
 
-export function module(module){
-    return new Module(module);
-}
-
-class Module {
-    constructor(module){
-        addModuleToGlobal(module);
-        this._module = module;
-    }
-}
-
 class Context {
     frame(args=[]){
         return frame(args,this);
@@ -133,7 +112,8 @@ class Context {
     }
     let(k, type, card = null){
         //if(this._init >= this._arity) return this;
-        this._frame[k] = this.check(this._args[this._init],type,card);
+        this._frame[k] = this._args[this._init];//this.check(this._args[this._init], type, card);
+        this._params[this._init] = k;
         this._init++;
         return this;
     }
@@ -209,7 +189,9 @@ export function context(module){
 export function call($fn,...args){
     let fn = _first($fn);
     if (_isMap(fn)) {
-        return seq(fn.get(_first(args[0])));
+        var k = _first(args[0]).valueOf();
+        var v = fn.get(k);
+        return !!v ? seq(v) : seq();
     }
     if(_isArray(fn)){
         return fn.isEmpty() ? seq() : seq(fn.get(_first(args[0])-1));

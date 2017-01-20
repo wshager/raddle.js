@@ -6,7 +6,7 @@ import * as a from "./array-util";
 
 import * as console from "./console";
 
-import * as fn from "xvfn";
+import * as fn from "./fn";
 
 import * as map from "xvmap";
 
@@ -40,7 +40,7 @@ export function and$2(...$_a) {
     var $ = n.frame($_a)
         .item("a")
         .item("b");
-    return fn.concat(n.string("$.test("), $("a"), n.string(") &amp;&amp; $.test("), $("b"), n.string(")"));
+    return fn.concat(n.string("$.test("), $("a"), n.string(") && $.test("), $("b"), n.string(")"));
 
 }
 
@@ -302,7 +302,7 @@ export function processArgs$4(...$_a) {
                                         $ = $("s", array.size($("val")));
                                         $ = $("ret", ($ => {
                                             if ($.test(n.eq($("s"), n.integer(0)))) {
-                                                return n.string("return n.seq();&#13;");
+                                                return n.string("return n.seq();\n");
                                             } else {
                                                 return ($ => {
                                                     if ($.test(n.gt($("s"), n.integer(1)))) {
@@ -310,11 +310,11 @@ export function processArgs$4(...$_a) {
                                                             if ($.test($("isLetRet"))) {
                                                                 return letRet($("val"), $("letSeq"), n.seq());
                                                             } else {
-                                                                return fn.concat(n.string("return n.seq("), fn.stringJoin(array.flatten($("val")), n.string(",")), n.string(");&#13;"));
+                                                                return fn.concat(n.string("return n.seq("), fn.stringJoin(array.flatten($("val")), n.string(",")), n.string(");\n"));
                                                             }
                                                         })($.frame());
                                                     } else {
-                                                        return fn.concat(n.string("return "), n.call($("val"), n.integer(1)), n.string(";&#13;"));
+                                                        return fn.concat(n.string("return "), n.call($("val"), n.integer(1)), n.string(";\n"));
                                                     }
                                                 })($.frame());
                                             }
@@ -367,7 +367,7 @@ export function processArgs$4(...$_a) {
                                                         $ = $("s", array.size($("val")));
                                                         return ($ => {
                                                             if ($.test(n.eq($("s"), n.integer(0)))) {
-                                                                return n.string("return n.seq();&#13;");
+                                                                return n.string("return n.seq();\n");
                                                             } else {
                                                                 return ($ => {
                                                                     if ($.test(n.gt($("s"), n.integer(1)))) {
@@ -375,11 +375,11 @@ export function processArgs$4(...$_a) {
                                                                             if ($.test($("isLetRet"))) {
                                                                                 return letRet($("val"), $("letSeq"), n.seq());
                                                                             } else {
-                                                                                return fn.concat(n.string("return n.seq("), fn.stringJoin(array.flatten($("val")), n.string(",")), n.string(");&#13;"));
+                                                                                return fn.concat(n.string("return n.seq("), fn.stringJoin(array.flatten($("val")), n.string(",")), n.string(");\n"));
                                                                             }
                                                                         })($.frame());
                                                                     } else {
-                                                                        return fn.concat(n.string("return "), n.call($("val"), n.integer(1)), n.string(";&#13;"));
+                                                                        return fn.concat(n.string("return "), n.call($("val"), n.integer(1)), n.string(";\n"));
                                                                     }
                                                                 })($.frame());
                                                             }
@@ -388,7 +388,7 @@ export function processArgs$4(...$_a) {
                                                         $ = $("ret", processValue($("arg"), $("frame"), $("at")));
                                                         return ($ => {
                                                             if ($.test($("isBody"))) {
-                                                                return fn.concat(n.string("return "), $("ret"), n.string(";&#13;"));
+                                                                return fn.concat(n.string("return "), $("ret"), n.string(";\n"));
                                                             } else {
                                                                 return $("ret");
                                                             }
@@ -493,12 +493,12 @@ export function interop$2(...$_a) {
         } else {
             $ = $("parts", fn.tokenize(rdl.clip($("name")), n.string(":")));
             $ = $("fname", rdl.camelCase(n.filter($("parts"), $_0 => n.geq(fn.position($_0), fn.last($_0)))));
-            return fn.concat(n.string("export function "), $("fname"), n.string("(...$_a) {&#13;&#9;"), n.string("var $_l = $_a.length;&#13;&#9;"), fn.stringJoin(fn.forEach(array.flatten($("arities")), function(...$_a) {
+            return fn.concat(n.string("export function "), $("fname"), n.string("(...$_a) {\n\t"), n.string("var $_l = $_a.length;\n\t"), fn.stringJoin(fn.forEach(array.flatten($("arities")), function(...$_a) {
                 $ = $.frame($_a)
                     .item("a");
-                return fn.concat(n.string("if($_l==="), $("a"), n.string("){&#13;&#9;&#9;"), n.string("return "), $("fname"), n.string("$"), $("a"), n.string(".apply(this,$_a);&#13;&#9;"), n.string("}&#13;&#9;"));
+                return fn.concat(n.string("if($_l==="), $("a"), n.string("){\n\t\t"), n.string("return "), $("fname"), n.string("$"), $("a"), n.string(".apply(this,$_a);\n\t"), n.string("}\n\t"));
 
-            }), n.string("&#13;")), n.string("&#13;&#9;"), n.string("return n.error("), $("fname"), n.string(",$_l);&#13;}"));
+            }), n.string("\n")), n.string("\n\t"), n.string("return n.error("), $("fname"), n.string(",$_l);\n}"));
         }
     })($.frame());
 
@@ -629,9 +629,9 @@ export function processTree$5(...$_a) {
                         if ($.test($.test(n.ne($("ret"), n.string(""))) && $.test(n.ggt($("at"), n.integer(1))))) {
                             return ($ => {
                                 if ($.test($("top"))) {
-                                    return n.string("&#10;&#13;");
+                                    return n.string("\r\n");
                                 } else {
-                                    return n.string(",&#13;");
+                                    return n.string(",\n");
                                 }
                             })($.frame());
                         } else {
@@ -921,7 +921,7 @@ export function convert$2(...$_a) {
                             $ = $("parts", fn.tokenize(rdl.camelCase(fn.replace($("string"), n.string("#\\p{N}+$"), n.string(""))), n.string(":")));
                             return ($ => {
                                 if ($.test(n.eq(fn.count($("parts")), n.integer(1)))) {
-                                    return fn.concat(n.string("$(&quot;"), fn.replace($("parts"), n.string("^\\$"), n.string("")), n.string("&quot;)"));
+                                    return fn.concat(n.string("$(\""), fn.replace($("parts"), n.string("^\\$"), n.string("")), n.string("\")"));
                                 } else {
                                     return ($ => {
                                         if ($.test(fn.matches(n.filter($("parts"), $_0 => n.geq(fn.position($_0), n.integer(1))), fn.concat(n.string("^\\$?"), n.call($("frame"), n.string("$prefix")))))) {
@@ -934,8 +934,8 @@ export function convert$2(...$_a) {
                             })($.frame());
                         } else {
                             return ($ => {
-                                if ($.test(fn.matches($("string"), n.string("^(&quot;[^&quot;]*&quot;)$")))) {
-                                    return fn.concat(n.string("n.string("), fn.replace($("string"), n.string("\\\\"), n.string("\\\\\\\\")), n.string(")"));
+                                if ($.test(fn.matches($("string"), n.string("^(\"[^\"]*\")$")))) {
+                                    return fn.concat(n.string("n.string("), fn.replace($("string"), n.string("\\\\"), n.string("\\\\")), n.string(")"));
                                 } else {
                                     return ($ => {
                                         if ($.test(map.contains(autoConverted, $("string")))) {
@@ -943,7 +943,7 @@ export function convert$2(...$_a) {
                                         } else {
                                             return ($ => {
                                                 if ($.test(n.geq(fn.string(fn.number($("string"))), n.string("NaN")))) {
-                                                    return fn.concat(n.string("n.string(&quot;"), fn.replace($("string"), n.string("\\\\"), n.string("\\\\\\\\")), n.string("&quot;)"));
+                                                    return fn.concat(n.string("n.string(\""), fn.replace($("string"), n.string("\\\\"), n.string("\\\\")), n.string("\")"));
                                                 } else {
                                                     return ($ => {
                                                         if ($.test(fn.matches($("string"), n.string("\\.")))) {
@@ -1042,7 +1042,7 @@ export function module$4(...$_a) {
         .item("prefix")
         .item("ns")
         .item("desc");
-    return fn.concat(n.string("/*module namespace "), rdl.clip($("prefix")), n.string("="), $("ns"), n.string(";&#10;&#13;"), $("desc"), n.string("*/"));
+    return fn.concat(n.string("/*module namespace "), rdl.clip($("prefix")), n.string("="), $("ns"), n.string(";\r\n"), $("desc"), n.string("*/"));
 
 }
 
@@ -1086,7 +1086,7 @@ export function ximport$4(...$_a) {
         if ($.test(n.instanceOf($("frame"), n.string()))) {
             return fn.concat(n.string("ximport("), $("frame"), n.string(","), $("prefix"), n.string(","), $("ns"), n.string(","), $("loc"), n.string(")"));
         } else {
-            return fn.concat(n.string("import * as "), rdl.clip($("prefix")), n.string(" from "), fn.replace($("loc"), n.string("(\\.xql|\\.rdl)&quot;$"), n.string(".js&quot;")), n.string(""));
+            return fn.concat(n.string("import * as "), rdl.clip($("prefix")), n.string(" from "), fn.replace($("loc"), n.string("(\\.xql|\\.rdl)\"$"), n.string(".js\"")), n.string(""));
         }
     })($.frame());
 
@@ -1244,10 +1244,10 @@ export function define$7(...$_a) {
                 return ($ => {
                     if ($.test(n.instanceOf($("_"), n.map()))) {
                         $ = $("args", n.call($("_"), n.string("args")));
-                        $ = $("param", fn.concat(n.string("&quot;"), rdl.camelCase(n.call($("args"), n.integer(2))), n.string("&quot;")));
+                        $ = $("param", fn.concat(n.string("\""), rdl.camelCase(n.call($("args"), n.integer(2))), n.string("\"")));
                         $ = $("composite", array.flatten(array.subarray($("args"), n.integer(3))));
                         $ = $("card", cardinality(n.array(n.seq(n.call($("_"), n.string("suffix"))))));
-                        return fn.concat(fn.replace(n.call($("_"), n.string("name")), n.string("core:"), n.string("&#9;.")), n.string("("), $("param"), fn.forEach($("composite"), function(...$_a) {
+                        return fn.concat(fn.replace(n.call($("_"), n.string("name")), n.string("core:"), n.string("\t.")), n.string("("), $("param"), fn.forEach($("composite"), function(...$_a) {
                             $ = $.frame($_a)
                                 .item("_");
                             return fn.concat(n.string(","), fn.replace(n.call($("_"), n.string("name")), n.string("core:"), n.string("\\$.")), n.string("("), cardinality(n.array(n.seq(n.call($("_"), n.string("suffix"))))), n.string(")"));
@@ -1279,7 +1279,7 @@ export function define$7(...$_a) {
                 } else {
                     return n.string("export ");
                 }
-            })($.frame()), n.string("function "), $("fname"), n.string("(...$_a) {&#13;&#9;"), n.string("var $ = n.frame($_a)&#13;&#9;"), fn.stringJoin($("init"), n.string("&#13;&#9;")), n.string(";&#13;&#9;"), $("body"), n.string("&#13;}"));
+            })($.frame()), n.string("function "), $("fname"), n.string("(...$_a) {\n\t"), n.string("var $ = n.frame($_a)\n\t"), fn.stringJoin($("init"), n.string("\n\t")), n.string(";\n\t"), $("body"), n.string("\n}"));
         }
     })($.frame());
 
@@ -1312,10 +1312,10 @@ export function anon$4(...$_a) {
                 return ($ => {
                     if ($.test(n.instanceOf($("_"), n.map()))) {
                         $ = $("args", n.call($("_"), n.string("args")));
-                        $ = $("param", fn.concat(n.string("&quot;"), rdl.camelCase(n.call($("args"), n.integer(2))), n.string("&quot;")));
+                        $ = $("param", fn.concat(n.string("\""), rdl.camelCase(n.call($("args"), n.integer(2))), n.string("\"")));
                         $ = $("composite", array.flatten(array.subarray($("args"), n.integer(3))));
                         $ = $("card", cardinality(n.array(n.seq(n.call($("_"), n.string("suffix"))))));
-                        return fn.concat(fn.replace(n.call($("_"), n.string("name")), n.string("core:"), n.string("&#9;.")), n.string("("), $("param"), fn.forEach($("composite"), function(...$_a) {
+                        return fn.concat(fn.replace(n.call($("_"), n.string("name")), n.string("core:"), n.string("\t.")), n.string("("), $("param"), fn.forEach($("composite"), function(...$_a) {
                             $ = $.frame($_a)
                                 .item("_");
                             return fn.concat(n.string(","), fn.replace(n.call($("_"), n.string("name")), n.string("core:"), n.string("\\$.")), n.string("("), cardinality(n.array(n.seq(n.call($("_"), n.string("suffix"))))), n.string(")"));
@@ -1339,7 +1339,7 @@ export function anon$4(...$_a) {
                 })($.frame());
 
             })));
-            return fn.concat(n.string("function (...$_a) {&#13;&#9;"), n.string("$ = $.frame($_a)&#13;&#9;"), fn.stringJoin($("init"), n.string("&#13;&#9;")), n.string(";&#13;&#9;"), $("body"), n.string("&#13;}"));
+            return fn.concat(n.string("function (...$_a) {\n\t"), n.string("$ = $.frame($_a)\n\t"), fn.stringJoin($("init"), n.string("\n\t")), n.string(";\n\t"), $("body"), n.string("\n}"));
         }
     })($.frame());
 
@@ -1376,11 +1376,11 @@ export function letRet$3(...$_a) {
                             } else {
                                 return $("_");
                             }
-                        })($.frame()), n.string(";&#13;&#9;"));
+                        })($.frame()), n.string(";\n\t"));
                     }
                 })($.frame());
 
-            })), n.string(";&#13;&#9;"));
+            })), n.string(";\n\t"));
         }
     })($.frame());
 
@@ -1391,18 +1391,18 @@ export function iff$3(...$_a) {
         .item("a")
         .item("b")
         .item("c");
-    $ = $("d", n.string("&#13;&#9;"));
+    $ = $("d", n.string("\n\t"));
     return fn.concat(n.string("($ => {"), $("d"), n.string("if($.test("), $("a"), n.string(")) {"), $("d"), ($ => {
         if ($.test(fn.matches($("b"), n.string("^return|^\\$ =")))) {
             return $("b");
         } else {
-            return fn.concat(n.string("return "), $("b"), n.string(";&#13;"));
+            return fn.concat(n.string("return "), $("b"), n.string(";\n"));
         }
     })($.frame()), n.string("} else {"), $("d"), ($ => {
         if ($.test(fn.matches($("c"), n.string("^return|^\\$ =")))) {
             return $("c");
         } else {
-            return fn.concat(n.string("return "), $("c"), n.string(";&#13;"));
+            return fn.concat(n.string("return "), $("c"), n.string(";\n"));
         }
     })($.frame()), n.string("}"), $("d"), n.string("})($.frame())"));
 
@@ -1480,9 +1480,9 @@ export function _typegen$1(...$_a) {
                     $ = $("param", rdl.camelCase(rdl.clip(n.call($("args"), n.integer(2)))));
                     return ($ => {
                         if ($.test(n.call($("args"), n.integer(3)))) {
-                            return fn.concat(n.string("$(&quot;"), $("param"), n.string("&quot;,"), n.call($("args"), n.integer(3)), n.string(")"));
+                            return fn.concat(n.string("$(\""), $("param"), n.string("\","), n.call($("args"), n.integer(3)), n.string(")"));
                         } else {
-                            return fn.concat(n.string("$(&quot;"), fn.replace($("param"), n.string("^([^\\.]*)(\\.{3})$"), n.string("$2 $1")), n.string("&quot;)"));
+                            return fn.concat(n.string("$(\""), fn.replace($("param"), n.string("^([^\\.]*)(\\.{3})$"), n.string("$2 $1")), n.string("\")"));
                         }
                     })($.frame());
                 }

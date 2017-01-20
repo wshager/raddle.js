@@ -9,8 +9,8 @@ import {
     module
 } from "xvfn";
 
-import { array, _isArray } from "xvarray";
-import { map, entry, _isMap } from "xvmap";
+import { array, _isArray, get as aGet } from "xvarray";
+import { map, entry, _isMap, get as mGet } from "xvmap";
 
 // mix in bools you shall!
 const fn = booleans;
@@ -112,7 +112,7 @@ class Context {
     }
     let(k, type, card = null){
         //if(this._init >= this._arity) return this;
-        this._frame[k] = this._args[this._init];//this.check(this._args[this._init], type, card);
+        this._frame[k] = this.check(this._args[this._init], type, card);
         this._params[this._init] = k;
         this._init++;
         return this;
@@ -145,6 +145,18 @@ class Context {
         return this.let(k);
     }
     attribute(k,card){
+        return this.let(k);
+    }
+    func(k,params,ret = null,card = null) {
+        return this.let(k);
+    }
+    atomic(k,card = null){
+        return this.let(k);
+    }
+    documentNode(k, card = null){
+        return this.let(k);
+    }
+    node(k, card = null){
         return this.let(k);
     }
     get(k){
@@ -185,12 +197,10 @@ class Context {
 export function call($fn,...args){
     let fn = _first($fn);
     if (_isMap(fn)) {
-        var k = _first(args[0]).valueOf();
-        var v = fn.get(k);
-        return !!v ? seq(v) : seq();
+        return mGet.call(null,fn,args[0]);
     }
     if(_isArray(fn)){
-        return fn.isEmpty() ? seq() : seq(fn.get(_first(args[0])-1));
+        return aGet.call(null,fn,args[0]);
     }
     try {
         return seq(fn.apply(null, args));

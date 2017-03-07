@@ -21,6 +21,7 @@ n.seq()
 })
 */
 
+
 export const ncname = n.string("\\p{L}\\p{N}\\-_\\.@");
 
 export const qname = n.concat(n.concat(n.concat(n.concat(n.concat(n.string("^(\\p{L}|@)["), ncname), n.string("]*:?")), n.string("[")), ncname), n.string("]*"));
@@ -1121,9 +1122,7 @@ export function body$4(...$_a) {
                                     $ = $("next", n.select(fn.head($("rest")), $_0 => fn.string($_0)));
                                     return ($ => {
                                         if ($.test(fn.matches($("next"), n.string("[^\\.]\\)")))) {
-                                            return fn.insertBefore(fn.tail($("rest")), n.integer(1), $("n.seq($("
-                                                n.seq($("n.seq(n.integer(1))"), fn.replace($("next"), n.string("^([^\\)]*)\\)"), n.string("$1.)")))
-                                                "))"));
+                                            return fn.insertBefore(fn.tail($("rest")), n.integer(1), n.element(n.string("fn:match"), n.seq(n.element(n.string("fn:group"), n.seq(n.attribute(n.string("nr"), n.seq(n.integer(1))), fn.replace($("next"), n.string("^([^\\)]*)\\)"), n.string("$1.)")))))));
                                         } else {
                                             return $("rest");
                                         }

@@ -60,16 +60,17 @@ function test(...$_a) {
     return n.error(test, $_l);
 }
 var params = n.map({
-    "$compat": ""
+    "$compat": "xquery"
 });
 var fs = require('fs');
 
-fs.readFile("d:/workspace/raddled/xq-compat.rdl",function(err,file){
+fs.readFile("d:/workspace/raddle.xq/lib/xq-compat.xql",function(err,file){
     if(err) return console.error(err);
     var query = file.toString();
+    //var query = "1 + 1";
     var tree = rdl.parse(query, params);
     console.log("Tree Done")
-//    console.log(rdl.stringify(tree,params));
+    //console.log(js.transpile(tree,params));
     fs.writeFile("d:/workspace/raddle.js/test/test.js",js.transpile(tree,params).first(),function(err){
         if(err) console.log(err);
     });

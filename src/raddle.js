@@ -82,7 +82,7 @@ export function processStrings$3(...$_a) {
         } else {
             $ = $("head", fn.head($("strings")));
             return ($ => {
-                if ($.test(n.eq(fn.name($("head")), n.string("match")))) {
+                if ($.test(n.eq(fn.name($("head")), n.string("fn:match")))) {
                     $ = $("string", n.select($("head"), $_0 => fn.string($_0)));
                     $ = $("index", ($ => {
                         if ($.test(map.contains($("ret"), $("string")))) {

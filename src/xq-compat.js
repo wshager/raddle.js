@@ -1,5 +1,7 @@
 import * as n from "./n";
 
+import * as a from "./array-util";
+
 import * as fn from "xvfn";
 
 for (var k in fn.booleans) fn[k] = fn.booleans[k];

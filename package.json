@@ -1,6 +1,6 @@
 {
   "name": "raddle",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Wouter Hager",
   "contributors": [],
   "keywords": [
@@ -28,14 +28,14 @@
   ],
   "mappings": {},
   "dependencies": {
-    "xvarray": "^0.1.1",
-    "xvfn": "^0.1.8",
-    "xvmap": "0.0.9",
-    "xvnode": "^0.1.4",
-    "xvop": "0.0.8",
-    "xvpath": "0.0.5",
-    "xvseq": "^0.1.6",
-    "xvtype": "^0.1.6"
+    "xvarray": "*",
+    "xvfn": "*",
+    "xvmap": "*",
+    "xvnode": "*",
+    "xvop": "*",
+    "xvpath": "*",
+    "xvseq": "*",
+    "xvtype": "*"
   },
   "devDependencies": {
     "babel-cli": "^6.18.0",
@@ -45,6 +45,6 @@
     "url": "https://github.com/wshager/raddle/issues"
   },
   "homepage": "https://github.com/wshager/raddle#readme",
-  "main": "index.js",
+  "main": "./lib/index.js",
   "license": "BSD-3-Clause"
 }

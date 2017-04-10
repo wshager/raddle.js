@@ -5,11 +5,11 @@ import * as xverr from "xverr";
 import {
     concat, forEach, filter, foldLeft, foldRight,
     item, string, number, boolean, integer, double, float, decimal, data, to,
-    doc, collection, parse, name, position, last, not, apply, sort, round, booleans
+    doc, collection, parse, name, position, last, not, apply, sort, round, booleans, module
 } from "xvfn";
 
-import { array, _isArray } from "xvarray";
-import { map, entry, _isMap } from "xvmap";
+import { array, _isArray, get as arrayGet } from "xvarray";
+import { map, entry, _isMap, get as mapGet } from "xvmap";
 
 // mix in bools you shall!
 const fn = booleans;
@@ -66,21 +66,10 @@ let(k,v=null,type=item){
 }
  */
 
-// TODO load from json
-const modules = [{
-    "prefix": "n",
-    "uri":"http://raddle.org/native"
-}];
 
-const global = {
-    modules:{}
-};
-
-function addModuleToGlobal(module){
-    // conflict?
-    if(module.uri in global.modules) return;
-    global.modules[module.uri] = module;
-}
+exports.$prefix = "n";
+exports.$uri = "http://raddle.org/native";
+exports.$module = module(__filename);
 
 export function frame(args=[],cx=null){
     var f = function (key,value) {
@@ -110,17 +99,6 @@ export function frame(args=[],cx=null){
     }
     f.__proto__ = cx;
     return f;
-}
-
-export function module(module){
-    return new Module(module);
-}
-
-class Module {
-    constructor(module){
-        addModuleToGlobal(module);
-        this._module = module;
-    }
 }
 
 class Context {
@@ -202,17 +180,13 @@ class Context {
     }
 }
 
-export function context(module){
-    return new Context(module);
-}
-
 export function call($fn,...args){
     let fn = _first($fn);
     if (_isMap(fn)) {
-        return seq(fn.get(_first(args[0])));
+        return mapGet.call(null,fn,args[0]);
     }
     if(_isArray(fn)){
-        return fn.isEmpty() ? seq() : seq(fn.get(_first(args[0])-1));
+        return arrayGet.call(null,fn,args[0]);
     }
     try {
         return seq(fn.apply(null, args));

@@ -45,6 +45,6 @@
     "url": "https://github.com/wshager/raddle/issues"
   },
   "homepage": "https://github.com/wshager/raddle#readme",
-  "main": "index.js",
+  "main": "lib/raddle.js",
   "license": "BSD-3-Clause"
 }

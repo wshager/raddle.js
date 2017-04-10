@@ -98,7 +98,7 @@ export function frame(args=[],cx=null){
             }
         //}
     }
-    f.__proto__ = cx;
+    Object.setPrototypeOf(f,cx);
     return f;
 }
 

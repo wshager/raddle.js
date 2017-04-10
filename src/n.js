@@ -5,11 +5,12 @@ import * as xverr from "xverr";
 import {
     concat, forEach, filter, foldLeft, foldRight,
     item, string, number, boolean, integer, double, float, decimal, data, to,
-    doc, collection, parse, name, position, last, not, apply, sort, round, booleans, module
+    doc, collection, parse, name, position, last, not, apply, sort, round, booleans,
+    module
 } from "xvfn";
 
-import { array, _isArray, get as arrayGet } from "xvarray";
-import { map, entry, _isMap, get as mapGet } from "xvmap";
+import { array, _isArray, get as aGet } from "xvarray";
+import { map, entry, _isMap, get as mGet } from "xvmap";
 
 // mix in bools you shall!
 const fn = booleans;
@@ -66,10 +67,9 @@ let(k,v=null,type=item){
 }
  */
 
-
-exports.$prefix = "n";
-exports.$uri = "http://raddle.org/native";
-exports.$module = module(__filename);
+export const $prefix = "n";
+export const $uri = "http://raddle.org/native";
+export const $module = module(__filename);
 
 export function frame(args=[],cx=null){
     var f = function (key,value) {
@@ -85,6 +85,7 @@ export function frame(args=[],cx=null){
     var closure = cx && cx._frame ? cx._frame : null;
     if(!cx) cx = new Context();
     f._args = args;
+    f._params = [];
     // is this correct?
     f._arity = args.length;
     f._init = 0;
@@ -97,7 +98,7 @@ export function frame(args=[],cx=null){
             }
         //}
     }
-    f.__proto__ = cx;
+    Object.setPrototypeOf(f,cx);
     return f;
 }
 
@@ -111,7 +112,8 @@ class Context {
     }
     let(k, type, card = null){
         //if(this._init >= this._arity) return this;
-        this._frame[k] = this.check(this._args[this._init],type,card);
+        this._frame[k] = this.check(this._args[this._init], type, card);
+        this._params[this._init] = k;
         this._init++;
         return this;
     }
@@ -143,6 +145,18 @@ class Context {
         return this.let(k);
     }
     attribute(k,card){
+        return this.let(k);
+    }
+    func(k,params,ret = null,card = null) {
+        return this.let(k);
+    }
+    atomic(k,card = null){
+        return this.let(k);
+    }
+    documentNode(k, card = null){
+        return this.let(k);
+    }
+    node(k, card = null){
         return this.let(k);
     }
     get(k){
@@ -183,10 +197,10 @@ class Context {
 export function call($fn,...args){
     let fn = _first($fn);
     if (_isMap(fn)) {
-        return mapGet.call(null,fn,args[0]);
+        return mGet.call(null,fn,args[0]);
     }
     if(_isArray(fn)){
-        return arrayGet.call(null,fn,args[0]);
+        return aGet.call(null,fn,args[0]);
     }
     try {
         return seq(fn.apply(null, args));
@@ -206,7 +220,7 @@ export function error(fn,l){
 
 export {
     seq, toSeq, _first, _isSeq, filter, forEach, foldLeft, foldRight, item, string, number, boolean, integer, double, float, decimal, data, to, array, map, concat,
-    element, attribute, text, minus, instanceOf, fromJS
+    element, attribute, text, minus, instanceOf, fromJS, module
 };
 
 export * from "xvop";

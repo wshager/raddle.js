@@ -1,6 +1,4 @@
-var xs = require("xvtype");
-
-var fn = require("xvfn");
+var fn = require("../lib/fn");
 
 var n = require("../lib/n");
 
@@ -69,8 +67,24 @@ var fs = require('fs');
 fs.readFile("d:/workspace/raddle.xq/lib/xq-compat.xql",function(err,file){
     if(err) return console.error(err);
     var query = file.toString();
-    var tree = rdl.parse("declare function local:test($x) { $x };", params);
-    console.log(js.transpile(tree,params).first());
+    var query = "1 + 1";
+    var tree = rdl.parse(query, params);
+    console.log("Tree Done");
+    //console.log(rdl.stringify(tree,params));
+    var out = `
+        var n = require("d:/workspace/raddle.js/lib/n");
+        var fn = require("d:/workspace/raddle.js/lib/fn");
+        var $ = n.frame();
+        exports.main = function(){
+            return ${js.transpile(tree,params).first()};
+        };`;
+    console.log(out);
+    var exec = eval(out);
+    console.log(exec().toString());
+    //fs.writeFile("d:/workspace/raddle.js/test/test.rdl",rdl.stringify(tree,params).first(),function(err){
+    //    if(err) console.log(err);
+    //});
+
 /*fs.writeFile("d:/workspace/raddle.js/test/test.js", js.transpile(tree,params).first().replace(/&#9;/g,"\t").replace(/&#10;/g,"\r").replace(/&#13;/g,"\n").replace(/&quot;/g,"\""), function(err) {
     if(err) {
         return console.log(err);

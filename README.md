@@ -59,7 +59,7 @@ Assign a local variable:
 `let($,variable-name,variable-type,whatever)`
 
 
-Bind a parameter:
+Bind a parameter to a function:
 
 `bind($,param-name,param-description,param-type[,whatever])`
 

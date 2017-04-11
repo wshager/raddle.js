@@ -46,22 +46,41 @@ ____
 
 Define a function:
 
-`core:define($,function-name,function-description,return-type,(arguments)[,body])`
+`define($,function-name,function-description,(arguments),return-type[,body])`
 
 
 Declare a constant:
 
-`core:var($,constant-name,constant-description,constant-type[,whatever])`
+`var($,constant-name,constant-description,constant-type[,whatever])`
 
 
 Assign a local variable:
 
-`core:let($,variable-name,variable-type,whatever)`
+`let($,variable-name,variable-type,whatever)`
 
 
 Bind a parameter:
 
-`core:bind($,param-name,param-description,param-type[,whatever])`
+`bind($,param-name,param-description,param-type[,whatever])`
 
 
+The dollar sign provides a context where stuff can be assigned to, but it's also a function. So you could write:
 
+`$(name,whatever[,type])`
+
+
+To retrieve the value from the current context, you can call the function with a name:
+
+`$(name)`
+
+
+But the shorthand also works:
+
+`$name`
+
+
+Function references can be found in yet another way. Since Raddle uses the function's arity to distinguish between functions that have the same name, you can reference it as:
+
+`name#N`
+
+Where N is the number of parameters bound to the function. This is the preferred way.

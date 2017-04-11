@@ -1,4 +1,4 @@
-# Raddle
+![Raddle](https://raw.githubusercontent.com/wshager/raddle.js/master/logo.svg.png)
 Recursive Definition Language for the Web
 
 See https://github.com/wshager/raddled for definition files.

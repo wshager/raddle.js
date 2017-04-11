@@ -84,3 +84,11 @@ Function references can be found in yet another way. Since Raddle uses the funct
 `name#N`
 
 Where N is the number of parameters bound to the function. This is the preferred way.
+
+
+Finally, for the last bit of shorthand you can use type tests for any of the core functions (i.e. 'define', 'var', 'let' and 'bind') above.
+
+`string($,name[,whatever])`
+
+
+When a type constructor is called with a context as it's first argument, it will default to an assignment.

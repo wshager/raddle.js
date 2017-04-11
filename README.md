@@ -1,4 +1,5 @@
-<img src="https://raw.githubusercontent.com/wshager/raddle.js/master/logo.svg.png" alt="Raddle" style="width:120px;">
+![Raddle](https://github.com/wshager/raddle.js/raw/master/logo.svg.png)
+
 Recursive Definition Language for the Web
 
 See https://github.com/wshager/raddled for definition files.

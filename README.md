@@ -1,7 +1,7 @@
 # Raddle
 Recursive Definition Language for the Web
 
-See https://github.com/wshager/raddled.git for definition files.
+See https://github.com/wshager/raddled for definition files.
 
 
 ## What is it?
@@ -10,7 +10,7 @@ Raddle is a rad new language for manipulating structured documents on the web. I
 
 ### Fully-featured
 
-The Raddle core implements the entire W3C XQUERY 3.1 function specification and then some.
+The Raddle core provides a parser, compiler and runtime environment. It utilizes [Frink](https://github.com/wshager/frink), a full set of standards-compliant functions build in modern JavaScript.
 
 ### Functional
 
@@ -18,7 +18,7 @@ Raddle has all the good things from functional programming, including respect fo
 
 ### Point-less
 
-You can't declare variables in Raddle, as you won't need them.
+You can use variables in Raddle, but most of the time you don't have to.
 
 ### URL-encodable
 
@@ -30,18 +30,36 @@ With Raddle's type declarations, types are kept in check.
 
 ### Free
 
-Raddle is licensed under the AFL or BSD license.
+Raddle is licensed under the new BSD license.
 
 
 ## Genesis
 
-Raddle was inspired by RQL. RQL is a great tool for querying JSON, but with Raddle you can extend that greatness! It is capable of handling more types than arrays of objects, and you can add new functionality, either inline or from external modules.
+Raddle was inspired by RQL and XQuery. RQL is a great tool for querying JSON, but with Raddle you can extend that greatness! It is capable of handling more types than arrays of objects, and you can add new functionality, either inline or from external modules.
 
 Furthermore, Raddle encourages implementation in other languages, as its core definitions are clear and concise from the start.
+____
 
-## TODO
+## Definition Anatomy
 
-* Implement Raddle's parser and transpiler in Javascript, XQuery, Java, PHP, Scala, Ruby, Perl, Python, C++, et cetera.
-* Implement Raddle's core functions in Javascript, XQuery, Java, PHP, Scala, Ruby, Perl, Python, C++, et cetera.
-* Make Raddle compatible with Dojo's [dstore](https://github.com/sitepen/dstore).
-* Use Raddle to manipulate the browser's DOM.
+Define a function:
+
+`core:define($,function-name,function-description,return-type,(arguments)[,body])`
+
+
+Declare a constant:
+
+`core:var($,constant-name,constant-description,constant-type[,whatever])`
+
+
+Assign a local variable:
+
+`core:let($,variable-name,variable-type,whatever)`
+
+
+Bind a parameter:
+
+`core:bind($,param-name,param-description,param-type[,whatever])`
+
+
+

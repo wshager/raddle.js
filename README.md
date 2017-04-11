@@ -93,4 +93,13 @@ Finally, for the last bit of shorthand you can use type constructors directly in
 
 When a type constructor is called with a context as it's first argument, it will default to an assignment. Admittedly, this looks a bit odd for functions:
 
-`function($,name,(argument-types),return-type,function((arguments-with-types),return-type-again,body))`
+`function($,func,(argument-types),return-type,function((arguments-with-types),body[,return-type-again]))`
+
+The actual function value is assigned to 'func' of type function as an anonymous function constructor. Because this makes the return type (and bound parameter types) redundant, the return type for an anonymous function is made optional. Please don't try this at home and do try to encourage XQuery people to revise this:
+
+```xquery
+let $func as function(xs:string) as xs:string := function($s as xs:string) as xs:string {
+    $s
+}
+return $func("x")
+```

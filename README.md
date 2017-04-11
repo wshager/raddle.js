@@ -42,21 +42,22 @@ ____
 
 ## Definition Anatomy
 
+
 Define a function:
 
 `core:define($,function-name,function-description,return-type,(arguments)[,body])`
 
-
+---
 Declare a constant:
 
 `core:var($,constant-name,constant-description,constant-type[,whatever])`
 
-
+---
 Assign a local variable:
 
 `core:let($,variable-name,variable-type,whatever)`
 
-
+---
 Bind a parameter:
 
 `core:bind($,param-name,param-description,param-type[,whatever])`

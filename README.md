@@ -100,7 +100,7 @@ The actual function value is assigned to 'func' of type function as an anonymous
 
 
 
-<div id="1" style="margin-top:2em;font-size:smaller">
+<div id="1" style="margin-top:2em;font-size:small;">
 1. Please don't try this at home and do try to encourage XQuery people to revise this:
 
 ```xquery

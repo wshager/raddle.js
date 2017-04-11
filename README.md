@@ -91,4 +91,6 @@ Finally, for the last bit of shorthand you can use type constructors directly in
 `string($,name[,whatever])`
 
 
-When a type constructor is called with a context as it's first argument, it will default to an assignment.
+When a type constructor is called with a context as it's first argument, it will default to an assignment. Admittedly, this looks a bit odd for functions:
+
+`function($,name,(argument-types),return-type,function((arguments-with-types),return-type-again,body))`

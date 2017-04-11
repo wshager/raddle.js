@@ -100,8 +100,8 @@ The actual function value is assigned to 'func' of type function as an anonymous
 
 
 
-<div id="1">
-1) Please don't try this at home and do try to encourage XQuery people to revise this:
+<div id="1" style="margin-top:2em;font-size:smaller">
+1. Please don't try this at home and do try to encourage XQuery people to revise this:
 
 ```xquery
 let $func as function(xs:string) as xs:string := function($s as xs:string) as xs:string {

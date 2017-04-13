@@ -1,6 +1,11 @@
-import * as fn from "xvfn";
-
-export * from "xvfn";
+import * as n from "./n";
+export * from "./n";
+// mix in bools you shall!
+const fn = {
+    true:n.t,
+    false:n.f
+};
+for(var k in n) fn[k] = n[k];
 
 export function count$1(...$_a) {
 	var $ = n.frame($_a)

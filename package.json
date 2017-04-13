@@ -28,14 +28,7 @@
   ],
   "mappings": {},
   "dependencies": {
-    "xvarray": "*",
-    "xvfn": "*",
-    "xvmap": "*",
-    "xvnode": "*",
-    "xvop": "*",
-    "xvpath": "*",
-    "xvseq": "*",
-    "xvtype": "*"
+    "frink": "*"
   },
   "devDependencies": {
     "babel-cli": "^6.18.0",

@@ -1,19 +1,14 @@
-import { seq, toSeq, _isSeq, _first, _boolean, text, element, attribute, minus, instanceOf, fromJS } from "xvtype";
+import * as n from "frink";
 
-import * as xverr from "xverr";
-
-import {
-    concat, forEach, filter, foldLeft, foldRight,
-    item, string, number, boolean, integer, double, float, decimal, data, to,
-    doc, collection, parse, name, position, last, not, apply, sort, round, booleans,
-    module
-} from "xvfn";
-
-import { array, _isArray, get as aGet } from "xvarray";
-import { map, entry, _isMap, get as mGet } from "xvmap";
+import { default as array, isArray, get as aGet } from "../node_modules/frink/lib/array";
+import { default as map, entry, isMap, get as mGet } from "../node_modules/frink/lib/map";
 
 // mix in bools you shall!
-const fn = booleans;
+const fn = {
+    true:n.t,
+    false:n.f
+};
+for(var k in n) fn[k] = n[k];
 
 /*
 func(... a) {
@@ -69,7 +64,7 @@ let(k,v=null,type=item){
 
 export const $prefix = "n";
 export const $uri = "http://raddle.org/native";
-export const $module = module(__filename);
+export const $module = n.module(__filename);
 
 export function frame(args=[],cx=null){
     var f = function (key,value) {
@@ -124,16 +119,16 @@ class Context {
         return this.let(k,string,card);
     }
     integer(k,card){
-        return this.let(k,integer);
+        return this.let(k,n.integer);
     }
     decimal(k,card){
-        return this.let(k,decimal,card);
+        return this.let(k,n.decimal,card);
     }
     double(k,card){
-        return this.let(k,double,card);
+        return this.let(k,n.double,card);
     }
     number(k,card){
-        return this.let(k,number,card);
+        return this.let(k,n.number,card);
     }
     array(k, valuetype = null,card = null){
         return this.let(k, valuetype, card);
@@ -166,10 +161,10 @@ class Context {
         return ret;
     }
     test($test) {
-        return _boolean($test);
+        return n.boolean($test);
     }
     if($test){
-        this._frame[0] = _boolean($test);
+        this._frame[0] = n.boolean($test);
         return this;
     }
     then(fn){
@@ -195,15 +190,15 @@ class Context {
 }
 
 export function call($fn,...args){
-    let fn = _first($fn);
-    if (_isMap(fn)) {
+    let fn = n.first($fn);
+    if (isMap(fn)) {
         return mGet.call(null,fn,args[0]);
     }
-    if(_isArray(fn)){
+    if(isArray(fn)){
         return aGet.call(null,fn,args[0]);
     }
     try {
-        return seq(fn.apply(null, args));
+        return fn.apply(null, args);
     } catch(e) {
         //console.log(e);
     }
@@ -213,15 +208,11 @@ export const pair = entry;
 
 export function error(fn,l){
     if(typeof fn == "function"){
-        return xverr.error("err:XPST0017", "Function " + fn.name + " did not receive the correct number of arguments.");
+        return n.error("err:XPST0017", "Function " + fn.name + " did not receive the correct number of arguments.");
     }
-    return xverr.error("err:XPST0017", "Anonymous function did not receive the correct number of arguments.");
+    return n.error("err:XPST0017", "Anonymous function did not receive the correct number of arguments.");
 }
 
-export {
-    seq, toSeq, _first, _isSeq, filter, forEach, foldLeft, foldRight, item, string, number, boolean, integer, double, float, decimal, data, to, array, map, concat,
-    element, attribute, text, minus, instanceOf, fromJS, module
-};
+export * from "frink";
 
-export * from "xvop";
-export * from "xvpath";
+export { map, array };

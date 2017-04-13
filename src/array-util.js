@@ -6,9 +6,13 @@ n.seq()*/
 
 import * as n from "./n";
 
-import * as array from "xvarray";
+import * as array from "../node_modules/frink/lib/array";
 
-import * as fn from "xvfn";
+const fn = {
+    true:n.t,
+    false:n.f
+};
+for(var k in n) fn[k] = n[k];
 
 var $ = n.frame();
 

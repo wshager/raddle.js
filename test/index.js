@@ -6,13 +6,13 @@ var xqc = require("../lib/xq-compat");
 
 var a = require("../lib/array-util");
 
-var array = require("xvarray");
+var array = require("../node_modules/frink/lib/array");
 
 var rdl = require("../lib/raddle");
 
 var js = require("../lib/js");
 
-for (var k in fn.booleans) fn[k] = fn.booleans[k];
+//for (var k in fn.booleans) fn[k] = fn.booleans[k];
 
 function x(...a) {
     var l = a.length,
@@ -64,9 +64,9 @@ var params = n.map({
 });
 var fs = require('fs');
 
-fs.readFile("d:/workspace/raddle.xq/lib/xq-compat.xql",function(err,file){
-    if(err) return console.error(err);
-    var query = file.toString();
+//fs.readFile("d:/workspace/raddle.xq/lib/xq-compat.xql",function(err,file){
+    //if(err) return console.error(err);
+    //var query = file.toString();
     var query = "1 + 1";
     var tree = rdl.parse(query, params);
     console.log("Tree Done");
@@ -92,4 +92,4 @@ fs.readFile("d:/workspace/raddle.xq/lib/xq-compat.xql",function(err,file){
 
     console.log("The file was saved!");
 });*/
-});
+//});

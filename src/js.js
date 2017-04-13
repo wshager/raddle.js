@@ -8,13 +8,16 @@ import * as env from "./env";
 
 import * as console from "./console";
 
-import * as fn from "./fn";
+import * as map from "../node_modules/frink/lib/map";
 
-import * as map from "xvmap";
+import * as array from "../node_modules/frink/lib/array";
 
-import * as array from "xvarray";
-
-for (var k in fn.booleans) fn[k] = fn.booleans[k];
+// mix in bools you shall!
+const fn = {
+    true:n.t,
+    false:n.f
+};
+for(var k in n) fn[k] = n[k];
 
 var $ = n.frame();
 

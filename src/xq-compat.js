@@ -2,13 +2,16 @@ import * as n from "./n";
 
 import * as a from "./array-util";
 
-import * as fn from "xvfn";
+// mix in bools you shall!
+const fn = {
+    true:n.t,
+    false:n.f
+};
+for(var k in n) fn[k] = n[k];
 
-for (var k in fn.booleans) fn[k] = fn.booleans[k];
+import * as map from "../node_modules/frink/lib/map";
 
-import * as map from "xvmap";
-
-import * as array from "xvarray";
+import * as array from "../node_modules/frink/lib/array";
 
 import * as console from "./console";
 

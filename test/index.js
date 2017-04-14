@@ -59,9 +59,7 @@ function test(...$_a) {
     }
     return n.error(test, $_l);
 }
-var params = n.map({
-    "$compat": "xquery"
-});
+var params = n.map(n.pair("$compat", "xquery"));
 var fs = require('fs');
 
 //fs.readFile("d:/workspace/raddle.xq/lib/xq-compat.xql",function(err,file){

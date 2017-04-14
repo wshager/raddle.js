@@ -5,8 +5,8 @@ import { default as map, entry, isMap, get as mGet } from "../node_modules/frink
 
 // mix in bools you shall!
 const fn = {
-    true:n.t,
-    false:n.f
+    true: () => true,
+    false: () => false
 };
 for(var k in n) fn[k] = n[k];
 
@@ -113,10 +113,10 @@ class Context {
         return this;
     }
     item(k,card){
-        return this.let(k,item,card);
+        return this.let(k,n.item,card);
     }
     string(k,card){
-        return this.let(k,string,card);
+        return this.let(k,n.string,card);
     }
     integer(k,card){
         return this.let(k,n.integer);
@@ -205,14 +205,14 @@ export function call($fn,...args){
 }
 
 export const pair = entry;
-
+/*
 export function error(fn,l){
     if(typeof fn == "function"){
         return n.error("err:XPST0017", "Function " + fn.name + " did not receive the correct number of arguments.");
     }
     return n.error("err:XPST0017", "Anonymous function did not receive the correct number of arguments.");
 }
-
+*/
 export * from "frink";
 
-export { map, array };
+export { map, array, isMap, isArray };

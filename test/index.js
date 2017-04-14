@@ -69,7 +69,7 @@ var fs = require('fs');
     //var query = file.toString();
     var query = "1 + 1";
     var tree = rdl.parse(query, params);
-    console.log("Tree Done");
+    console.log("Tree Done",tree);
     //console.log(rdl.stringify(tree,params));
     var out = `
         var n = require("d:/workspace/raddle.js/lib/n");

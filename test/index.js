@@ -67,14 +67,14 @@ var fs = require('fs');
     //var query = file.toString();
     var query = "1 + 1";
     var tree = rdl.parse(query, params);
-    console.log("Tree Done",tree);
+    console.log("Tree Done");
     //console.log(rdl.stringify(tree,params));
     var out = `
         var n = require("d:/workspace/raddle.js/lib/n");
         var fn = require("d:/workspace/raddle.js/lib/fn");
         var $ = n.frame();
         exports.main = function(){
-            return ${js.transpile(tree,params).first()};
+            return ${js.transpile(tree,params)};
         };`;
     console.log(out);
     var exec = eval(out);

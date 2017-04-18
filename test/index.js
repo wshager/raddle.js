@@ -65,13 +65,13 @@ var fs = require('fs');
 //fs.readFile("d:/workspace/raddle.xq/lib/xq-compat.xql",function(err,file){
     //if(err) return console.error(err);
     //var query = file.toString();
-    var query = "1 + 1";
+    var query = "declare function local:x($x) { 1 + 1 };";
     var tree = rdl.parse(query, params);
     console.log("Tree Done");
     //console.log(rdl.stringify(tree,params));
     var out = `
-        var n = require("d:/workspace/raddle.js/lib/n");
-        var fn = require("d:/workspace/raddle.js/lib/fn");
+        var n = require("raddle");
+        var fn = n;
         var $ = n.frame();
         exports.main = function(){
             return ${js.transpile(tree,params)};

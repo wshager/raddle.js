@@ -11,7 +11,7 @@ Raddle is a rad new language for manipulating structured documents on the web. I
 
 ### Fully-featured
 
-The Raddle core provides a parser, compiler and runtime environment. It utilizes [Frink](https://github.com/wshager/frink), a full set of standards-compliant functions build in modern JavaScript.
+The Raddle core provides a parser, compiler and runtime environment. It utilizes [Frink](https://github.com/wshager/frink), a full set of standards-compliant functions built in modern JavaScript.
 
 ### Functional
 

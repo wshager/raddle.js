@@ -68,7 +68,7 @@ var fs = require('fs');
     var query = "declare function local:x($x) { 1 + 1 };";
     var tree = rdl.parse(query, params);
     console.log("Tree Done");
-    //console.log(rdl.stringify(tree,params));
+    console.log(rdl.stringify(tree,params));
     var out = `
         var n = require("raddle");
         var fn = n;

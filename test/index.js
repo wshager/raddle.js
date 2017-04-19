@@ -62,10 +62,10 @@ function test(...$_a) {
 var params = n.map(n.pair("$compat", "xquery"));
 var fs = require('fs');
 
-//fs.readFile("d:/workspace/raddle.xq/lib/xq-compat.xql",function(err,file){
-    //if(err) return console.error(err);
-    //var query = file.toString();
-    var query = "declare function local:x($x) { 1 + 1 };";
+fs.readFile("../raddle.xq/lib/xq-compat.xql",function(err,file){
+    if(err) return console.error(err);
+    var query = file.toString();
+    //var query = "declare function local:x($x) { 1 + 1 };";
     var tree = rdl.parse(query, params);
     console.log("Tree Done");
     console.log(rdl.stringify(tree,params));
@@ -77,8 +77,8 @@ var fs = require('fs');
             return ${js.transpile(tree,params)};
         };`;
     console.log(out);
-    var exec = eval(out);
-    console.log(exec().toString());
+    //var exec = eval(out);
+    //console.log(exec().toString());
     //fs.writeFile("d:/workspace/raddle.js/test/test.rdl",rdl.stringify(tree,params).first(),function(err){
     //    if(err) console.log(err);
     //});
@@ -90,4 +90,4 @@ var fs = require('fs');
 
     console.log("The file was saved!");
 });*/
-//});
+});

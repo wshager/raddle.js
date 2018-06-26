@@ -20,9 +20,14 @@
     "Wouter Hager <wshager@gmail.com>"
   ],
   "dependencies": {
+    "array-last-item": "0.0.3",
     "rxjs": "^6.2.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-preset-env": "^1.7.0"
+  },
   "bugs": {
     "url": "https://github.com/wshager/raddle/issues"
   },

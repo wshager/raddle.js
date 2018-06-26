@@ -1,7 +1,4 @@
-downloaded-modules
+.jshintrc
 node_modules
-npm-debug.log
-*.log
-test
-!test/index.js
-!test/server.js
+lib/layers
+tests

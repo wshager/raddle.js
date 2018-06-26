@@ -2,7 +2,6 @@
   "name": "raddle",
   "version": "0.0.2",
   "author": "Wouter Hager",
-  "contributors": [],
   "keywords": [
     "resource",
     "query",
@@ -10,12 +9,6 @@
     "transform"
   ],
   "description": "Extensible document manipulation language for the web",
-  "files": [
-    "lib"
-  ],
-  "directories": {
-    "test": "test"
-  },
   "scripts": {
     "build": "babel src --out-dir lib"
   },
@@ -26,14 +19,10 @@
   "maintainers": [
     "Wouter Hager <wshager@gmail.com>"
   ],
-  "mappings": {},
   "dependencies": {
-    "frink": "*"
+    "rxjs": "^6.2.1"
   },
-  "devDependencies": {
-    "babel-cli": "^6.18.0",
-    "babel-plugin-transform-es2015-modules-commonjs": "^6.18.0"
-  },
+  "devDependencies": {},
   "bugs": {
     "url": "https://github.com/wshager/raddle/issues"
   },

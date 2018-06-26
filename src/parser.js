@@ -1,9 +1,10 @@
 import { Observable, from } from "rxjs";
-import { mergeMap, concat } from "rxjs/operators";
+import { mergeMap } from "rxjs/operators";
 import { find } from "./trie";
 import { reduceAround } from "./rich-reducers";
 import { fromReadStream } from "./node-stream";
-import {} from "./shim";
+import {} from "array-last-item";
+
 const ops = require("../operator-trie.json");
 
 const opMap = {
@@ -93,7 +94,7 @@ function expandBinOps(r) {
 				// reset last binary at depth
 				prev = void 0;
 				// recurse
-				closeBin(o.last(),tpl);
+				closeBin(o.lastItem,tpl);
 			}
 		}
 	};
@@ -106,8 +107,8 @@ function expandBinOps(r) {
 			idx[tpl.d] = ret.length;
 		} else if(t == 4) {
 			if(tpl.b) {
-				closeBin(o.last(),tpl);
-				const last = ret.last();
+				closeBin(o.lastItem,tpl);
+				const last = ret.lastItem;
 				const preceeds = prev && tpl.v > prev.v;
 				// if we have preceding then use its index, else use last opening
 				const insert = preceeds ? prev.i : idx[last.d];
@@ -141,7 +142,7 @@ function expandBinOps(r) {
 			// some close, unwrap any open ops
 			// we don't want to interfere with bin-op, because it would close them to soon
 			if(t === 3 || t === 2 || t === 0) {
-				closeBin(o.last(),tpl);
+				closeBin(o.lastItem,tpl);
 				ret.push(tpl);
 				if(t !== 2) idx[tpl.d] = ret.length;
 			} else {
@@ -160,7 +161,7 @@ function charReducer(state,next) {
 		state.char = next;
 		return state;
 	}
-	if(next == EOF) {
+	if(char == EOF) {
 		state.emit = state.emit && state.tpl.t == 0 ? void 0 : {t:0, v:0, o:EOF};
 		return state;
 	}
@@ -390,6 +391,10 @@ const tokenize = function(state,$chars) {
 				if(state.emit) $o.next(state.emit);
 			},
 			complete() {
+				charReducer(state,EOF);
+				if(state.emit) $o.next(state.emit);
+				charReducer(state);
+				if(state.emit) $o.next(state.emit);
 				$o.complete();
 			}
 		});
@@ -464,6 +469,8 @@ const initTokenState = () => {
 	};
 };
 
-export const parse = path => lex(tokenize(initTokenState(),fromReadStream(path).pipe(mergeMap(chunk => from(chunk.toString())),concat(EOF))));
+const boundTokenize = tokenize.bind(null,initTokenState());
 
-export const parseString = str => lex(tokenize(initTokenState(),from(str+EOF)));
+export const parse = path => fromReadStream(path).pipe(mergeMap(chunk => from(chunk.toString())),boundTokenize,lex);
+
+export const parseString = str => from(str).pipe(boundTokenize,lex);

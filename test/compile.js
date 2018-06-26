@@ -3,8 +3,8 @@ const compiler = require("../lib/compiler");
 const l3n = require("l3n");
 const n = require("frink");
 
-compiler.run(l3n.fromStream(parser.parseString("1 + 2")),{
+parser.parseString("1 + 2").pipe(l3n.fromStream,$o => compiler.run($o,{
 	modules:{
 		n:n
 	}
-}).subscribe(console.log);
+})).subscribe(console.log);

@@ -3,7 +3,6 @@ import { mergeMap } from "rxjs/operators";
 import { find } from "./trie";
 import { reduceAround } from "./rich-reducers";
 import { fromReadStream } from "./node-stream";
-import {} from "array-last-item";
 
 const ops = require("../operator-trie.json");
 

@@ -5,7 +5,6 @@ import { prefixAndName, normalizeName } from "./compiler-util";
 import { ReplaySubject } from "rxjs";
 import { reduce, map, mergeAll } from "rxjs/operators";
 import { $_, papplyAny } from "./papply";
-import {} from "array-last-item";
 
 //const compose = (...fns) => fns.reduce((f, g) => (...args) => f(g(...args)));
 

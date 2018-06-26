@@ -17,7 +17,7 @@ Raddle is inspired by RQL and XQuery.
 
 Run `npm install` to fetch all the dependencies. We need all of them to compile a string of code:
 
-`
+```
 import { parseString, run } from 'raddle';
 import { fromStream } from 'l3n';
 import * as n from 'frink';
@@ -27,7 +27,7 @@ parseString("1 + 2").pipe(toVNodeStream,$o => run($o,{
 		n:n
 	}
 }));
-`
+```
 
 The parser emits an L3N stream, a flat encoding of the program. However, the compiler expects a `VNode` stream, which wraps it into a more convenient interface. See [L3N](https://github.com/wshager/l3n) for more information.
 

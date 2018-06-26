@@ -17,12 +17,12 @@ Raddle is inspired by RQL and XQuery.
 
 Run `npm install` to fetch all the dependencies. We need all of them to compile a string of code:
 
-```
+```javascript
 import { parseString, run } from 'raddle';
 import { fromStream } from 'l3n';
 import * as n from 'frink';
 
-parseString("1 + 2").pipe(toVNodeStream,$o => run($o,{
+parseString("add(1,2)").pipe(toVNodeStream,$o => run($o,{
 	modules:{
 		n:n
 	}

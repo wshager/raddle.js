@@ -2,20 +2,18 @@
 
 A minimalist functional language
 
-See https://github.com/wshager/raddled for definition files.
 
+## What?
 
-## What is it?
+Raddle is a functional language for manipulating structured documents (XML, HTML, JSON or... Raddle itself).
 
-Raddle is a functional language for manipulating structured documents.
-
-This library provides only a parser and compiler. It utilizes [L3N](https://github.com/wshager/l3n), a tiny format for encoding the language as a flat stream, and [Frink](https://github.com/wshager/frink), the core functionality using a *reactive* approach.
+This library provides only a parser and compiler. It utilizes [L3N](https://npmjs.com/l3n), a tiny format for encoding the language as a flat stream, and [Frink](https://npmjs.com/frink), the core functionality using a *reactive* approach.
 
 Raddle is inspired by RQL and XQuery.
 
 ## Getting started
 
-Run `npm install` to fetch all the dependencies. We need all of them to compile a string of code:
+Run `npm install` to fetch all dependencies. We need them to compile a string of code, for example:
 
 ```javascript
 import { parseString, run } from 'raddle';
@@ -29,7 +27,10 @@ parseString("add(1,2)").pipe(toVNodeStream,$o => run($o,{
 }));
 ```
 
-The parser emits an L3N stream, a flat encoding of the program. However, the compiler expects a `VNode` stream, which wraps it into a more convenient interface. See [L3N](https://github.com/wshager/l3n) for more information.
+The parser emits an L3N stream, a flat binary encoding of the program. However, the compiler expects a `VNode` stream, which wraps the binary data into a more convenient interface. See [L3N](https://npmjs.com/l3n) for more information.
+
+The compiler takes a confuration object with at least the module containing the core functions. The default prefix for this is `n`, but this may be configured as well in the near future.
+
 
 ## Definition Anatomy
 
@@ -37,7 +38,7 @@ The dollar sign provides a context where stuff can be assigned to, and it can be
 
 `$(name[,documentation][,type],body)`
 
-Character strings don't have to be written in quotes always. Only in cases where ambiguity with reserved characters would arise, a string should be notated between a pair of (single or double) quotes (see [Reserved Characters](#reserved-characters)).
+Character strings don't have to be written in quotes always. Only in cases where ambiguity with reserved characters would arise, a string should be notated between a pair of (single or double) quotes.
 
 
 To retrieve the value from the variable, you can call the dollar function with its name:

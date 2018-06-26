@@ -3,8 +3,9 @@ import { isLeaf, isBranch, isClose, isDirect, fromStream } from "l3n";
 import { parse } from "./parser";
 import { prefixAndName, normalizeName } from "./compiler-util";
 import { ReplaySubject } from "rxjs";
-import { reduce, map } from "rxjs/operators";
+import { reduce, map, mergeAll } from "rxjs/operators";
 import { $_, papplyAny } from "./papply";
+import {} from "array-last-item";
 
 //const compose = (...fns) => fns.reduce((f, g) => (...args) => f(g(...args)));
 
@@ -46,7 +47,7 @@ class Context {
 			// assigment
 			v = new Var(this,1,count);
 		} else {
-			const index = this.stack.last();
+			const index = this.stack.lastItem;
 			if(typeof index == "number") {
 				this.length++;
 				v = new Var(this,2,1);
@@ -257,9 +258,9 @@ export function compile(o,cx) {
 			const refNode = node.node;
 			if(isQuotNode(refNode)) {
 				const dest = quots.pop();
-				quots.last().append(dest);
+				quots.lastItem.append(dest);
 			} else {
-				const target = quots.last();
+				const target = quots.lastItem;
 				if(isVarNode(refNode)) {
 					// var or param
 					const count = refNode.count();
@@ -292,9 +293,9 @@ export function compile(o,cx) {
 			}
 		} else if(isDirect(type)) {
 			// call last on stack
-			quots.last().addDirect(node.node);
+			quots.lastItem.addDirect(node.node);
 		} else if(isLeaf(type)) {
-			quots.last().addDatum(node.type,node.value);
+			quots.lastItem.addDatum(node.type,node.value);
 		} else if(isBranch(type) && isQuotNode(node)) {
 			// add quot to scope stack
 			quots.push(new Context(cx));
@@ -303,4 +304,4 @@ export function compile(o,cx) {
 	},cx));
 }
 
-export const run = (o,cx) => compile(o,cx).pipe(map(cx => cx.apply()));
+export const run = (o,cx) => compile(o,cx).pipe(map(cx => cx.apply()),mergeAll());

@@ -1,9 +1,8 @@
-const parser = require("../lib/parser");
-const compiler = require("../lib/compiler");
+const rdl = require("../lib/index");
 const l3n = require("l3n");
 const n = require("frink");
 
-parser.parseString("1 + 2").pipe(l3n.fromStream,$o => compiler.run($o,{
+rdl.parseString("1 + 2").pipe(l3n.toVNodeStream,$o => rdl.run($o,{
 	modules:{
 		n:n
 	}

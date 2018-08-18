@@ -3,10 +3,12 @@ import { mergeMap } from "rxjs/operators";
 import { find } from "./trie";
 import { reduceAround } from "./rich-reducers";
 import { fromReadStream } from "./node-stream";
+import Triply from "triply";
 
 const ops = require("../operator-trie.json");
 
 const opMap = {
+	801: "subtract",
 	802: "add",
 	903: "divide",
 	904: "multiply",
@@ -48,109 +50,121 @@ const incr = a => a.map(x => {
 	x.d++;
 	return x;
 });
+           (x)
+    $  --- /$ - , 2 - ) on close, nest:
+   /                      \       mark call again
+call                       /call - , 3 ) on close, nest
 */
 
+function handleBinOps(state) {
+	const r = state.r;
+	let lastv;
+	for(let i = 0; i < state.bin; i++) {
+		// handle each mark
+		// mark again so we can peek
+		const cur = r.unmark(i).mark(i).peek();
+		//console.log("bin",_strip(cur));
+		// normal case: last preceeds
+		if(!lastv || lastv > cur.v) {
+			// move to 2nd arg, insert closing paren, peek
+			const close = r.moveNextSibling().insertAfter(closeTpl()).peek();
+			// move back to op`, move to 1st arg, insert opening paren, nest until 2nd arg
+			r.unmark(i).movePreviousSibling().insertBefore(openTpl()).openBefore(cur,close);
+		} else {
+			// we should move out at the end
+			// remove cur
+			r.pop();
+			r.moveNextSibling();
+			// grab the next arg and remove it
+			const arg2 = r.pop();
+			// move to the last operator and goto it's last child
+			r.movePreviousSibling().moveLastChild()
+			// insert the detached 2nd argument, followed by a comma and move to the 1st argument
+				.insertBefore(arg2).insertBefore(commaTpl()).movePreviousSibling()
+			// insert opening paren and open with all siblings (= open + 2nd argument + comma)
+				.insertBefore(openTpl()).openBefore(cur);
+		}
+		lastv = cur.v;
+		Object.assign(cur,commaTpl());
+	}
+
+}
+
 function process(tpl,state) {
-	const t = tpl.t, v = tpl.v;
-	if(t == 4){
+	const t = tpl.t, v = tpl.v, r = state.r;
+	if(t == 1) {
+		const last = r.lastChild();
+		if(last && last.t === 2) {
+			// 1. mark call
+			//console.log("peek",r.peek());
+			state.call = true;
+			// nest entire tree
+			// 2. push comma
+			// TODO add original position to comma
+			r.mark("call").push(commaTpl());
+		} else {
+			r.open(tpl);
+		}
+	} else if(t == 2) {
+		state.r.push(tpl).close();
+		if(state.call) {
+			// $(x)(2) => call($(x),2)
+			state.call = false;
+			r.unmark("call").insertBefore(openTpl()).openBefore({t:6,v:"call"}).close();
+		}
+		/*
+		* 1 * 2 + 3
+		* mult(1,2) + 3
+		* 1 + 2 * 3
+		* add(1,2) * 3 => pre, so nest in last
+		* add(1,2 * 3))
+		* add(1,mult(2,3)) => pre, so next in last (we're in subs, so openBefore )
+		 */
+		//console.log("peek",_strip(r.peek()));
+		if(state.bin) {
+			// mark close so we can return to it
+			r.mark("close");
+			handleBinOps(state);
+			r.unmark("close");
+			state.bin = 0;
+		}
+	} else if(t == 4){
 		if(v == 119 || v == 2003) {
 			if(opMap.hasOwnProperty(v)) tpl.o = opMap[v];
-			state.r = state.r.concat([tpl,{t:1,v:1},{t:2,v:2}]);
+			state.r.push(tpl).open(openTpl()).push(closeTpl()).close();
 		} else if(v > 3800) {
-			state.r = [{t:4,v:v,o:opMap[v]},{t:1,v:1},...state.r,{t:2,v:2}];
-		} else if(v > 300 && v < 2100) {
+			//state.r = [{t:4,v:v,o:opMap[v]},{t:1,v:1},...state.r,{t:2,v:2}];
+			state.r.insertAfter(closeTpl()).movePreviousSibling().insertBefore(openTpl()).openBefore({t:4,v:v,o:opMap[v]});
+		}
+		state.r.push(tpl);
+		if(v > 300 && v < 2100) {
 			const mappedOp = opMap.hasOwnProperty(v) ? opMap[v] : tpl.o;
 			// if original operator is not same, it was an infix operator
 			// so mark it for precedence and closing
+			//console.log(r.peek());
 			if(tpl.o !== mappedOp) {
-				tpl.o = mappedOp;
-				tpl.b = true;
+				r.peek().o = mappedOp;
+				r.mark(state.bin++);
 			}
 		}
+	} else if(t == 6 && /^\$/.test(v)) {
+		// var
+		tpl.v = v.replace(/^\$/,"");
+		state.r.push({t:10,v:"$",o:"$"}).open({t:1,v:1}).push(tpl).push({t:2,v:2}).close();
+	} else if(t === 0) {
 		state.r.push(tpl);
+		if(state.bin) {
+			// mark close so we can return to it
+			r.mark("EOS");
+			handleBinOps(state);
+			r.unmark("EOS");
+			state.bin = 0;
+		}
 	} else {
 		state.r.push(tpl);
 	}
 	state.depth = tpl.d;
 	return state;
-}
-
-function expandBinOps(r) {
-	const ret = [];
-	const o = [];
-	let prev;
-	const idx = {};
-	const closeBin = (last,tpl) => {
-		// close one at same depth
-		if(last) {
-			if(tpl.d <= last.d) {
-				last.closed = ret.length;
-				ret.push(closeTpl(tpl.d));
-				o.pop();
-			}
-			if(tpl.d < last.d) {
-				// close all at lower depth
-				// reset last binary at depth
-				prev = void 0;
-				// recurse
-				closeBin(o.lastItem,tpl);
-			}
-		}
-	};
-	for(var i=0;i<r.length;i++) {
-		const tpl = r[i];
-		const t = tpl.t;
-		if(t === 1 || t === 10 || t === 6) {
-			// keep track depth increases (in the result)
-			ret.push(tpl);
-			idx[tpl.d] = ret.length;
-		} else if(t == 4) {
-			if(tpl.b) {
-				closeBin(o.lastItem,tpl);
-				const last = ret.lastItem;
-				const preceeds = prev && tpl.v > prev.v;
-				// if we have preceding then use its index, else use last opening
-				const insert = preceeds ? prev.i : idx[last.d];
-				//console.log(tpl,ret,insert,last,idx);
-				// if preceding encountered, operator should be swapped, but its close too
-				if(preceeds) {
-				// 1. un-close prev
-					ret.splice(prev.closed,1);
-					// 2. re-mark prev as open
-					o.push(prev);
-				}
-				// default operations:
-				// 3. insert open + tpl
-				ret.splice(insert,0,openTpl());
-				ret.splice(insert,0,tpl);
-				// 4. push comma
-				ret.push(commaTpl());
-				// 5. keep track of insertion point
-				tpl.i = ret.length;
-				// 6. mark as open
-				o.push(tpl);
-				// 7. store as prev
-				prev = tpl;
-			} else {
-				// keep track depth increases (in the result)
-				//console.log("op",tpl);
-				idx[tpl.d] = ret.length;
-				ret.push(tpl);
-			}
-		} else {
-			// some close, unwrap any open ops
-			// we don't want to interfere with bin-op, because it would close them to soon
-			if(t === 3 || t === 2 || t === 0) {
-				closeBin(o.lastItem,tpl);
-				ret.push(tpl);
-				if(t !== 2) idx[tpl.d] = ret.length;
-			} else {
-				ret.push(tpl);
-			}
-		}
-	}
-	//console.log(ret);
-	return ret;
 }
 
 function charReducer(state,next) {
@@ -169,7 +183,7 @@ function charReducer(state,next) {
 	const buffer = state.buffer;
 	const oldString = state.string;
 	//const oldTpl = state.tpl;
-	const zero = oldComment || state.qname || state.var || state.number ? false : oldString === 0;
+	const zero = oldComment || state.qname || state.number ? false : oldString === 0;
 	const b = buffer + char;
 	const tmp = zero ? find(state.trie,char,b,state.path) : [[],[]];
 	const trie = tmp[0];
@@ -214,17 +228,16 @@ function charReducer(state,next) {
 	} else {
 		type = 0;
 	}
-	//console.log("ct",char,type);
+	//console.log("ct",char,type,zero,next);
 	//if((type == 802 || type == 904 || type == 2003) && state.lastQname && types.includes(state.lastQname.v)) {
 	//	type += 3000;
 	//}
-	let variable = (zero && type == 9) || (state.var && type != 10);
+	//
 	let number = (zero && (type == 11 || (type == 8 && oldType != 8 && /[0-9]/.test(next)))) || (state.number && (type === 0 || type == 11));
-	let qname = (zero && !variable && !number && type != 10 && match == 2) || (state.qname && type != 10);
-	let stop = ((variable || qname) && /[^a-zA-Z0-9\-_:]/.test(next)) || (number && /[^0-9.]/.test(next));
-	if(stop && !state.var) variable = false;
+	let qname = (zero && !number && type != 10 && match == 2) || (state.qname && type != 10);
+	let stop = (qname && /[^a-zA-Z0-9\-_:]/.test(next)) || (number && /[^0-9.]/.test(next));
 	let flag;
-	if(variable || number || qname) {
+	if(number || qname) {
 		flag = 0;
 	} else if(zero) {
 		if(type == 6 || type == 7) {
@@ -255,7 +268,9 @@ function charReducer(state,next) {
 	let tpl;
 	if(!flag) {
 		if(stop && type != 9) {
-			tpl = {t:variable ? 5 : number ? 8 : 6,v:b};
+			tpl = {t:number ? 8 : 6,v:b};
+		} else if(number && type == 8) {
+			// continue
 		} else if(match != 2 && match !== 0) {
 			let t = type == 1 || type == 3 || type == 2001 ? 1 :
 				type == 2 || type == 4 || type == 2002 ? 2 :
@@ -282,7 +297,6 @@ function charReducer(state,next) {
 	if(qname) state.lastQname = tpl;
 	// FIXME hack to skip a char
 	state.char = flag == 4 ? void 0 : next;
-	state.var = variable && !stop;
 	state.number = number && !stop;
 	state.qname = qname && !stop;
 	state.type = type;
@@ -349,14 +363,11 @@ function toL3(ret,entry,last,next){
 			}
 		}
 	} else if($t == 2) {
-		if(next && next.t == 1 && next.v == 1) {
-			r = [18];
-		} else {
-			r = [17];
-		}
+		r = [17];
 	} else if($t == 7) {
 		r = [3,$v];
 	} else if($t == 8) {
+		if(/^\./.test($v)) $v = "0" + $v;
 		r = [12,$v];
 	} else if($t == 6) {
 		if(/#[0-9]$/.test($v)) {
@@ -382,12 +393,14 @@ function toL3(ret,entry,last,next){
 	return ret;
 }
 
-const tokenize = function(state,$chars) {
+export const tokenize = state => $chars => {
 	return Observable.create($o => {
 		$chars.subscribe({
 			next(cur) {
 				charReducer(state,cur);
-				if(state.emit) $o.next(state.emit);
+				if(state.emit) {
+					$o.next(state.emit);
+				}
 			},
 			complete() {
 				charReducer(state,EOF);
@@ -400,46 +413,50 @@ const tokenize = function(state,$chars) {
 	});
 	//return $chars.scan((state,cur) => charReducer(state,cur),state).filter(state => state.emit).map(state => state.emit);
 };
+//const dollarRE = /^\$/;
+//const _strip = x => x && Object.entries(x).reduce((a,[k,v]) => dollarRE.test(k) ? a : (a[k] = v,a),{});
 
-function lex($tpls) {
-	let state = {
+const initLexerState = () => {
+	return {
 		emit:false,
 		depth:0,
-		i:{},
-		r:[],
-		o:[]
+		r:new Triply(),
+		call:false,
+		bin:0
 	};
+};
+
+export function lex($tpls) {
+	let state = initLexerState();
 	return Observable.create($o => {
 		$tpls.subscribe({
 			next(tpl){
 				const r = state.r;
 				let depth = state.depth;
-				//console.log(tpl,r,depth);
-
 				if(tpl.t == 2) {
 					depth--;
 					if(depth < 0) {
-						console.log(r);
 						throw new Error("Incorrect depth of close");
 					}
 					if(!state.tpl || state.tpl.t == 3) throw new Error("Incorrect position of close");
 				} else if(tpl.t == 1) {
-					state.i[depth] = r.length;
+					//state.i[depth] = r.length;
 					depth++;
 				}
 				tpl.d = depth;
 				//console.log(depth,tpl);
-				state = process(tpl,state,r);
+				state = process(tpl,state);
 				state.tpl = tpl;
 				// never emit tpl, oldTpl can be overriden
 				if(tpl.t === 0) {
 					if(depth !== 0){
-						console.log(tpl);
+						//console.log(tpl);
 						throw new Error("Incorrect depth at EOF");
 					}
-					reduceAround(expandBinOps(state.r),toL3,$o);
+					r.moveRoot().pop();
+					reduceAround(r.traverse(),toL3,$o);
 					//$o.next(expandBinOps(state.r).reduce(toRdl,""));
-					state.r = [];
+					state.r = new Triply();
 				}
 			},
 			complete(){
@@ -448,14 +465,13 @@ function lex($tpls) {
 	});
 }
 
-const initTokenState = () => {
+export const initTokenState = () => {
 	return {
 		type:0,
 		buffer:"",
 		string:0,
 		flag:0,
 		trie:ops,
-		var:false,
 		ws:false,
 		number:false,
 		comment:false,
@@ -468,8 +484,6 @@ const initTokenState = () => {
 	};
 };
 
-const boundTokenize = tokenize.bind(null,initTokenState());
+export const parse = path => fromReadStream(path).pipe(mergeMap(chunk => from(chunk.toString())),tokenize(initTokenState()),lex);
 
-export const parse = path => fromReadStream(path).pipe(mergeMap(chunk => from(chunk.toString())),boundTokenize,lex);
-
-export const parseString = str => from(str).pipe(boundTokenize,lex);
+export const parseString = str => from(str).pipe(tokenize(initTokenState()),lex);

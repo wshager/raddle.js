@@ -10,7 +10,7 @@
   ],
   "description": "Extensible document manipulation language for the web",
   "scripts": {
-    "build": "babel src --out-dir lib"
+    "build": "babel --no-babelrc --plugins @babel/plugin-transform-modules-commonjs src --out-dir lib -s"
   },
   "repository": {
     "type": "git",
@@ -20,8 +20,13 @@
     "Wouter Hager <wshager@gmail.com>"
   ],
   "dependencies": {
+    "@babel/cli": "^7.0.0-beta.53",
+    "@babel/core": "^7.0.0-beta.53",
+    "@babel/plugin-transform-modules-commonjs": "^7.0.0-beta.53",
     "array-last-item": "0.0.3",
-    "rxjs": "^6.2.1"
+    "l3n": "0.0.6",
+    "rxjs": "^6.2.1",
+    "triply": "0.0.13"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

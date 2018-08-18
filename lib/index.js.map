@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/index.js"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAAA;;AAEA;;AAEA","sourcesContent":["import {} from \"array-last-item\";\r\n\r\nexport { compile, run } from \"./compiler\";\r\n\r\nexport { parse, parseString } from \"./parser\";\r\n"],"file":"index.js"}

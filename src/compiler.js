@@ -1,9 +1,9 @@
 // TODO detect AND/OR and convert to quotation
-import { isLeaf, isBranch, isClose, isDirect, fromStream } from "l3n";
+import { isLeaf, isBranch, isClose, toVNodeStream } from "l3n";
 import { parse } from "./parser";
 import { prefixAndName, normalizeName } from "./compiler-util";
-import { ReplaySubject } from "rxjs";
-import { reduce, map, mergeAll } from "rxjs/operators";
+import { ReplaySubject, isObservable } from "rxjs";
+import { reduce, map, mergeMap, mergeAll } from "rxjs/operators";
 import { $_, papplyAny } from "./papply";
 
 //const compose = (...fns) => fns.reduce((f, g) => (...args) => f(g(...args)));
@@ -64,19 +64,23 @@ class Context {
 		this.append(new Call("module",length,ref));
 	}
 	addImport(length) {
-		const ref = (prefix,loc) => {
+		const ref = (prefix,ns,loc) => {
+			if(length == 2) loc = ns;
 			this.refsToResolve[prefix] = {};
 			// TODO merge properly
-			compile(fromStream(parse(loc)),this).subscribe(cx => {
-				cx.apply().subscribe(() => {
-					const module = cx.modules[prefix];
-					Object.entries(this.refsToResolve[prefix]).forEach(([k,v]) => {
-						v.next(module[k]);
-						v.complete();
-					});
+			const self = this;
+			return parse("../raddled/"+loc+".rdl").pipe(toVNodeStream,x => compile(x,this),mergeMap(cx => {
+				const ret = cx.apply();
+				//console.log(ret);
+				return ret;
+			}),map(() => {
+				const module = self.modules[prefix];
+				Object.entries(self.refsToResolve[prefix]).forEach(([k,v]) => {
+					v.next(module[k]);
+					v.complete();
 				});
-			});
-			return NOOP;
+				return self;
+			}));
 		};
 		this.append(new Call("import",length,ref));
 	}
@@ -132,7 +136,7 @@ class Context {
 		return NOOP;
 	}
 	addCall(qname,length) {
-		if(!qname) console.trace(qname,length);
+		//if(!qname) console.trace(qname,length);
 		this.append(new Call(qname,length));
 	}
 	addDatum(type,value) {
@@ -170,8 +174,16 @@ class Context {
 				// if last.ref is Subject, evaluation must be deferred:
 				// take next from the stack when ref is resolved
 				last.apply(this,_args).subscribe(ret => {
-					if(ret !== NOOP) stack.push(ret);
-					next(i+1);
+					if(isObservable(ret)) {
+						ret.subscribe({
+							complete(){
+								next(i+1);
+							}
+						});
+					} else {
+						if(ret !== NOOP) stack.push(ret);
+						next(i+1);
+					}
 				});
 			} else if(isVar(last)) {
 				if(last.isParam) {
@@ -247,7 +259,7 @@ class Call {
 	}
 }
 
-export function compile(o,cx) {
+export const compile = cx => o => {
 	cx = new Context(cx);
 	const quots = [cx];
 	// this is a reduction into a single result
@@ -290,9 +302,6 @@ export function compile(o,cx) {
 					target.addCall(refNode.name,refNode.count());
 				}
 			}
-		} else if(isDirect(type)) {
-			// call last on stack
-			quots.lastItem.addDirect(node.node);
 		} else if(isLeaf(type)) {
 			quots.lastItem.addDatum(node.type,node.value);
 		} else if(isBranch(type) && isQuotNode(node)) {
@@ -301,6 +310,6 @@ export function compile(o,cx) {
 		}
 		return cx;
 	},cx));
-}
+};
 
 export const run = (o,cx) => compile(o,cx).pipe(map(cx => cx.apply()),mergeAll());

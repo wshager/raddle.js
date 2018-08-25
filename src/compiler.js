@@ -1,16 +1,17 @@
 // TODO detect AND/OR and convert to quotation
 import { isLeaf, isBranch, isClose, toVNodeStream } from "l3n";
-import { parse } from "./parser";
+import { parse, parseString } from "./parser";
 import { prefixAndName, normalizeName } from "./compiler-util";
-import { ReplaySubject, isObservable } from "rxjs";
-import { reduce, map, mergeMap, mergeAll } from "rxjs/operators";
-import { $_, papplyAny } from "./papply";
+import { Observable, isObservable, pipe } from "rxjs";
+import { reduce, map, switchMap, mergeMap } from "rxjs/operators";
+import { $_ /*, papplyAny*/ } from "./papply";
 
 //const compose = (...fns) => fns.reduce((f, g) => (...args) => f(g(...args)));
 
 //const ifRe = /^(n:)?if$/;
 //const andRe = /^(n:)?and$/;
 //const orRe = /^(n:)?or$/;
+//const andOrRe = /^(n\.)?(and|or)$/;
 
 const isCallNode = node => node && node.type == 14;
 const isQuotNode = node => node && node.type == 15;
@@ -26,7 +27,7 @@ const isPartialNode = node => isCallNode(node) && node.name == "$_";
 //const isOrNode = node => isCallNode(node) && orRe.test(node.name);
 
 const isCall = x => x && x instanceof Call;
-const isQuot = x => x && x instanceof Context;
+const isQuot = x => x && x instanceof Quot;
 const isVar = x => x && x instanceof Var;
 //const isParam = x => x && x instanceof Var && x.isParam;
 const NOOP = {__noop:true};
@@ -34,6 +35,7 @@ const NOOP = {__noop:true};
 // TODO module namespace
 class Context {
 	constructor(props = {}) {
+		this.core = props.core;
 		this.modules = props.modules || {};
 		this.stack = [];
 		this.length = 0;
@@ -68,18 +70,14 @@ class Context {
 			if(length == 2) loc = ns;
 			this.refsToResolve[prefix] = {};
 			// TODO merge properly
-			const self = this;
-			return parse("../raddled/"+loc+".rdl").pipe(toVNodeStream,x => compile(x,this),mergeMap(cx => {
-				const ret = cx.apply();
-				//console.log(ret);
-				return ret;
-			}),map(() => {
-				const module = self.modules[prefix];
-				Object.entries(self.refsToResolve[prefix]).forEach(([k,v]) => {
+			const cx = this;
+			return run("../raddled/"+loc+".rdl")(cx).pipe(map(() => {
+				const module = cx.modules[prefix];
+				Object.entries(cx.refsToResolve[prefix]).forEach(([k,v]) => {
 					v.next(module[k]);
 					v.complete();
 				});
-				return self;
+				return cx;
 			}));
 		};
 		this.append(new Call("import",length,ref));
@@ -89,37 +87,41 @@ class Context {
 			const { prefix, name } = normalizeName(qname);
 			const module = this.modules[prefix];
 			if(!module) throw new Error(`Module "${prefix}" has not been formally declared`);
-			if(isQuot(body)) {
-				// add an object that serves as a proxy (i.e. can be applied)
-				if(!module[name]) module[name] = {
-					apply(self,args) {
-						const ref = this[args.length];
-						if(!ref) throw new Error(`Incorrect number of parameters for ${qname}, received ${args.length}, have ${Object.keys(this)}`);
-						return ref.apply(self,args);
-					}
-				};
-				// TODO add type
+			if(body === undefined) {
+				// bind in core
+				body = this.core[name];
+				if(body) module[name] = type(body);
+			} else if(isQuot(body)) {
+				// add a function that serves as a proxy (i.e. can be applied)
+				if(!module[name]) {
+					module[name] = {
+						apply(self,args) {
+							const ref = this[args.length];
+							if(!ref) throw new Error(`Incorrect number of parameters for ${qname}, received ${args.length}, have ${Object.keys(this)}`);
+							return type(ref.call.bind(ref,self))(...args);
+						}
+					};
+				}
 				module[name][body.length] = body;
 			} else {
-				module[name] = body;
+				module[name] = type(body);
 			}
+			// perhaps we should just return the export / thing itself
 			return NOOP;
 		};
-		this.append(new Call("export",length,length == 2 ? papplyAny(ref,$_,() => {},$_) : ref));
+		this.append(new Call("export",length,ref));
 	}
 	getRef(qname) {
 		const modules = this.modules;
+		const core = this.core;
 		const { prefix, name } = normalizeName(qname,"n");
 		if(modules.hasOwnProperty(prefix)) {
-			return modules[prefix][name];
+			const ref = modules[prefix][name];
+			if(ref) return ref;
+			if(prefix === "n" && core[name]) return core[name];
+			throw new Error(`Could not resolve ${name} in module ${prefix}`);
 		} else {
-			//console.log("no module found",prefix);
-			// deferring module entry as a ReplaySubject
-			const rts = this.refsToResolve;
-			if(!rts.hasOwnProperty(prefix)) throw new Error(`Import of prefix ${prefix} not yet encountered`);
-			const def = new ReplaySubject();
-			if(!rts[prefix].hasOwnProperty(name)) rts[prefix][name] = def;
-			return def;
+			throw new Error("no module found: "+prefix);
 		}
 	}
 	isBoundQname(qname) {
@@ -135,9 +137,9 @@ class Context {
 		this.scope[qname] = value;
 		return NOOP;
 	}
-	addCall(qname,length) {
+	addCall(qname,length,isDef) {
 		//if(!qname) console.trace(qname,length);
-		this.append(new Call(qname,length));
+		this.append(new Call(qname,length,undefined,isDef));
 	}
 	addDatum(type,value) {
 		if(type !== 8) this.append(value);
@@ -146,77 +148,76 @@ class Context {
 		this.stack.push(item);
 	}
 	apply(self,args){
-		// TODO first arg is external?
+		// TODO
+		// - first arg is external?
+		// - prevent recursion
+		// - prevent type checks: just use method for stack/next on each type
 		// evaluation stack
 		var stack = [];
-		var ret = new ReplaySubject();
 		const len = this.stack.length;
 		//for(let i = 0, len = this.stack.length; i < len; i++) {
-		const next = (i) => {
-			if(i == len) {
+		const next = (i,$o) => {
+			if(i === len) {
 				const last = stack.pop();
-				if(last instanceof ReplaySubject) {
-					last.subscribe(ret);
-				} else {
-					ret.next(last);
-					ret.complete();
+				if($o) {
+					$o.next(last);
+					$o.complete();
+					return $o;
 				}
-				return;
+				return last;
 			}
 			const last = this.stack[i];
 			if(isQuot(last)) {
-				stack.push(last);
-				next(i+1);
+				stack.push(last.call.bind(last,this));
+				return next(i+1,$o);
 			} else if(isCall(last)) {
 				const len = last.length;
+				if(stack.length < len) throw new Error("Stack underflow");
 				const _args = stack.splice(-len,len);
-				// TODO original stack as Observable
-				// if last.ref is Subject, evaluation must be deferred:
-				// take next from the stack when ref is resolved
-				last.apply(this,_args).subscribe(ret => {
-					if(isObservable(ret)) {
-						ret.subscribe({
-							complete(){
-								next(i+1);
-							}
-						});
-					} else {
-						if(ret !== NOOP) stack.push(ret);
-						next(i+1);
-					}
-				});
+				const ret = last.apply(this,_args);
+				if(last.qname == "import") {
+					ret.subscribe({
+						complete(){
+							next(i+1,$o);
+						}
+					});
+				} else {
+					if(ret !== NOOP) stack.push(ret);
+					return next(i+1,$o);
+				}
 			} else if(isVar(last)) {
 				if(last.isParam) {
 					// pop the index, push the arg
 					const index = stack.pop();
 					stack.push(args[index - 1]);
-					next(i+1);
+					return next(i+1,$o);
 				} else {
 					// treat vars as Calls
 					const len = last.length;
 					const _args = stack.splice(-len,len);
 					const ref = last.apply(self,_args);
-					if(last.isAssig) {
-						next(i+1);
+					if(!last.isAssig) {
+						stack.push(ref);
 					} else {
-						if(ref instanceof ReplaySubject) {
-							ref.subscribe((x) => {
-								stack.push(x);
-								next(i+1);
-							});
-						} else {
-							stack.push(ref);
-							next(i+1);
-						}
+						stack.push(null);
 					}
+					return next(i+1,$o);
 				}
 			} else {
 				stack.push(last);
-				next(i+1);
+				return next(i+1,$o);
 			}
 		};
-		next(0);
-		return ret;
+		if(isQuot(this)) {
+			return next(0);
+		} else {
+			return Observable.create($o => {
+				next(0,$o);
+			});
+		}
+	}
+	call(self,...args) {
+		return this.apply(self,args);
 	}
 }
 class Var {
@@ -239,25 +240,32 @@ class Var {
 	}
 }
 
+class Quot extends Context {
+}
+
 class Call {
-	constructor(qname,length,ref) {
+	constructor(qname,length,ref,isDef) {
 		this.qname = qname;
 		this.length = length;
 		this.ref = ref;
+		this.isDef = isDef;
 	}
 	apply(cx,args) {
 		const ref = this.ref || cx.getRef(this.qname,this.length);
-		if(ref instanceof ReplaySubject) {
-			return ref.pipe(map(ref => ref.apply(this,args)));
-		} else {
-			const ret = ref.apply(this,args);
-			let sub = new ReplaySubject();
-			sub.next(ret);
-			sub.complete();
-			return sub;
+		// TODO generalize...
+		if(this.isDef) {
+			args.unshift(this.isDef);
 		}
+		return ref.apply(this,args);
 	}
 }
+
+export const prepare = (core,prefix="n",path="../raddled/") => {
+	// pre-compile core
+	core.jsArray = (...a) => a;
+	const cx = new Context({core:core,modules:{local:{}}});
+	return run(path+prefix+".rdl")(cx).pipe(map(() => cx));
+};
 
 export const compile = cx => o => {
 	cx = new Context(cx);
@@ -299,17 +307,37 @@ export const compile = cx => o => {
 					target.append($_);
 				} else if(isCallNode(refNode)){
 					// handle call
-					target.addCall(refNode.name,refNode.count());
+					let name = refNode.name;
+					let isDef;
+					// TODO generalize
+					// Use array and seq indifferently
+					// and always apply interop higher-order functions.
+					// Functions from implementation provide seqs
+					// while inline stuff is just arrays
+					if(name == "function") {
+						name = "def";
+						isDef = refNode.parent.first();
+						if(typeof isDef !== "string") isDef = "_";
+					} else if(name == "") {
+						if(refNode.parent.name == "function") {
+							name = "jsArray";
+						} else {
+							name = "seq";
+						}
+					}
+					target.addCall(name,refNode.count(),isDef);
 				}
 			}
 		} else if(isLeaf(type)) {
 			quots.lastItem.addDatum(node.type,node.value);
 		} else if(isBranch(type) && isQuotNode(node)) {
 			// add quot to scope stack
-			quots.push(new Context(cx));
+			quots.push(new Quot(cx));
 		}
 		return cx;
 	},cx));
 };
 
-export const run = (o,cx) => compile(o,cx).pipe(map(cx => cx.apply()),mergeAll());
+const runnable = cx => pipe(toVNodeStream,compile(cx),switchMap(cx => cx.apply()),mergeMap(x => isObservable(x) ? x : [x]));
+export const run = str => cx => runnable(cx)(parse(str));
+export const runString = str => cx => runnable(cx)(parseString(str));

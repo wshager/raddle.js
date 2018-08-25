@@ -1,5 +1,5 @@
 import {} from "array-last-item";
 
-export { compile, run } from "./compiler";
+export { compile, prepare, run, runString } from "./compiler";
 
 export { parse, parseString } from "./parser";

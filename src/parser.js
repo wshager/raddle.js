@@ -1,7 +1,7 @@
 import { Observable, from } from "rxjs";
 import { mergeMap } from "rxjs/operators";
 import { find } from "./trie";
-import { reduceAround } from "./rich-reducers";
+import { reduce, reduceAround } from "./rich-reducers";
 import { fromReadStream } from "./node-stream";
 import Triply from "triply";
 
@@ -12,14 +12,14 @@ const opMap = {
 	802: "add",
 	903: "divide",
 	904: "multiply",
-	5003: "zero-or-one",
-	3904: "zero-or-more",
-	3802: "one-or-more",
-	2003: "$_"
+	5003: "maybe",
+	3904: "any",
+	3802: "many",
+	2003: "$_",
+	1500: "cast-as"
 };
 
-/*
-const types = [
+const simpleTypes = [
 	"item",
 	"atomic",
 	"string",
@@ -28,22 +28,40 @@ const types = [
 	"number",
 	"double",
 	"decimal",
-	"float",
+	"float"
+];
+
+const complexTypes = [
 	"function",
 	"array",
 	"map"
 ];
-*/
+
+const kinds = [
+	"document-node",
+	"element",
+	"attribute",
+	"processing-instruction",
+	"comment",
+	"text",
+	"node"
+];
+
+const andOrRe = /^(n:)?(and|or)$/;
 
 const EOF = String.fromCharCode(25);
 
-const tpl = (t,v,o,d) => { return {t:t,v:v,o:o,d:d}; };
+const tpl = (t,v,o) => { return {t:t,v:v,o:o}; };
 
-const openTpl = (d = 0) => tpl(1,1,"(",d);
+const openParen = () => tpl(1,1,"(");
 
-const commaTpl = (d = 0) => tpl(3,100,",",d);
+const comma = () => tpl(3,100,",");
 
-const closeTpl = (d = 0) => tpl(2,2,")",d);
+const closeParen = () => tpl(2,2,")");
+
+const openCurly = () => tpl(1,3,"{");
+
+const closeCurly = () => tpl(2,4,"}");
 
 /*
 const incr = a => a.map(x => {
@@ -55,21 +73,37 @@ const incr = a => a.map(x => {
    /                      \       mark call again
 call                       /call - , 3 ) on close, nest
 */
-
-function handleBinOps(state) {
+function handleBinOps(state,d) {
 	const r = state.r;
 	let lastv;
-	for(let i = 0; i < state.bin; i++) {
+	for(let i = 0; i < state.bin[d]; i++) {
 		// handle each mark
 		// mark again so we can peek
-		const cur = r.unmark(i).mark(i).peek();
-		//console.log("bin",_strip(cur));
+		const bm = d+":"+i;
+		const cur = r.unmark(bm).mark(bm).peek();
+		// treat and/or
+		if(andOrRe.test(cur.o)) {
+			// wrap the first arg
+			const close = r.movePreviousSibling().insertAfter(closeCurly()).peek();
+			r.movePreviousSibling().openBefore(openCurly(),close);
+			r.unmark(bm).mark(bm);
+			// wrap the snd arg
+			const close2 = r.moveNextSibling().insertAfter(closeCurly()).peek();
+			r.movePreviousSibling().openBefore(openCurly(),close2);
+			r.unmark(bm).mark(bm);
+		}
 		// normal case: last preceeds
 		if(!lastv || lastv > cur.v) {
 			// move to 2nd arg, insert closing paren, peek
-			const close = r.moveNextSibling().insertAfter(closeTpl()).peek();
+			let close;
+			if(Triply.isBranch(cur)) {
+				close = r.moveNextSibling().peek();
+				r.insertBefore(closeParen());
+			} else {
+				close = r.moveNextSibling().insertAfter(closeParen()).peek();
+			}
 			// move back to op`, move to 1st arg, insert opening paren, nest until 2nd arg
-			r.unmark(i).movePreviousSibling().insertBefore(openTpl()).openBefore(cur,close);
+			r.unmark(bm).movePreviousSibling().insertBefore(openParen()).openBefore(cur,close);
 		} else {
 			// we should move out at the end
 			// remove cur
@@ -79,38 +113,44 @@ function handleBinOps(state) {
 			const arg2 = r.pop();
 			// move to the last operator and goto it's last child
 			r.movePreviousSibling().moveLastChild()
-			// insert the detached 2nd argument, followed by a comma and move to the 1st argument
-				.insertBefore(arg2).insertBefore(commaTpl()).movePreviousSibling()
+			// insert the detached 2nd argument, add close paren and move after it, add a comma and move to the 1st argument
+				.insertBefore(arg2).insertAfter(closeParen()).movePreviousSibling().insertBefore(comma()).movePreviousSibling()
 			// insert opening paren and open with all siblings (= open + 2nd argument + comma)
-				.insertBefore(openTpl()).openBefore(cur);
+				.insertBefore(openParen()).openBefore(cur);
 		}
 		lastv = cur.v;
-		Object.assign(cur,commaTpl());
+		Object.assign(cur,comma());
 	}
 
 }
 
 function process(tpl,state) {
 	const t = tpl.t, v = tpl.v, r = state.r;
+	const d = state.depth;
+	//console.log(t,v,tpl.o);
 	if(t == 1) {
 		const last = r.lastChild();
 		if(last && last.t === 2) {
 			// 1. mark call
-			//console.log("peek",r.peek());
-			state.call = true;
+			state.call[d] = true;
+			//console.log("opencall",d,_strip(r.peek()));
 			// nest entire tree
 			// 2. push comma
 			// TODO add original position to comma
-			r.mark("call").push(commaTpl());
+			r.mark("call"+d).push(comma());
 		} else {
 			r.open(tpl);
 		}
 	} else if(t == 2) {
+		// FIXME treat all bin-ops in same depth, not just on close
+		//console.log(state.depth,_strip(state.r.previous()));
 		state.r.push(tpl).close();
-		if(state.call) {
+		const cd = d - 1;
+		if(state.call[cd]) {
 			// $(x)(2) => call($(x),2)
-			state.call = false;
-			r.unmark("call").insertBefore(openTpl()).openBefore({t:6,v:"call"}).close();
+			state.call[cd] = false;
+			//console.log("call",r.peek());
+			r.unmark("call"+cd).insertBefore(openParen()).openBefore({t:6,v:"call"}).close();
 		}
 		/*
 		* 1 * 2 + 3
@@ -120,45 +160,52 @@ function process(tpl,state) {
 		* add(1,2 * 3))
 		* add(1,mult(2,3)) => pre, so next in last (we're in subs, so openBefore )
 		 */
-		//console.log("peek",_strip(r.peek()));
-		if(state.bin) {
+		if(state.bin[d]) {
+			//console.log("peek-close",_strip(r.peek()));
 			// mark close so we can return to it
 			r.mark("close");
-			handleBinOps(state);
+			handleBinOps(state,d);
 			r.unmark("close");
-			state.bin = 0;
+			state.bin[d] = null;
 		}
 	} else if(t == 4){
+		if(v == 802 || v == 904 || v == 2003) {
+			const last = r.peek();
+			const test = last && (last.o || last.v);
+			const isEmpty = x => x && Triply.nextSibling(Triply.firstChild(x)) == Triply.lastChild(x);
+			//console.log(v,test,isEmpty(last));
+			if(test && ((simpleTypes.includes(test) && isEmpty(last)) || complexTypes.includes(test) || kinds.includes(test))) {
+				const nv = v + 3000;
+				state.r.insertAfter(closeParen()).movePreviousSibling().insertBefore(openParen()).openBefore({t:4,v:nv,o:opMap[nv]});
+				return state;
+			}
+		}
 		if(v == 119 || v == 2003) {
 			if(opMap.hasOwnProperty(v)) tpl.o = opMap[v];
-			state.r.push(tpl).open(openTpl()).push(closeTpl()).close();
-		} else if(v > 3800) {
-			//state.r = [{t:4,v:v,o:opMap[v]},{t:1,v:1},...state.r,{t:2,v:2}];
-			state.r.insertAfter(closeTpl()).movePreviousSibling().insertBefore(openTpl()).openBefore({t:4,v:v,o:opMap[v]});
-		}
-		state.r.push(tpl);
-		if(v > 300 && v < 2100) {
-			const mappedOp = opMap.hasOwnProperty(v) ? opMap[v] : tpl.o;
-			// if original operator is not same, it was an infix operator
-			// so mark it for precedence and closing
-			//console.log(r.peek());
-			if(tpl.o !== mappedOp) {
-				r.peek().o = mappedOp;
-				r.mark(state.bin++);
-			}
+			state.r.push(tpl).open(openParen()).push(closeParen()).close();
+		} else if(v >= 300 && v < 2100) {
+			// add prefix to distinguish between infix operators and equivalent functions
+			const mappedOp = opMap.hasOwnProperty(v) ? opMap[v] : "n:"+tpl.o;
+			tpl.o = mappedOp;
+			state.r.push(tpl);
+			if(!state.bin[d]) state.bin[d] = 0;
+			r.mark(d+":"+state.bin[d]++);
+		} else {
+			state.r.push(tpl);
 		}
 	} else if(t == 6 && /^\$/.test(v)) {
 		// var
 		tpl.v = v.replace(/^\$/,"");
-		state.r.push({t:10,v:"$",o:"$"}).open({t:1,v:1}).push(tpl).push({t:2,v:2}).close();
+		if(/[0-9]/.test(tpl.v)) tpl.t = 8;
+		state.r.push({t:10,v:"$",o:"$"}).open(openParen()).push(tpl).push(closeParen()).close();
 	} else if(t === 0) {
 		state.r.push(tpl);
-		if(state.bin) {
+		if(state.bin[d]) {
 			// mark close so we can return to it
 			r.mark("EOS");
-			handleBinOps(state);
+			handleBinOps(state,d);
 			r.unmark("EOS");
-			state.bin = 0;
+			state.bin[d] = null;
 		}
 	} else {
 		state.r.push(tpl);
@@ -211,6 +258,7 @@ function charReducer(state,next) {
 			match = 2;
 		}
 	}
+	if(next == "-" && match == 1) match = 0;
 	let type;
 	// skip anything but closers
 	if(match == 1) {
@@ -228,14 +276,19 @@ function charReducer(state,next) {
 	} else {
 		type = 0;
 	}
-	//console.log("ct",char,type,zero,next);
+	//console.log("ct",char,type,trie);
 	//if((type == 802 || type == 904 || type == 2003) && state.lastQname && types.includes(state.lastQname.v)) {
 	//	type += 3000;
 	//}
 	//
+	const isVar = (type == 9 && next != "(");
+	if(isVar) {
+		match = type = 0;
+	}
 	let number = (zero && (type == 11 || (type == 8 && oldType != 8 && /[0-9]/.test(next)))) || (state.number && (type === 0 || type == 11));
-	let qname = (zero && !number && type != 10 && match == 2) || (state.qname && type != 10);
+	let qname = (zero && !number && type != 10 && match == 2) || (state.qname && type != 10) || isVar;
 	let stop = (qname && /[^a-zA-Z0-9\-_:]/.test(next)) || (number && /[^0-9.]/.test(next));
+	//console.log("ct",char,type,state);
 	let flag;
 	if(number || qname) {
 		flag = 0;
@@ -284,7 +337,6 @@ function charReducer(state,next) {
 	} else if(flag == 2 || flag == 4) {
 		tpl = {t:flag == 2 ? 7 : 9,v:buffer};
 	}
-
 	// if the result is an array, it was expanded
 	// in this case, emit will be overridden by process...
 	// we should only just buffer 2 levels of depth:
@@ -329,9 +381,10 @@ function charReducer(state,next) {
 	return state;
 }
 
-/*
-function toRdl(ret,entry) {
+function toRdl($o,entry) {
+	//console.log(_strip(entry))
 	const t = entry.t, v = entry.v;
+	let ret = "";
 	if(t === 0) {
 		ret += (";\n\n");
 	} else if(t == 7) {
@@ -340,15 +393,16 @@ function toRdl(ret,entry) {
 		ret += (v);
 	} else if(t == 9) {
 		ret += ("(:"+v+":)");
-	} else {
+	} else if(entry.o){
 		ret += (entry.o);
 	}
-	return ret;
+	$o.next(ret);
+	return $o;
 }
-*/
+
 
 function toL3(ret,entry,last,next){
-	//console.log(ret,entry,last,next);
+	//console.log(_strip(entry));
 	let $t = entry.t;
 	let $v = entry.v;
 	let r = [];
@@ -399,6 +453,7 @@ export const tokenize = state => $chars => {
 			next(cur) {
 				charReducer(state,cur);
 				if(state.emit) {
+					//console.log(state.emit);
 					$o.next(state.emit);
 				}
 			},
@@ -413,20 +468,21 @@ export const tokenize = state => $chars => {
 	});
 	//return $chars.scan((state,cur) => charReducer(state,cur),state).filter(state => state.emit).map(state => state.emit);
 };
-//const dollarRE = /^\$/;
-//const _strip = x => x && Object.entries(x).reduce((a,[k,v]) => dollarRE.test(k) ? a : (a[k] = v,a),{});
+const dollarRE = /^\$/;
+const _strip = x => x && Object.entries(x).reduce((a,[k,v]) => dollarRE.test(k) ? a : (a[k] = v,a),{});
 
 const initLexerState = () => {
 	return {
 		emit:false,
 		depth:0,
 		r:new Triply(),
-		call:false,
-		bin:0
+		call:[],
+		bin:[]
 	};
 };
 
-export function lex($tpls) {
+export const lex = props => $tpls => {
+	const rdl = props.rdl;
 	let state = initLexerState();
 	return Observable.create($o => {
 		$tpls.subscribe({
@@ -454,7 +510,11 @@ export function lex($tpls) {
 						throw new Error("Incorrect depth at EOF");
 					}
 					r.moveRoot().pop();
-					reduceAround(r.traverse(),toL3,$o);
+					if(rdl) {
+						reduce(r.traverse(),toRdl,$o);
+					} else {
+						reduceAround(r.traverse(),toL3,$o);
+					}
 					//$o.next(expandBinOps(state.r).reduce(toRdl,""));
 					state.r = new Triply();
 				}
@@ -463,7 +523,7 @@ export function lex($tpls) {
 				$o.complete();
 			}});
 	});
-}
+};
 
 export const initTokenState = () => {
 	return {
@@ -484,6 +544,6 @@ export const initTokenState = () => {
 	};
 };
 
-export const parse = path => fromReadStream(path).pipe(mergeMap(chunk => from(chunk.toString())),tokenize(initTokenState()),lex);
+export const parse = (path,props = {}) => fromReadStream(path).pipe(mergeMap(chunk => from(chunk.toString())),tokenize(initTokenState()),lex(props));
 
-export const parseString = str => from(str).pipe(tokenize(initTokenState()),lex);
+export const parseString = (str,props = {}) => from(str).pipe(tokenize(initTokenState()),lex(props));

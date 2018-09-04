@@ -16,22 +16,16 @@
     "type": "git",
     "url": "git+ssh://git@github.com/wshager/raddle.git"
   },
-  "maintainers": [
-    "Wouter Hager <wshager@gmail.com>"
-  ],
   "dependencies": {
-    "@babel/cli": "^7.0.0-beta.53",
-    "@babel/core": "^7.0.0-beta.53",
-    "@babel/plugin-transform-modules-commonjs": "^7.0.0-beta.53",
-    "array-last-item": "0.0.3",
+    "array-last-item": "0.0.6",
     "l3n": "0.0.6",
     "rxjs": "^6.2.1",
     "triply": "0.0.13"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.3",
-    "babel-preset-env": "^1.7.0"
+    "@babel/cli": "^7.0.0-beta.53",
+    "@babel/core": "^7.0.0-beta.53",
+    "@babel/plugin-transform-modules-commonjs": "^7.0.0-beta.53"
   },
   "bugs": {
     "url": "https://github.com/wshager/raddle/issues"

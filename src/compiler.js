@@ -3,7 +3,7 @@ import { isLeaf, isBranch, isClose, toVNodeStream } from "l3n";
 import { parse, parseString } from "./parser";
 import { prefixAndName, normalizeName } from "./compiler-util";
 import { Observable, isObservable, pipe } from "rxjs";
-import { reduce, map, switchMap, mergeMap } from "rxjs/operators";
+import { reduce, switchMap, mergeMap } from "rxjs/operators";
 import { $_ /*, papplyAny*/ } from "./papply";
 
 //const compose = (...fns) => fns.reduce((f, g) => (...args) => f(g(...args)));
@@ -13,8 +13,11 @@ import { $_ /*, papplyAny*/ } from "./papply";
 //const orRe = /^(n:)?or$/;
 //const andOrRe = /^(n\.)?(and|or)$/;
 
-const isCallNode = node => node && node.type == 14;
-const isQuotNode = node => node && node.type == 15;
+const isCallNode = node => node.type == 14;
+const isQuotNode = node => node.type == 15;
+const isElementNode = node => node.type == 1;
+const isListNode = node => node.type == 5;
+const isMapNode = node => node.type == 6;
 //const isSeqNode = node => isCallNode(node) && node.name === "";
 const isModuleNode = node => isCallNode(node) && node.name === "$*";
 const isImportNode = node => isCallNode(node) && node.name === "$<";
@@ -29,56 +32,70 @@ const isPartialNode = node => isCallNode(node) && node.name == "$_";
 const isCall = x => x && x instanceof Call;
 const isQuot = x => x && x instanceof Quot;
 const isVar = x => x && x instanceof Var;
+const isDatum = x => x && x instanceof Datum;
 //const isParam = x => x && x instanceof Var && x.isParam;
-const NOOP = {__noop:true};
+
+const makeAttrMap = (...a) => ({$attrs:a.reduce((o,[k,v]) => (o[k] = v,o),{})});
+
+class Datum {
+	constructor(type,value,key) {
+		this.type = type;
+		this.value = value;
+		this.key = key;
+		this.length = 0;
+	}
+	apply() {
+		return this.value;
+	}
+}
 
 // TODO module namespace
 class Context {
-	constructor(props = {}) {
+	constructor(props = {},key) {
 		this.core = props.core;
 		this.modules = props.modules || {};
+		this.path = null;
+		this.prefix = "local";
+		this.namespace = null;
 		this.stack = [];
 		this.length = 0;
 		this.scope = {};
-		this.refsToResolve = {};
+		this.key = key;
 	}
-	addVar(count){
+	addVar(count,key){
 		let v;
 		if(count > 1) {
 			// assigment
 			v = new Var(this,1,count);
 		} else {
 			const index = this.stack.lastItem;
-			if(typeof index == "number") {
+			if(index.type == 12) {
 				this.length++;
-				v = new Var(this,2,1);
+				v = new Var(this,2,1,key);
 			} else {
-				v = new Var(this,3,1);
+				v = new Var(this,3,1,key);
 			}
 		}
 		this.append(v);
 	}
 	addModule(length) {
-		const ref = prefix => {
+		const ref = (prefix,ns) => {
+			this.prefix = prefix;
+			this.namespace = ns;
+			this.moduleMap = {[prefix]:ns};
 			this.modules[prefix] = {};
-			return NOOP;
+			return this;
 		};
 		this.append(new Call("module",length,ref));
 	}
 	addImport(length) {
-		const ref = (prefix,ns,loc) => {
-			if(length == 2) loc = ns;
-			this.refsToResolve[prefix] = {};
+		const ref = (prefix,loc,remap = false) => {
 			// TODO merge properly
-			const cx = this;
-			return run("../raddled/"+loc+".rdl")(cx).pipe(map(() => {
-				const module = cx.modules[prefix];
-				Object.entries(cx.refsToResolve[prefix]).forEach(([k,v]) => {
-					v.next(module[k]);
-					v.complete();
-				});
+			const ret = run("../raddled/"+loc+".rdl")(this);
+			return remap ? ret.pipe(mergeMap(cx => {
+				Object.assign(cx.modules[this.prefix],cx.modules[prefix]);
 				return cx;
-			}));
+			})) : ret;
 		};
 		this.append(new Call("import",length,ref));
 	}
@@ -90,7 +107,24 @@ class Context {
 			if(body === undefined) {
 				// bind in core
 				body = this.core[name];
-				if(body) module[name] = type(body);
+				if(!body) {
+					//throw new Error(`No entry found for function ${qname}`);
+				} else {
+					if(type.__length == -1) {
+						module[name] = type(body);
+					} else {
+						if(!module[name]) {
+							module[name] = {
+								apply(self,args) {
+									const type = this[args.length];
+									if(!type) throw new Error(`No definition found for function ${qname}#${args.length}`);
+									return type(body)(...args);
+								}
+							};
+						}
+						module[name][type.__length] = type;
+					}
+				}
 			} else if(isQuot(body)) {
 				// add a function that serves as a proxy (i.e. can be applied)
 				if(!module[name]) {
@@ -107,7 +141,6 @@ class Context {
 				module[name] = type(body);
 			}
 			// perhaps we should just return the export / thing itself
-			return NOOP;
 		};
 		this.append(new Call("export",length,ref));
 	}
@@ -115,18 +148,20 @@ class Context {
 		const modules = this.modules;
 		const core = this.core;
 		const { prefix, name } = normalizeName(qname,"n");
-		if(modules.hasOwnProperty(prefix)) {
+		const has = modules.hasOwnProperty(prefix);
+		if(has) {
 			const ref = modules[prefix][name];
 			if(ref) return ref;
-			if(prefix === "n" && core[name]) return core[name];
-			throw new Error(`Could not resolve ${name} in module ${prefix}`);
+		}
+		if(prefix === "n" && core[name]) {
+			return core[name];
 		} else {
-			throw new Error("no module found: "+prefix);
+			throw new Error(`Could not resolve ${name} in module ${prefix}. `+ (has ? "" : "Module "+prefix+" not found."));
 		}
 	}
 	isBoundQname(qname) {
 		const { prefix } = prefixAndName(qname);
-		return this.modules.hasOwnProperty(prefix) || this.refsToResolve.hasOwnProperty(prefix);
+		return this.modules.hasOwnProperty(prefix);
 	}
 	getVarRef(qname) {
 		// ignore NS to see if we have prefix
@@ -135,14 +170,13 @@ class Context {
 	}
 	setVarRef(qname,type,value) {
 		this.scope[qname] = value;
-		return NOOP;
 	}
-	addCall(qname,length,isDef) {
-		//if(!qname) console.trace(qname,length);
-		this.append(new Call(qname,length,undefined,isDef));
+	addCall(qname,length,isDef,key,args) {
+		this.append(new Call(qname,length,undefined,isDef,key,args));
 	}
-	addDatum(type,value) {
-		if(type !== 8) this.append(value);
+	addDatum(type,value,key) {
+		// don't append comments
+		if(type != 8) this.append(new Datum(type,value,key));
 	}
 	append(item){
 		this.stack.push(item);
@@ -167,22 +201,27 @@ class Context {
 				return last;
 			}
 			const last = this.stack[i];
+			//if(last.key) keys.push(last.key);
+			const key = last.key;
 			if(isQuot(last)) {
 				stack.push(last.call.bind(last,this));
 				return next(i+1,$o);
 			} else if(isCall(last)) {
+				const qname = last.qname;
 				const len = last.length;
 				if(stack.length < len) throw new Error("Stack underflow");
 				const _args = stack.splice(-len,len);
 				const ret = last.apply(this,_args);
-				if(last.qname == "import") {
+				if(qname == "import") {
 					ret.subscribe({
 						complete(){
 							next(i+1,$o);
 						}
 					});
+				} else if(qname == "export"){
+					return next(i+1,$o);
 				} else {
-					if(ret !== NOOP) stack.push(ret);
+					stack.push(key ? [key,ret] : ret);
 					return next(i+1,$o);
 				}
 			} else if(isVar(last)) {
@@ -197,14 +236,18 @@ class Context {
 					const _args = stack.splice(-len,len);
 					const ref = last.apply(self,_args);
 					if(!last.isAssig) {
-						stack.push(ref);
+						stack.push(key ? [key,ref] : ref);
 					} else {
 						stack.push(null);
 					}
 					return next(i+1,$o);
 				}
+			} else if(isDatum(last)){
+				const ret = last.apply();
+				stack.push(key ? [key,ret] : ret);
+				return next(i+1,$o);
 			} else {
-				stack.push(last);
+				stack.push(key ? [key,last] : last);
 				return next(i+1,$o);
 			}
 		};
@@ -244,11 +287,13 @@ class Quot extends Context {
 }
 
 class Call {
-	constructor(qname,length,ref,isDef) {
+	constructor(qname,length,ref,isDef,key,args) {
 		this.qname = qname;
 		this.length = length;
 		this.ref = ref;
 		this.isDef = isDef;
+		this.key = key;
+		this.args = args;
 	}
 	apply(cx,args) {
 		const ref = this.ref || cx.getRef(this.qname,this.length);
@@ -256,15 +301,14 @@ class Call {
 		if(this.isDef) {
 			args.unshift(this.isDef);
 		}
-		return ref.apply(this,args);
+		return ref.apply(this,this.args ? this.args.concat(args) : args);
 	}
 }
 
 export const prepare = (core,prefix="n",path="../raddled/") => {
 	// pre-compile core
-	core.jsArray = (...a) => a;
-	const cx = new Context({core:core,modules:{local:{}}});
-	return run(path+prefix+".rdl")(cx).pipe(map(() => cx));
+	const cx = new Context({core:core,modules:{null:{}}});
+	return run(path+prefix+".rdl")(cx);//.pipe(mergeMap(run(path+"fn.rdl")));
 };
 
 export const compile = cx => o => {
@@ -280,7 +324,15 @@ export const compile = cx => o => {
 				quots.lastItem.append(dest);
 			} else {
 				const target = quots.lastItem;
-				if(isVarNode(refNode)) {
+				const key = refNode.key;
+				if(isElementNode(refNode)) {
+					target.addCall("e",refNode.count(),null,key,[refNode.name,makeAttrMap(refNode.entries())]);
+				} else if(isListNode(refNode)) {
+					target.addCall("l",refNode.count(),null,key);
+				} else if(isMapNode(refNode)) {
+					// 1 extra for keys on stack
+					target.addCall("m",refNode.count(),null,key);
+				} else if(isVarNode(refNode)) {
 					// var or param
 					const count = refNode.count();
 					// TODO add default prefix
@@ -290,7 +342,7 @@ export const compile = cx => o => {
 						// private top-level declaration, simply add as export
 						target.addExport(count);
 					} else {
-						target.addVar(count);
+						target.addVar(count,key);
 					}
 				} else if(isModuleNode(refNode)) {
 					// handle module insertion
@@ -315,29 +367,32 @@ export const compile = cx => o => {
 					// Functions from implementation provide seqs
 					// while inline stuff is just arrays
 					if(name == "function") {
-						name = "def";
+						name = "n:def";
 						isDef = refNode.parent.first();
 						if(typeof isDef !== "string") isDef = "_";
 					} else if(name == "") {
 						if(refNode.parent.name == "function") {
-							name = "jsArray";
+							name = "n:l";
 						} else {
-							name = "seq";
+							name = "n:seq";
 						}
 					}
-					target.addCall(name,refNode.count(),isDef);
+					target.addCall(name,refNode.count(),isDef,key);
 				}
 			}
 		} else if(isLeaf(type)) {
-			quots.lastItem.addDatum(node.type,node.value);
+			quots.lastItem.addDatum(node.type,node.value,node.key);
 		} else if(isBranch(type) && isQuotNode(node)) {
 			// add quot to scope stack
-			quots.push(new Quot(cx));
+			quots.push(new Quot(cx,node.key));
 		}
 		return cx;
 	},cx));
 };
 
-const runnable = cx => pipe(toVNodeStream,compile(cx),switchMap(cx => cx.apply()),mergeMap(x => isObservable(x) ? x : [x]));
-export const run = str => cx => runnable(cx)(parse(str));
+const runnable = (cx,path) => pipe(toVNodeStream,compile(cx),switchMap(cx => {
+	cx.path = path;
+	return cx.apply();
+}),mergeMap(x => isObservable(x) ? x : [x]));
+export const run = path => cx => runnable(cx,path)(parse(path));
 export const runString = str => cx => runnable(cx)(parseString(str));

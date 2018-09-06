@@ -1,21 +1,27 @@
 import { Observable, from } from "rxjs";
 import { mergeMap } from "rxjs/operators";
 import { find } from "./trie";
-import { reduce, reduceAround } from "./rich-reducers";
+import { reduce, reduceAhead } from "./rich-reducers";
 import { fromReadStream } from "./node-stream";
 import Triply from "triply";
 
 const ops = require("../operator-trie.json");
 
 const opMap = {
+	119: "rest-params",
+	505: "ggt",
+	507: "glt",
+	509: "geq",
 	801: "subtract",
 	802: "add",
 	903: "divide",
 	904: "multiply",
-	5003: "maybe",
+	1701: "minus",
+	1702: "plus",
+	5005: "maybe",
 	3904: "any",
 	3802: "many",
-	2003: "$_",
+	2005: "$_",
 	1500: "cast-as"
 };
 
@@ -49,6 +55,8 @@ const kinds = [
 
 const andOrRe = /^(n:)?(and|or)$/;
 
+const ncnameRe = new RegExp("[\\p{L}\\p{N}_-]","u");
+
 const EOF = String.fromCharCode(25);
 
 const tpl = (t,v,o) => { return {t:t,v:v,o:o}; };
@@ -63,6 +71,24 @@ const openCurly = () => tpl(1,3,"{");
 
 const closeCurly = () => tpl(2,4,"}");
 
+const openTag = (qname,attrs) => {
+	const n = tpl(11,qname);
+	n.a = attrs;
+	return n;
+};
+
+const closeTag = qname => tpl(12,qname);
+
+const seq = () => tpl(6,"");
+
+
+const log = r => reduce(Triply.traverse(r._root),(a,x) => {
+	const n = Triply.view(x.$0 == 3 ? x.$3 : x,1);
+	n.is = x.$0 === 1 ? "LEAF" : x.$0 === 3 ? "CLOSE" : "BRANCH";
+	console.log(n);
+	return a;
+});
+
 /*
 const incr = a => a.map(x => {
 	x.d++;
@@ -73,10 +99,10 @@ const incr = a => a.map(x => {
    /                      \       mark call again
 call                       /call - , 3 ) on close, nest
 */
-function handleBinOps(state,d) {
+function handleInfix(state,d) {
 	const r = state.r;
 	let lastv;
-	for(let i = 0; i < state.bin[d]; i++) {
+	for(let i = state.infix[d] - 1; i >= 0; i--) {
 		// handle each mark
 		// mark again so we can peek
 		const bm = d+":"+i;
@@ -95,55 +121,87 @@ function handleBinOps(state,d) {
 		// normal case: last preceeds
 		if(!lastv || lastv > cur.v) {
 			// move to 2nd arg, insert closing paren, peek
-			let close;
-			if(Triply.isBranch(cur)) {
-				close = r.moveNextSibling().peek();
-				r.insertBefore(closeParen());
-			} else {
-				close = r.moveNextSibling().insertAfter(closeParen()).peek();
-			}
-			// move back to op`, move to 1st arg, insert opening paren, nest until 2nd arg
-			r.unmark(bm).movePreviousSibling().insertBefore(openParen()).openBefore(cur,close);
-		} else {
-			// we should move out at the end
-			// remove cur
 			r.pop();
+			if(cur.v > 900) {
+				const close = r.moveNextSibling().push(closeParen()).peek();
+				r.movePreviousSibling().insertBefore(openParen());
+				r.openBefore(cur,close);
+				r.unmark(bm);
+			} else {
+				r.push(comma());
+				const close = r.moveNextSibling().push(closeParen()).peek();
+				r.unmark(bm);
+				r.movePreviousSibling().insertBefore(openParen());
+				r.openBefore(cur,close);
+			}
+		} else {
+			// remove the operator
+			r.pop();
+			// move to the second arg
 			r.moveNextSibling();
-			// grab the next arg and remove it
+			// remove the second argument of this operator
 			const arg2 = r.pop();
-			// move to the last operator and goto it's last child
-			r.movePreviousSibling().moveLastChild()
-			// insert the detached 2nd argument, add close paren and move after it, add a comma and move to the 1st argument
-				.insertBefore(arg2).insertAfter(closeParen()).movePreviousSibling().insertBefore(comma()).movePreviousSibling()
-			// insert opening paren and open with all siblings (= open + 2nd argument + comma)
-				.insertBefore(openParen()).openBefore(cur);
+			// move to the previous operator that's already processed
+			// go into the second argument and wrap it
+			// move to before the closing paren
+			//r.unmark("OP");
+			if(cur.v > 900) {
+				const close = r.moveNextSibling().push(closeParen()).peek();
+				r.movePreviousSibling().insertBefore(openParen());
+				r.openBefore(cur,close);
+			} else {
+				r.movePreviousSibling().moveLastChild().movePreviousSibling();
+				const close = r.push(comma()).push(arg2).push(closeParen()).peek();
+				r.movePreviousSibling().movePreviousSibling().movePreviousSibling();
+				r.insertBefore(openParen()).openBefore(cur,close);//.moveLastChild();
+				// insert open parent, open and add the operator
+				// add comma, the second arg and closing paren
+			}
+			r.unmark(bm);
 		}
 		lastv = cur.v;
-		Object.assign(cur,comma());
+		//Object.assign(cur,comma());
 	}
 
 }
 
+// NOTE whitespace is ignored by the lexer, but it is in the state
 function process(tpl,state) {
 	const t = tpl.t, v = tpl.v, r = state.r;
 	const d = state.depth;
+	// reset WS every time
+	const ws = state.ws;
+	const hasTag = state.hasTag;
+	//console.log(t,v,ws,hasTag);
+	state.ws = false;
+	state.hasTag = 0;
 	//console.log(t,v,tpl.o);
 	if(t == 1) {
-		const last = r.lastChild();
-		if(last && last.t === 2) {
-			// 1. mark call
-			state.call[d] = true;
-			//console.log("opencall",d,_strip(r.peek()));
-			// nest entire tree
-			// 2. push comma
-			// TODO add original position to comma
-			r.mark("call"+d).push(comma());
+		if(v == 1) {
+			const last = r.lastChild();
+			if(last && last.t === 2 && last.v == 2) {
+				// 1. mark call
+				state.call[d] = true;
+				//console.log("opencall",d,_strip(r.peek()));
+				// nest entire tree
+				// 2. push comma
+				// TODO add original position to comma
+				r.mark("call"+d).push(comma());
+			} else {
+				const cur = r.peek();
+				if(v == 1 && cur.t !== 6 && cur.t !== 10 && !(cur.t == 4 && (cur.v < 300 || cur.v > 2000))) {
+					//console.log(cur.t,cur.v,cur.o);
+					r.push(seq());
+				}
+				r.open(tpl);
+			}
+		} else if(v == 3 && state.xml) {
+			r.open(tpl);
 		} else {
 			r.open(tpl);
 		}
 	} else if(t == 2) {
-		// FIXME treat all bin-ops in same depth, not just on close
-		//console.log(state.depth,_strip(state.r.previous()));
+		// FIXME treat all infix-ops in same depth, not just on close
 		state.r.push(tpl).close();
 		const cd = d - 1;
 		if(state.call[cd]) {
@@ -160,55 +218,135 @@ function process(tpl,state) {
 		* add(1,2 * 3))
 		* add(1,mult(2,3)) => pre, so next in last (we're in subs, so openBefore )
 		 */
-		if(state.bin[d]) {
+		if(state.infix[d]) {
 			//console.log("peek-close",_strip(r.peek()));
 			// mark close so we can return to it
 			r.mark("close");
-			handleBinOps(state,d);
+			handleInfix(state,d);
 			r.unmark("close");
-			state.bin[d] = null;
+			state.infix[d] = null;
 		}
 	} else if(t == 4){
-		if(v == 802 || v == 904 || v == 2003) {
+		if(v == 802 || v == 904 || v == 2005) {
 			const last = r.peek();
 			const test = last && (last.o || last.v);
 			const isEmpty = x => x && Triply.nextSibling(Triply.firstChild(x)) == Triply.lastChild(x);
-			//console.log(v,test,isEmpty(last));
 			if(test && ((simpleTypes.includes(test) && isEmpty(last)) || complexTypes.includes(test) || kinds.includes(test))) {
-				const nv = v + 3000;
-				state.r.insertAfter(closeParen()).movePreviousSibling().insertBefore(openParen()).openBefore({t:4,v:nv,o:opMap[nv]});
+				tpl.o = opMap[ v + 3000];
+				state.r.insertAfter(closeParen()).movePreviousSibling().insertBefore(openParen()).openBefore(tpl);
 				return state;
+			} else if(last.t == 1 && last.v == 1) {
+				const prev = r.previous();
+				const test = prev && prev.o;
+				if(test && complexTypes.includes(test)) {
+					if(test == "function") {
+						// convert function(*) to function((...),item()*)
+						state.r.push(seq()).open(openParen()).push({t:4,o:"rest-params"}).push(closeParen()).close().push(closeParen()).close()
+							.push({t:4,o:"any"}).open(openParen()).push({t:4,o:"item"}).open(openParen()).push(closeParen()).close()
+							.push(closeParen()).close();
+					}
+					return state;
+				}
 			}
 		}
-		if(v == 119 || v == 2003) {
-			if(opMap.hasOwnProperty(v)) tpl.o = opMap[v];
-			state.r.push(tpl).open(openParen()).push(closeParen()).close();
-		} else if(v >= 300 && v < 2100) {
-			// add prefix to distinguish between infix operators and equivalent functions
-			const mappedOp = opMap.hasOwnProperty(v) ? opMap[v] : "n:"+tpl.o;
-			tpl.o = mappedOp;
-			state.r.push(tpl);
-			if(!state.bin[d]) state.bin[d] = 0;
-			r.mark(d+":"+state.bin[d]++);
-		} else {
-			state.r.push(tpl);
+		if(v == 505 && hasTag) {
+			// TODO replace with tag and flag XML at depth
+			r.pop();
+			const qname = state.qname;
+			state.qname = null;
+			if(hasTag == 1) {
+				r.push(openTag(qname,state.attrs));
+				state.xml++;
+				state.attrs = [];
+			} else if(hasTag == 3 || hasTag == 6) {
+				r.push(closeTag(qname));//.close();
+			}
+			state.infix[d]--;
+			return state;
+		} else if(v == 1901) {
+			const last = r.peek();
+			if(last.t == 4 && last.v == 507) {
+				// close tag
+				if(hasTag) {
+					const qname = state.qname;
+					r.pop();
+					r.push(openTag(qname,state.attrs));
+					r.push(tpl);
+					state.attrs = [];
+				}
+				state.hasTag = hasTag + 2;
+				return state;
+			}
+		} else if(v == 2600) {
+			const prev = r.previousSibling();
+			if(prev && prev.t == 1 && prev.v == 3) {
+				prev.v += 2000;
+			}
+			const last = r.peek(1);
+			r.pop();
+			tpl.o = last.v;
+		} else if(v == 509 && hasTag == 5) {
+			// NOTE treat attrs as pairs
+			state.hasTag = hasTag + 1;
+			return state;
 		}
-	} else if(t == 6 && /^\$/.test(v)) {
-		// var
-		tpl.v = v.replace(/^\$/,"");
-		if(/[0-9]/.test(tpl.v)) tpl.t = 8;
-		state.r.push({t:10,v:"$",o:"$"}).open(openParen()).push(tpl).push(closeParen()).close();
+		if(v == 119 || v == 2005) {
+			if(opMap.hasOwnProperty(v)) tpl.o = opMap[v];
+			r.push(tpl).open(openParen()).push(closeParen()).close();
+		} else if(v >= 300 && v < 2000) {
+			// NOTE always add prefix to distinguish between infix operators and equivalent functions
+			const last = r.peek();
+			const unaryOp = (v == 801 || v == 802) && (!last || !last.t || last.t == 1 || last.t == 4);
+			const v1 = unaryOp ? v + 900 : v;
+			tpl.v = v1;
+			const mappedOp = opMap.hasOwnProperty(v1) ? opMap[v1] : "n:"+tpl.o;
+			tpl.o = mappedOp;
+			r.push(tpl);
+			if(!state.infix[d]) state.infix[d] = 0;
+			r.mark(d+":"+state.infix[d]++);
+		} else {
+			r.push(tpl);
+		}
+	} else if(t == 6) {
+		if(/^\$/.test(v)) {
+			// var
+			tpl.v = v.replace(/^\$/,"");
+			if(/[0-9]/.test(tpl.v)) tpl.t = 8;
+			r.push({t:10,v:"$",o:"$"}).open(openParen()).push(tpl).push(closeParen()).close();
+		} else {
+			const last = r.peek();
+			if(last.t == 4 && last.v == 507 && !ws) {
+				state.qname = v;
+				state.hasTag = hasTag + 1;
+				return state;
+			} else if(hasTag == 4) {
+				state.hasTag = hasTag + 1;
+				if(!state.attrs) state.attrs = [];
+				state.attrs.push([v]);
+			} else {
+				r.push(tpl);
+			}
+		}
 	} else if(t === 0) {
-		state.r.push(tpl);
-		if(state.bin[d]) {
+		r.push(tpl);
+		if(state.infix[d]) {
 			// mark close so we can return to it
 			r.mark("EOS");
-			handleBinOps(state,d);
+			handleInfix(state,d);
 			r.unmark("EOS");
-			state.bin[d] = null;
+			state.infix[d] = null;
 		}
+	} else if(t === 17){
+		// mark WS
+		state.ws = true;
+		if(hasTag) state.hasTag = 4;
 	} else {
-		state.r.push(tpl);
+		if(hasTag == 6) {
+			state.attrs.lastItem.push(v);
+			state.hasTag = 1;
+		} else {
+			r.push(tpl);
+		}
 	}
 	state.depth = tpl.d;
 	return state;
@@ -250,15 +388,20 @@ function charReducer(state,next) {
 			// still a match, stop this one
 			match = 0;
 		} else if(match == 3) {
-			//console.log(trie[0],next);
-			if(trie[0]._v > 4 && /[a-z]/.test(next)) match = 2;
+			// don't match if char and next ncname
+			if(trie[0]._v > 4 && ncnameRe.test(char) && ncnameRe.test(next)) {
+				match = 2;
+			}
 			//match = 0;
 		} else if(match === 0) {
 			// next won't match, so neither will this
 			match = 2;
 		}
 	}
-	if(next == "-" && match == 1) match = 0;
+	// NOTE hack for qnames with dash
+	if(next == "-" && match == 1 && ncnameRe.test(char)) {
+		match = 0;
+	}
 	let type;
 	// skip anything but closers
 	if(match == 1) {
@@ -276,11 +419,6 @@ function charReducer(state,next) {
 	} else {
 		type = 0;
 	}
-	//console.log("ct",char,type,trie);
-	//if((type == 802 || type == 904 || type == 2003) && state.lastQname && types.includes(state.lastQname.v)) {
-	//	type += 3000;
-	//}
-	//
 	const isVar = (type == 9 && next != "(");
 	if(isVar) {
 		match = type = 0;
@@ -288,7 +426,6 @@ function charReducer(state,next) {
 	let number = (zero && (type == 11 || (type == 8 && oldType != 8 && /[0-9]/.test(next)))) || (state.number && (type === 0 || type == 11));
 	let qname = (zero && !number && type != 10 && match == 2) || (state.qname && type != 10) || isVar;
 	let stop = (qname && /[^a-zA-Z0-9\-_:]/.test(next)) || (number && /[^0-9.]/.test(next));
-	//console.log("ct",char,type,state);
 	let flag;
 	if(number || qname) {
 		flag = 0;
@@ -324,6 +461,8 @@ function charReducer(state,next) {
 			tpl = {t:number ? 8 : 6,v:b};
 		} else if(number && type == 8) {
 			// continue
+		} else if(type == 10 && state.type !== 10) {
+			tpl = {t:17};
 		} else if(match != 2 && match !== 0) {
 			let t = type == 1 || type == 3 || type == 2001 ? 1 :
 				type == 2 || type == 4 || type == 2002 ? 2 :
@@ -382,39 +521,45 @@ function charReducer(state,next) {
 }
 
 function toRdl($o,entry) {
-	//console.log(_strip(entry))
-	const t = entry.t, v = entry.v;
-	let ret = "";
+	const { t, v, o } = entry;
 	if(t === 0) {
-		ret += (";\n\n");
+		$o.next(o === EOF ? "" : ";\n\n");
 	} else if(t == 7) {
-		ret += (`"${v}"`);
+		$o.next(`"${v}"`);
 	} else if(t == 6 || t == 8) {
-		ret += (v);
+		$o.next(v);
 	} else if(t == 9) {
-		ret += ("(:"+v+":)");
-	} else if(entry.o){
-		ret += (entry.o);
+		$o.next("(:"+v+":)");
+	} else if(t == 11) {
+		let s = "<"+v;
+		for(let [k,v] of entry.a) {
+			s += " "+k+"=\""+v+"\"";
+		}
+		s += ">";
+		//s += next.t == 12 ? "/>" : ">";
+		$o.next(s);
+	} else if(t == 12) {
+		$o.next("</"+v+">");
+	} else if(t == 4 && v == 2600) {
+		$o.next("\""+o+"\":");
+	} else if(o){
+		$o.next(o);
 	}
-	$o.next(ret);
 	return $o;
 }
 
 
-function toL3(ret,entry,last,next){
-	//console.log(_strip(entry));
+function toL3(ret,entry,next){
 	let $t = entry.t;
 	let $v = entry.v;
 	let r = [];
 	if($t == 1) {
 		if($v == 3) {
 			r = [15];
-		} else if($v == 1) {
-			//(: TODO check for last operator :)
-			if(!last || last.t == 1) {
-				//console.log(last);
-				r = [14,""];
-			}
+		} else if($v == 2001) {
+			r = [5];
+		} else if($v == 2003) {
+			r = [6];
 		}
 	} else if($t == 2) {
 		r = [17];
@@ -430,15 +575,22 @@ function toL3(ret,entry,last,next){
 			r = next && next.t == 1 && next.v == 1 ? [14,$v] : [3,$v];
 		}
 	} else if($t == 4 || $t == 10) {
-		r = [14,entry.o];
+		if($v == 2600) {
+			r = [2,entry.o];
+		} else {
+			r = [14,entry.o];
+		}
 	} else if($t == 5) {
 		r = [3,$v];
 	} else if($t == 9) {
 		r = [8,$v];
 	} else if($t == 11) {
 		r = [1,$v];
+		for(let [k,v] of entry.a) {
+			r = r.concat([2,k,3,v]);
+		}
 	} else if($t == 12) {
-		r = [2,$v];
+		r = [17];
 	} else if($t == 13) {
 		r = [14,"$.",17];
 	}
@@ -468,8 +620,6 @@ export const tokenize = state => $chars => {
 	});
 	//return $chars.scan((state,cur) => charReducer(state,cur),state).filter(state => state.emit).map(state => state.emit);
 };
-const dollarRE = /^\$/;
-const _strip = x => x && Object.entries(x).reduce((a,[k,v]) => dollarRE.test(k) ? a : (a[k] = v,a),{});
 
 const initLexerState = () => {
 	return {
@@ -477,12 +627,17 @@ const initLexerState = () => {
 		depth:0,
 		r:new Triply(),
 		call:[],
-		bin:[]
+		infix:[],
+		xml:0,
+		ws:false,
+		hasTag:0,
+		qname:null
 	};
 };
 
 export const lex = props => $tpls => {
 	const rdl = props.rdl;
+	const src = props.src;
 	let state = initLexerState();
 	return Observable.create($o => {
 		$tpls.subscribe({
@@ -509,13 +664,18 @@ export const lex = props => $tpls => {
 						//console.log(tpl);
 						throw new Error("Incorrect depth at EOF");
 					}
+					//log(r);
 					r.moveRoot().pop();
-					if(rdl) {
-						reduce(r.traverse(),toRdl,$o);
+					if(src) {
+						return reduce(r.traverse(true),(a,x) => {
+							a.next(x);
+							return a;
+						},$o);
+					} else if(rdl) {
+						reduceAhead(r.traverse(),toRdl,$o);
 					} else {
-						reduceAround(r.traverse(),toL3,$o);
+						reduceAhead(r.traverse(),toL3,$o);
 					}
-					//$o.next(expandBinOps(state.r).reduce(toRdl,""));
 					state.r = new Triply();
 				}
 			},
@@ -532,7 +692,6 @@ export const initTokenState = () => {
 		string:0,
 		flag:0,
 		trie:ops,
-		ws:false,
 		number:false,
 		comment:false,
 		qname: false,

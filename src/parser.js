@@ -4,8 +4,7 @@ import { find } from "./trie";
 import { reduce, reduceAhead } from "./rich-reducers";
 import { fromReadStream } from "./node-stream";
 import Triply from "triply";
-
-const ops = require("../operator-trie.json");
+import { trie as ops } from "./operator-trie";
 
 const opMap = {
 	119: "rest-params",
@@ -14,6 +13,7 @@ const opMap = {
 	509: "geq",
 	801: "subtract",
 	802: "add",
+	600: "concat",
 	903: "divide",
 	904: "multiply",
 	1701: "minus",
@@ -81,13 +81,14 @@ const closeTag = qname => tpl(12,qname);
 
 const seq = () => tpl(6,"");
 
-
+/*
 const log = r => reduce(Triply.traverse(r._root),(a,x) => {
 	const n = Triply.view(x.$0 == 3 ? x.$3 : x,1);
 	n.is = x.$0 === 1 ? "LEAF" : x.$0 === 3 ? "CLOSE" : "BRANCH";
 	console.log(n);
 	return a;
 });
+*/
 
 /*
 const incr = a => a.map(x => {
@@ -629,6 +630,7 @@ const initLexerState = () => {
 		call:[],
 		infix:[],
 		xml:0,
+		attrs:[],
 		ws:false,
 		hasTag:0,
 		qname:null

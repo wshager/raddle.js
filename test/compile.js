@@ -1,6 +1,7 @@
 const rdl = require("../lib/index");
 const n = require("frink");
 const op = require("rxjs/operators");
+const l3 = require("l3n");
 
 const time = hrtime => {
 	const nanoseconds = (hrtime[0] * 1e9) + hrtime[1];
@@ -13,15 +14,17 @@ const time = hrtime => {
 		nanoseconds
 	};
 };
-const q = "subsequence(for-each(interval(50),{$1 + 1}),1,10)";
+const q = `l3:traverse(l3:e(root,for-each(subsequence(interval(1000),0,3),{l3:e(a,$1)})))
+`;
 const s = process.hrtime();
-//rdl.parseString(q,{rdl:0})
+//l3.toVNodeStreamCurried({withAttrs:true})(rdl.parseString(q,{rdl:0}))
 op.switchMap(rdl.runString(q))(rdl.prepare(n))
 	.subscribe({
 		next(x) {
-			console.log(x);
+			//if(x.type == 17) console.log(JSON.stringify(x.node.node));
+			console.log(x+"");
 		},
 		complete() {
-			console.log(time(process.hrtime(s)));
+			//console.log(time(process.hrtime(s)));
 		}
 	});

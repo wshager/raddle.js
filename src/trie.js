@@ -62,7 +62,8 @@ export function create(input,order) {
 			return input[a].localeCompare(input[b]);
 		};
 	}
-	Object.keys(input).sort(order).forEach(function(k){   process(input[k],root,root,"",k,0);
+	Object.keys(input).sort(order).forEach(function(k){
+		process(input[k],root,root,"",k,0);
 	});
 	const stripObj = x => {
 		if("_k" in x) return x;

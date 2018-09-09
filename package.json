@@ -10,7 +10,7 @@
   ],
   "description": "Extensible document manipulation language for the web",
   "scripts": {
-    "build": "babel --no-babelrc --plugins @babel/plugin-transform-modules-commonjs src --out-dir lib -s"
+    "build": "node ./create-trie.js && babel --no-babelrc --plugins @babel/plugin-transform-modules-commonjs src --out-dir lib -s"
   },
   "repository": {
     "type": "git",

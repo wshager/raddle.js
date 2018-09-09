@@ -1,17 +1,11 @@
 // TODO detect AND/OR and convert to quotation
-import { isLeaf, isBranch, isClose, toVNodeStream } from "l3n";
+import { isLeaf, isBranch, isClose, toVNodeStreamCurried } from "l3n";
+import * as l3 from "l3n";
 import { parse, parseString } from "./parser";
 import { prefixAndName, normalizeName } from "./compiler-util";
 import { Observable, isObservable, pipe } from "rxjs";
 import { reduce, switchMap, mergeMap } from "rxjs/operators";
 import { $_ /*, papplyAny*/ } from "./papply";
-
-//const compose = (...fns) => fns.reduce((f, g) => (...args) => f(g(...args)));
-
-//const ifRe = /^(n:)?if$/;
-//const andRe = /^(n:)?and$/;
-//const orRe = /^(n:)?or$/;
-//const andOrRe = /^(n\.)?(and|or)$/;
 
 const isCallNode = node => node.type == 14;
 const isQuotNode = node => node.type == 15;
@@ -24,10 +18,6 @@ const isImportNode = node => isCallNode(node) && node.name === "$<";
 const isExportNode = node => isCallNode(node) && node.name === "$>";
 const isVarNode = node => isCallNode(node) && node.name === "$";
 const isPartialNode = node => isCallNode(node) && node.name == "$_";
-//const isRecursivePartialNode = node => isCallNode(node) && node.name == "$.";
-//const isIfNode = node => isCallNode(node) && ifRe.test(node.name);
-//const isAndNode = node => isCallNode(node) && andRe.test(node.name);
-//const isOrNode = node => isCallNode(node) && orRe.test(node.name);
 
 const isCall = x => x && x instanceof Call;
 const isQuot = x => x && x instanceof Quot;
@@ -35,13 +25,10 @@ const isVar = x => x && x instanceof Var;
 const isDatum = x => x && x instanceof Datum;
 //const isParam = x => x && x instanceof Var && x.isParam;
 
-const makeAttrMap = (...a) => ({$attrs:a.reduce((o,[k,v]) => (o[k] = v,o),{})});
-
 class Datum {
-	constructor(type,value,key) {
+	constructor(type,value) {
 		this.type = type;
 		this.value = value;
-		this.key = key;
 		this.length = 0;
 	}
 	apply() {
@@ -51,7 +38,7 @@ class Datum {
 
 // TODO module namespace
 class Context {
-	constructor(props = {},key) {
+	constructor(props = {}) {
 		this.core = props.core;
 		this.modules = props.modules || {};
 		this.path = null;
@@ -60,9 +47,8 @@ class Context {
 		this.stack = [];
 		this.length = 0;
 		this.scope = {};
-		this.key = key;
 	}
-	addVar(count,key){
+	addVar(count){
 		let v;
 		if(count > 1) {
 			// assigment
@@ -71,9 +57,9 @@ class Context {
 			const index = this.stack.lastItem;
 			if(index.type == 12) {
 				this.length++;
-				v = new Var(this,2,1,key);
+				v = new Var(this,2,1);
 			} else {
-				v = new Var(this,3,1,key);
+				v = new Var(this,3,1);
 			}
 		}
 		this.append(v);
@@ -171,17 +157,17 @@ class Context {
 	setVarRef(qname,type,value) {
 		this.scope[qname] = value;
 	}
-	addCall(qname,length,isDef,key,args) {
-		this.append(new Call(qname,length,undefined,isDef,key,args));
+	addCall(qname,length,isDef,...args) {
+		this.append(new Call(qname,length,undefined,isDef,args));
 	}
-	addDatum(type,value,key) {
+	addDatum(type,value) {
 		// don't append comments
-		if(type != 8) this.append(new Datum(type,value,key));
+		if(type != 8) this.append(new Datum(type,value));
 	}
 	append(item){
 		this.stack.push(item);
 	}
-	apply(self,args){
+	apply(self,args = []){
 		// TODO
 		// - first arg is external?
 		// - prevent recursion
@@ -201,8 +187,6 @@ class Context {
 				return last;
 			}
 			const last = this.stack[i];
-			//if(last.key) keys.push(last.key);
-			const key = last.key;
 			if(isQuot(last)) {
 				stack.push(last.call.bind(last,this));
 				return next(i+1,$o);
@@ -211,6 +195,14 @@ class Context {
 				const len = last.length;
 				if(stack.length < len) throw new Error("Stack underflow");
 				const _args = stack.splice(-len,len);
+				if(qname == "l3:e") {
+					for(let i=0;i<len;i++){
+						const a = _args[i];
+						if(typeof a == "function") {
+							_args[i] = a(...args);
+						}
+					}
+				}
 				const ret = last.apply(this,_args);
 				if(qname == "import") {
 					ret.subscribe({
@@ -221,7 +213,7 @@ class Context {
 				} else if(qname == "export"){
 					return next(i+1,$o);
 				} else {
-					stack.push(key ? [key,ret] : ret);
+					stack.push(ret);
 					return next(i+1,$o);
 				}
 			} else if(isVar(last)) {
@@ -236,7 +228,7 @@ class Context {
 					const _args = stack.splice(-len,len);
 					const ref = last.apply(self,_args);
 					if(!last.isAssig) {
-						stack.push(key ? [key,ref] : ref);
+						stack.push(ref);
 					} else {
 						stack.push(null);
 					}
@@ -244,10 +236,10 @@ class Context {
 				}
 			} else if(isDatum(last)){
 				const ret = last.apply();
-				stack.push(key ? [key,ret] : ret);
+				stack.push(ret);
 				return next(i+1,$o);
 			} else {
-				stack.push(key ? [key,last] : last);
+				stack.push(last);
 				return next(i+1,$o);
 			}
 		};
@@ -287,12 +279,11 @@ class Quot extends Context {
 }
 
 class Call {
-	constructor(qname,length,ref,isDef,key,args) {
+	constructor(qname,length,ref,isDef,args) {
 		this.qname = qname;
 		this.length = length;
 		this.ref = ref;
 		this.isDef = isDef;
-		this.key = key;
 		this.args = args;
 	}
 	apply(cx,args) {
@@ -307,7 +298,7 @@ class Call {
 
 export const prepare = (core,prefix="n",path="../raddled/") => {
 	// pre-compile core
-	const cx = new Context({core:core,modules:{null:{}}});
+	const cx = new Context({core:core,modules:{null:{},l3:l3}});
 	return run(path+prefix+".rdl")(cx);//.pipe(mergeMap(run(path+"fn.rdl")));
 };
 
@@ -324,14 +315,13 @@ export const compile = cx => o => {
 				quots.lastItem.append(dest);
 			} else {
 				const target = quots.lastItem;
-				const key = refNode.key;
 				if(isElementNode(refNode)) {
-					target.addCall("e",refNode.count(),null,key,[refNode.name,makeAttrMap(refNode.entries())]);
+					target.addCall("l3:e",refNode.count(),null,refNode.name);
 				} else if(isListNode(refNode)) {
-					target.addCall("l",refNode.count(),null,key);
+					target.addCall("l3:l",refNode.count(),null);
 				} else if(isMapNode(refNode)) {
 					// 1 extra for keys on stack
-					target.addCall("m",refNode.count(),null,key);
+					target.addCall("l3:m",refNode.count(),null);
 				} else if(isVarNode(refNode)) {
 					// var or param
 					const count = refNode.count();
@@ -342,7 +332,7 @@ export const compile = cx => o => {
 						// private top-level declaration, simply add as export
 						target.addExport(count);
 					} else {
-						target.addVar(count,key);
+						target.addVar(count);
 					}
 				} else if(isModuleNode(refNode)) {
 					// handle module insertion
@@ -367,30 +357,44 @@ export const compile = cx => o => {
 					// Functions from implementation provide seqs
 					// while inline stuff is just arrays
 					if(name == "function") {
-						name = "n:def";
+						name = "def";
 						isDef = refNode.parent.first();
 						if(typeof isDef !== "string") isDef = "_";
 					} else if(name == "") {
 						if(refNode.parent.name == "function") {
-							name = "n:l";
+							name = "l";
 						} else {
-							name = "n:seq";
+							name = "seq";
 						}
 					}
-					target.addCall(name,refNode.count(),isDef,key);
+					target.addCall(name,refNode.count(),isDef);
+				}
+				const key = refNode.key;
+				if(key) {
+					target.addCall("l3:a",1,null,key);
 				}
 			}
 		} else if(isLeaf(type)) {
-			quots.lastItem.addDatum(node.type,node.value,node.key);
+			const target = quots.lastItem;
+			target.addDatum(node.type,node.value);
+			const key = node.key;
+			if(key) {
+				target.addCall("l3:a",1,null,key);
+			}
 		} else if(isBranch(type) && isQuotNode(node)) {
+			const target = quots.lastItem;
 			// add quot to scope stack
-			quots.push(new Quot(cx,node.key));
+			quots.push(new Quot(cx));
+			const key = node.key;
+			if(key) {
+				target.addCall("l3:a",1,null,key);
+			}
 		}
 		return cx;
 	},cx));
 };
 
-const runnable = (cx,path) => pipe(toVNodeStream,compile(cx),switchMap(cx => {
+const runnable = (cx,path) => pipe(toVNodeStreamCurried({withAttrs:true}),compile(cx),switchMap(cx => {
 	cx.path = path;
 	return cx.apply();
 }),mergeMap(x => isObservable(x) ? x : [x]));

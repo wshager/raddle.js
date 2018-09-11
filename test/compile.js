@@ -14,14 +14,15 @@ const time = hrtime => {
 		nanoseconds
 	};
 };
-const q = `l3:traverse(l3:e(root,for-each(subsequence(interval(1000),0,3),{l3:e(a,$1)})))
+const q = `
+l3:ensure-doc(<p>{for-each(subsequence(interval(500),2,5),{"x"})}</p>)
 `;
-const s = process.hrtime();
+//const s = process.hrtime();
 //l3.toVNodeStreamCurried({withAttrs:true})(rdl.parseString(q,{rdl:0}))
 op.switchMap(rdl.runString(q))(rdl.prepare(n))
 	.subscribe({
 		next(x) {
-			//if(x.type == 17) console.log(JSON.stringify(x.node.node));
+			if(x.type == 17) return console.log("closes "+x.node);
 			console.log(x+"");
 		},
 		complete() {

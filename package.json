@@ -1,6 +1,6 @@
 {
   "name": "raddle",
-  "version": "0.0.8",
+  "version": "0.1.0",
   "author": "Wouter Hager",
   "keywords": [
     "resource",
@@ -18,9 +18,9 @@
   },
   "dependencies": {
     "array-last-item": "0.0.6",
-    "l3n": "0.0.6",
-    "rxjs": "^6.2.1",
-    "triply": "0.0.13"
+    "l3n": "0.1.0",
+    "rxjs": "^6.2.2",
+    "triply": "0.1.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.53",

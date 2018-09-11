@@ -242,7 +242,9 @@ function process(tpl,state) {
 				if(test && complexTypes.includes(test)) {
 					if(test == "function") {
 						// convert function(*) to function((...),item()*)
-						state.r.push(seq()).open(openParen()).push({t:4,o:"rest-params"}).push(closeParen()).close().push(closeParen()).close()
+						state.r.push(seq()).open(openParen())
+							.push({t:4,o:"rest-params"}).open(openParen()).push(closeParen()).close()
+							.push(closeParen()).close().push(closeParen()).close()
 							.push({t:4,o:"any"}).open(openParen()).push({t:4,o:"item"}).open(openParen()).push(closeParen()).close()
 							.push(closeParen()).close();
 					}

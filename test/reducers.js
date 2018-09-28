@@ -1,10 +1,8 @@
-//const r = require("../lib/rich-reducers");
-require("array-last-item");
+const r = require("../lib/rich-reducers");
 const a = [1,2,3];
 
-/*const out = r.reduce(a,(a,x,n) => {
-	console.log(x,n);
+const sum = r.reduce(a,(a,x) => {
 	return a+x;
-},0);*/
+},0);
 
-console.log(Array.prototype.hasOwnProperty("lastItem"));
+console.log(sum);

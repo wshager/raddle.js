@@ -76,7 +76,7 @@ A module must be explicitly prefixed:
 
 #### $< import a module
 
-`$*(other-module,"path")`
+`$<(other-module,"path")`
 
 #### $> export a constant
 
